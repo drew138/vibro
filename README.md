@@ -1,2 +1,3 @@
-# v_website
-data management website
+# V website
+
+FullStack application for the V website
