@@ -15,14 +15,14 @@ class Company(models.Model):
     pbx = models.IntegerField(blank=True)
     city = models.ForeignKey(
         City,
-        related_name='company_city',
+        related_name='company',
         to_field="name",
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
     rut_city = models.ForeignKey(
         City,
-        related_name='rut_city',
+        related_name='ruts',
         to_field="name",
         on_delete=models.SET_NULL,
         blank=True,
@@ -30,7 +30,7 @@ class Company(models.Model):
 
 
 class Contact(models.Model):
-    company_name = models.ForeignKey(Company, related_name="contact_company", to_field="name", on_delete=models.CASCADE)
+    company_name = models.ForeignKey(Company, related_name="contacts", to_field="name", on_delete=models.CASCADE)
     email = models.EmailField(max_length=25, blank=True)
     phone = models.IntegerField(blank=True)
     ext = models.IntegerField(blank=True)
@@ -39,6 +39,9 @@ class Contact(models.Model):
 
 
 class Machine(models.Model):
+    class Meta:
+        unique_together = ["name", "machine_type", "company"]
+
     # TODO add choices and change machine_type field
     CHOICE = 'something'
     TYPE_CHOICES = [(CHOICE, 'Choice')]
@@ -51,21 +54,23 @@ class Machine(models.Model):
     # TODO
     company = models.ForeignKey(
         Company,
-        related_name="machine_company",
+        related_name="machines",
         to_field="name",
         on_delete=models.CASCADE)
 
 
 class Image(models.Model):
     image = models.ImageField()
-    machine = models.ForeignObject(
+    machine = models.ForeignKey(
         Machine,
-        to_fields=["name", "machine_type", "company"],
         related_name="images",
         on_delete=models.CASCADE)
 
 
 class Measurement(models.Model):
+    class Meta:
+        unique_together = ['measurement_type', 'date', 'machine']
+
     RED = "red"
     GREEN = 'green'
     YELLOW = 'yellow'
@@ -87,19 +92,28 @@ class Measurement(models.Model):
         max_length=10,
         choices=MEASUREMENT_CHOICES,
         default=PRED)
-    machine = models.ForeignObject(
+    machine = models.ForeignKey(
         Machine,
-        related_name="machine",
-        to_fields=["name", "machine_type", "company"],
-        on_delete=models.CASCADE)
+        related_name="measurements",
+        on_delete=models.CASCADE) 
 
 
-class GlobalMeasurement(models.Model):
+class Global(models.Model):
+    ACC = 'A'
+    VEL = 'V'
+    DEZ = 'D' # TODO assert with documentation
+    VER = 'V'
+    HOR = 'H'
+    AX = 'A'
+    TYPE_CHOICES = [(VEL, 'Velocity'), (ACC, 'Acceleration'), (DEZ, 'Axial')]
+    POSITION_CHOICES = [(VER, 'Vertical'), (HOR, 'Horizontal'), (AX, 'Axial')]
+
     identifier = models.IntegerField()
+    position = models.CharField(max_length=1, choices=POSITION_CHOICES, default='undefined')
+    number = models.IntegerField()
+    global_type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='undefined')
     value = models.DecimalField(decimal_places=2, max_digits=4)
-    measurement = models.ForeignObject(
+    measurement = models.ForeignKey(
         Measurement,
-        related_name="measurement",
-        to_fields=["measurement_type",
-        "date", "machine"],
+        related_name="globals",
         on_delete=models.CASCADE)
