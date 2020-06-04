@@ -21,7 +21,25 @@ class CompanySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# User Serializer
 class VibroUserSerializer(serializers.ModelSerializer):
+
+    company = CompanySerializer()
+
+    class Meta:
+        model = VibroUser
+        fields = [
+            'id',
+            'username',
+            'email',
+            ]
+
+    def create(self, validated_data):
+        user = VibroUser.objects.create_user(**validated_data)
+        return user
+
+# Register Serializer
+class RegisterVibroUserSerializer(serializers.ModelSerializer):
 
     company = CompanySerializer()
 
@@ -39,10 +57,24 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'celphone_one',
             'celphone_two'
             ]
+        extra_kwargs = {'password': {'write_only': True}}  # TODO check if kwargs are valid
 
     def create(self, validated_data):
         user = VibroUser.objects.create_user(**validated_data)
         return user
+
+# Login Serializer
+class LoginVibroUserSerializer(serializers.Serializer):
+
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        user = authenticate(**data)
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError('Credenciales Incorrectas')
+
 
 
 class MachineSerializer(serializers.ModelSerializer):

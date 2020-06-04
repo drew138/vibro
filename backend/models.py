@@ -33,7 +33,7 @@ class Company(models.Model):
 
 class VibroUser(AbstractUser):
 
-    company = models.ForeignKey(Company, related_name="user", to_field="name", on_delete=models.CASCADE, null=True)
+    company = models.ForeignKey(Company, related_name="user", to_field="name", on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(max_length=25, blank=True, null=True)
     phone = models.IntegerField(blank=True, null=True)
     ext = models.IntegerField(blank=True, null=True)
