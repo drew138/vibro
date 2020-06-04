@@ -1,6 +1,19 @@
-from rest_framework import viewsets
-from .models import City, Company, VibroUser, Machine, Image, Measurement, Point
-from .serializers import CitySerializer, CitySerializer, VibroUserSerializer, MachineSerializer, ImageSerializer, MeasurementSerializer, PointSerializer
+from rest_framework import viewsets, generics, permissions
+from rest_framework.response import Response
+from knox.models import AuthToken
+from .models import *
+from .serializers import *
+
+# Register API
+class ReisterAPI(generics.GenericAPIView):
+    pass
+
+
+# Login API
+
+
+# Get User API
+
 # from rest_framework import filters
 
 
