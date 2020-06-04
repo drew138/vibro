@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    # path('api/', include("backend.urls")),
+    path('api/', include("backend.urls")),
     path('admin/', admin.site.urls),
-    path('', include("frontend.urls")),
+    # path('', include("frontend.urls")),
 ]
+
+
+# https://realpython.com/manage-users-in-django-admin/

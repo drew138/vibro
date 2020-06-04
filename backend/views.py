@@ -1,29 +1,17 @@
 from rest_framework import viewsets
-# from .models import  
-# from .serializers import 
-from rest_framework import filters
-
-# Create your views here.
+from .models import City, Company, VibroUser, Machine, Image, Measurement, Point
+from .serializers import CitySerializer, CitySerializer, VibroUserSerializer, MachineSerializer, ImageSerializer, MeasurementSerializer, PointSerializer
+# from rest_framework import filters
 
 
-# class ToyView(viewsets.ModelViewSet):
-#     queryset = Toy.objects.all()
-#     serializer_class = ToySerializer
-#     filter_backends = [filters.SearchFilter]
-#     search_fields = [
-#         'id',
-#         'name',
-#         'description',
-#         'line',
-#         'mib_moc_price',
-#         'loose_price',
-#         'store_price',
-#         'all_time_high',
-#         'release_period'
-#     ]
+class CityView(viewsets.ModelViewSet):
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
 
-#     def get_queryset(self):
-#         pass
+
+class VibroUserView(viewsets.ModelViewSet):
+    queryset = VibroUser.objects.all()
+    serializer_class = VibroUserSerializer
 
 
 # class ImageView(viewsets.ModelViewSet):

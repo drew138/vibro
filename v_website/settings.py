@@ -39,12 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'frontend',
-    'backend.apps.Backend'
+    'backend',
+    'knox'
 ]
+
+AUTH_USER_MODEL = 'backend.VibroUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticated'
+        # ('knox.auth.TokenAuthentication',)
     ]
 }
 
