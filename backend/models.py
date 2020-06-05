@@ -32,6 +32,17 @@ class Company(models.Model):
 
 
 class VibroUser(AbstractUser):
+    ADMIN = 'admin'
+    ENGINEER = 'engineer'
+    CLIENT = 'client'
+    SUPPORT = 'support'
+
+    USER_CHOICES = [
+        (ADMIN, 'Admin'),
+        (ENGINEER, 'Engineer'),
+        (CLIENT, 'Client'),
+        (SUPPORT, 'Support')
+    ]
 
     company = models.ForeignKey(Company, related_name="user", to_field="name", on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(max_length=25, blank=True, null=True)
@@ -39,6 +50,19 @@ class VibroUser(AbstractUser):
     ext = models.IntegerField(blank=True, null=True)
     celphone_one = models.IntegerField(blank=True, null=True)
     celphone_two = models.IntegerField(blank=True, null=True) 
+    user_type = models.CharField(max_length=8, choices=USER_CHOICES, default=CLIENT)
+
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_staff
+
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_staff
+
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser or (obj and obj.id == request.user.id)
 
 
 class Machine(models.Model):
