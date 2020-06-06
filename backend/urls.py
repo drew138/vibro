@@ -14,9 +14,16 @@ auth_views = [
 
 
 router = routers.DefaultRouter()
-# router.register('user', views.RegisterAPI, 'user')
-# router.register('image', views.ImageView, 'image')
-
+router.register('city', views.CityView, 'city')
+router.register('company', views.CompanyView, 'company')
+router.register('machine', views.MachineView, 'machine')
+router.register('image', views.ImageView, 'image')
+router.register('measurement', views.MeasurementView, 'measurement')
+router.register('termal', views.TermoImageView, 'termal')
+router.register('point', views.PointView, 'point')
+router.register('tendency', views.TendencyView, 'tendency')
+router.register('espectra', views.EspectraView, 'espectra')
+router.register('timesignal', views.TimeSignalView, 'timesignal')
 
 
 urlpatterns =  auth_views + router.urls 

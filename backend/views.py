@@ -16,6 +16,13 @@ class CityView(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly
     ]
     
+    def get_queryset(self):
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            queryset = self.request.user.company.city
+        else:
+            queryset = City.objects.all()
+        return queryset
+
 
 class CompanyView(viewsets.ModelViewSet):
 
@@ -25,6 +32,13 @@ class CompanyView(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly
     ]
    
+    def get_queryset(self):
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            queryset = self.request.user.company
+        else:
+            queryset = Company.objects.all()
+        return queryset
+
 
 # Get User API
 class UserAPI(generics.RetrieveAPIView):
@@ -257,10 +271,10 @@ class PointView(viewsets.ModelViewSet):
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
             measurements = Measurement.objects.filter(q_objects).all()
-            q_objects_point = Q()
+            q_objects_measurement = Q()
             for me in measurements:
-                q_objects_point |= Q(measurement=me)
-            queryset = Point.objects.filter(q_objects_point).all()
+                q_objects_measurement |= Q(measurement=me)
+            queryset = Point.objects.filter(q_objects_measurement).all()
         else:
             queryset = Point.objects.all()
         if point_id is not None:
@@ -276,7 +290,6 @@ class PointView(viewsets.ModelViewSet):
         return queryset
 
 
-#TODO finish the following views
 class TendencyView(viewsets.ModelViewSet):
 
     serializer_class = TendencySerializer
@@ -292,7 +305,32 @@ class TendencyView(viewsets.ModelViewSet):
         unauthorized data.
         """
 
-        pass
+        tendency_id = self.request.query_params.get('id', None)
+        point = self.request.query_params.get('point', None)
+        value = self.request.query_params.get('value', None)
+
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            q_objects = Q()
+            for m in self.request.user.company.machines:
+                q_objects |= Q(machine=m)
+            measurements = Measurement.objects.filter(q_objects).all()
+            q_objects_measurement = Q()
+            for me in measurements:
+                q_objects_measurement |= Q(measurement=me)
+            points = Point.objects.filter(q_objects_measurement).all()
+            q_objects_point = Q()
+            for p in points:
+                q_objects_point |= Q(point=p)
+            queryset = Tendency.objects.filter(q_objects_point).all()
+        else:
+            queryset = Tendency.objects.all()
+        if tendency_id is not None:
+            queryset = queryset.filter(id=tendency_id)
+        if point is not None:
+            queryset = queryset.filter(point=point)
+        if value is not None:
+            queryset = queryset.filter(value=value)
+        return queryset
 
 
 class EspectraView(viewsets.ModelViewSet):
@@ -310,7 +348,36 @@ class EspectraView(viewsets.ModelViewSet):
         unauthorized data.
         """
 
-        pass
+        espectra_id = self.request.query_params.get('id', None)
+        identifier = self.request.query_params.get('identifier', None)
+        point = self.request.query_params.get('point', None)
+        value = self.request.query_params.get('value', None)
+
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            q_objects = Q()
+            for m in self.request.user.company.machines:
+                q_objects |= Q(machine=m)
+            measurements = Measurement.objects.filter(q_objects).all()
+            q_objects_measurement = Q()
+            for me in measurements:
+                q_objects_measurement |= Q(measurement=me)
+            points = Point.objects.filter(q_objects_measurement).all()
+            q_objects_point = Q()
+            for p in points:
+                q_objects_point |= Q(point=p)
+            queryset = Espectra.objects.filter(q_objects_point).all()
+        else:
+            queryset = Tendency.objects.all()
+        if espectra_id is not None:
+            queryset = queryset.filter(id=espectra_id)
+        if identifier is not None:
+            queryset = queryset.filter(identifier=identifier)
+        if point is not None:
+            queryset = queryset.filter(point=point)
+        if value is not None:
+            queryset = queryset.filter(value=value)
+        return queryset
+
 
 class TimeSignalView(viewsets.ModelViewSet):
 
@@ -327,4 +394,32 @@ class TimeSignalView(viewsets.ModelViewSet):
         unauthorized data.
         """
 
-        pass
+        signal_id = self.request.query_params.get('id', None)
+        identifier = self.request.query_params.get('identifier', None)
+        point = self.request.query_params.get('point', None)
+        value = self.request.query_params.get('value', None)
+
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            q_objects = Q()
+            for m in self.request.user.company.machines:
+                q_objects |= Q(machine=m)
+            measurements = Measurement.objects.filter(q_objects).all()
+            q_objects_measurement = Q()
+            for me in measurements:
+                q_objects_measurement |= Q(measurement=me)
+            points = Point.objects.filter(q_objects_measurement).all()
+            q_objects_point = Q()
+            for p in points:
+                q_objects_point |= Q(point=p)
+            queryset = TimeSignal.objects.filter(q_objects_point).all()
+        else:
+            queryset = Tendency.objects.all()
+        if signal_id is not None:
+            queryset = queryset.filter(id=signal_id)
+        if identifier is not None:
+            queryset = queryset.filter(identifier=identifier)
+        if point is not None:
+            queryset = queryset.filter(point=point)
+        if value is not None:
+            queryset = queryset.filter(value=value)
+        return queryset
