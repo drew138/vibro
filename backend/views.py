@@ -1,5 +1,6 @@
 from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from knox.models import AuthToken
 from .models import *
 from .serializers import *
@@ -87,7 +88,7 @@ class MachineView(viewsets.ModelViewSet):
         q_id = self.request.query_params.get('id', None)  # object id
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company.machines
+            queryset = self.request.user.company.machines.all()
         else:
             queryset = Machine.objects.all()
         if company is not None:
@@ -114,18 +115,20 @@ class ImageView(viewsets.ModelViewSet):
 
         """
         Optionally filter fields based on url. For non staff/superusers,
-        company is always filtered in order to prevent them from seeing
+        company is always filtered to prevent users them from seeing
         unauthorized data.
         """
 
-        machinne = self.request.query_params.get('machinne', None)
+        machine = self.request.query_params.get('machine', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company.machines.images
+            if machine is None:
+                raise ValidationError("Campo 'machine' debe ser proveido")
+            queryset = self.request.user.company.machines.filter(machine=machine).images.all()
         else:
             queryset = Image.objects.all()
-        if machinne is not None:
-            queryset = queryset.filter(machinne=machinne)
+            if machine is not None:
+                queryset = queryset.filter(machine=machine)
         return queryset
 
 
@@ -154,25 +157,27 @@ class MeasurementView(viewsets.ModelViewSet):
         machine = self.request.query_params.get('machine', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company.machines.measurements
+            if (machine is None):
+                raise ValidationError("Campo 'machine' debe ser proveido")
+            queryset = self.request.user.company.machines.filter(machine=machine).measurements.all()
         else:
             queryset = Image.objects.all()
-        if severity is not None:
-            queryset = queryset.filter(severity=severity)
-        if date is not None:
-            queryset = queryset.filter(date=date)  # requires further specification on date
-        if analysis is not None:
-            queryset = queryset.filter(analysis=analysis)
-        if recomendation is not None:
-            queryset = queryset.filter(recomendation=recomendation)
-        if revised is not None:
-            queryset = queryset.filter(revised=revised)
-        if resolved is not None:
-            queryset = queryset.filter(resolved=resolved)
-        if measurement_type is not None:
-            queryset = queryset.filter(measurement_type=measurement_type)
-        if machine is not None:
-            queryset = queryset.filter(machine=machine)
+            if severity is not None:
+                queryset = queryset.filter(severity=severity)
+            if date is not None:
+                queryset = queryset.filter(date=date)  # requires further specification on date
+            if analysis is not None:
+                queryset = queryset.filter(analysis=analysis)
+            if recomendation is not None:
+                queryset = queryset.filter(recomendation=recomendation)
+            if revised is not None:
+                queryset = queryset.filter(revised=revised)
+            if resolved is not None:
+                queryset = queryset.filter(resolved=resolved)
+            if measurement_type is not None:
+                queryset = queryset.filter(measurement_type=measurement_type)
+            if machine is not None:
+                queryset = queryset.filter(machine=machine)
         return queryset
         
 
