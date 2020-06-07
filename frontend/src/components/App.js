@@ -1,8 +1,8 @@
-import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 import NavBar from "./navigation";
 import PageBody from "./body";
 import Footer from "./footer";
-import { BrowserRouter as Router } from "react-router-dom";
+import React from "react";
 
 function App() {
   return (

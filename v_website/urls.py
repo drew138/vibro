@@ -1,5 +1,6 @@
-from django.contrib import admin
 from django.urls import path, include
+from django.contrib import admin
+
 
 urlpatterns = [
     path('api/', include("backend.urls")),
@@ -8,4 +9,3 @@ urlpatterns = [
 ]
 
 
-# https://realpython.com/manage-users-in-django-admin/

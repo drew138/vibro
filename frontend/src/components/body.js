@@ -1,6 +1,6 @@
 import { Switch, Route } from "react-router-dom";
-import React from "react";
 import NoMatch from "./noMatch";
+import React from "react";
 
 export default function PageBody() {
   return (

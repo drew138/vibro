@@ -1,6 +1,6 @@
-from django.db import models
-from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
+from django.contrib import admin
+from django.db import models
 
 
 class City(models.Model):
@@ -52,18 +52,6 @@ class VibroUser(AbstractUser):
     celphone_one = models.IntegerField(blank=True, null=True)
     celphone_two = models.IntegerField(blank=True, null=True) 
     user_type = models.CharField(max_length=8, choices=USER_CHOICES, default=CLIENT)
-
-
-    # def has_add_permission(self, request, obj=None):
-    #     return request.user.is_staff
-
-
-    # def has_delete_permission(self, request, obj=None):
-    #     return request.user.is_staff
-
-
-    # def has_change_permission(self, request, obj=None):
-    #     return request.user.is_superuser or (obj and obj.id == request.user.id)
 
 
 class Profile(models.Model):
