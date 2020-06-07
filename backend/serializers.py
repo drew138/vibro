@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import *
+from . import models
 
 
 class CitySerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = City
+        model = models.City
         fields = '__all__'
 
 
@@ -17,17 +17,15 @@ class CompanySerializer(serializers.ModelSerializer):
     rut_city = CitySerializer()
 
     class Meta:
-        model = Company
+        model = models.Company
         fields = '__all__'
 
 
 # User Serializer
 class VibroUserSerializer(serializers.ModelSerializer):
 
-    company = CompanySerializer()
-
     class Meta:
-        model = VibroUser
+        model = models.VibroUser
         fields = [
             'id',
             'username',
@@ -35,7 +33,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
             ]
 
     def create(self, validated_data):
-        user = VibroUser.objects.create_user(**validated_data)
+        user = models.VibroUser.objects.create_user(**validated_data)
         return user
 
 
@@ -45,7 +43,7 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
     company = CompanySerializer()
 
     class Meta:
-        model = VibroUser
+        model = models.VibroUser
         fields = [
             'username',
             'first_name',
@@ -61,7 +59,7 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}  # TODO check if kwargs are valid
 
     def create(self, validated_data):
-        user = VibroUser.objects.create_user(**validated_data)
+        user = models.VibroUser.objects.create_user(**validated_data)
         return user
 
 
@@ -83,7 +81,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     user = VibroUserSerializer()
 
     class Meta:
-        model = Profile
+        model = models.Profile
         fields = '__all__'
 
 
@@ -92,7 +90,7 @@ class MachineSerializer(serializers.ModelSerializer):
     company = CompanySerializer() 
 
     class Meta:
-        model = Machine
+        model = models.Machine
         fields = '__all__'
 
 
@@ -101,7 +99,7 @@ class ImageSerializer(serializers.ModelSerializer):
     machine = MachineSerializer()
 
     class Meta:
-        model = Image
+        model = models.Image
         fields = '__all__'
 
 
@@ -110,7 +108,7 @@ class MeasurementSerializer(serializers.ModelSerializer):
     machine = MachineSerializer()
 
     class Meta:
-        model = Measurement
+        model = models.Measurement
         fields = '__all__'
 
 
@@ -119,7 +117,7 @@ class TermoImageSerializer(serializers.ModelSerializer):
     measurement = MeasurementSerializer()
 
     class Meta:
-        model = TermoImage
+        model = models.TermoImage
         fields = '__all__'
 
 
@@ -128,7 +126,7 @@ class PointSerializer(serializers.ModelSerializer):
     measurement = MeasurementSerializer()
 
     class Meta:
-        model = Point
+        model = models.Point
         fields = '__all__'
 
 
@@ -137,7 +135,7 @@ class TendencySerializer(serializers.ModelSerializer):
     point = PointSerializer()
 
     class Meta:
-        model = Tendency
+        model = models.Tendency
         fields = '__all__'
 
 
@@ -146,7 +144,7 @@ class EspectraSerializer(serializers.ModelSerializer):
     point = PointSerializer()
 
     class Meta:
-        model = Espectra
+        model = models.Espectra
         fields = '__all__'
 
 
@@ -155,5 +153,5 @@ class TimeSignalSerializer(serializers.ModelSerializer):
     point = PointSerializer()
 
     class Meta:
-        model = TimeSignal
+        model = models.TimeSignal
         fields = '__all__'

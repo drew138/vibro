@@ -3,16 +3,17 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from knox.models import AuthToken
 from django.db.models import Q
-from .models import *
-from .serializers import *
+from . import models
+from . import serializers as custom_serializers
+from .permissions import IsStaffOrSuperUser
 # from rest_framework import filters
 
 
 class CityView(viewsets.ModelViewSet):
 
-    serializer_class = CitySerializer
+    serializer_class = custom_serializers.CitySerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
     
     def get_queryset(self):
@@ -28,7 +29,7 @@ class CityView(viewsets.ModelViewSet):
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company.city
         else:
-            queryset = City.objects.all()
+            queryset = models.City.objects.all()
         if name is not None:
             queryset = queryset.filter(name=name).all()
         return queryset
@@ -36,7 +37,7 @@ class CityView(viewsets.ModelViewSet):
 
 class CompanyView(viewsets.ModelViewSet):
 
-    serializer_class = CompanySerializer
+    serializer_class = custom_serializers.CompanySerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
@@ -60,7 +61,7 @@ class CompanyView(viewsets.ModelViewSet):
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company
         else:
-            queryset = Company.objects.all()
+            queryset = models.Company.objects.all()
         if name is not None:
             queryset = queryset.filter(name=name)
         if nit is not None:
@@ -83,7 +84,7 @@ class UserAPI(generics.RetrieveAPIView):
     permission_classes = [
         permissions.IsAuthenticated
     ]
-    serializer_class = VibroUserSerializer
+    serializer_class = custom_serializers.VibroUserSerializer
 
     def get_object(self):
         return self.request.user
@@ -91,14 +92,14 @@ class UserAPI(generics.RetrieveAPIView):
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
-    serializer_class = RegisterVibroUserSerializer
+    serializer_class = custom_serializers.RegisterVibroUserSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response({
-            "user": VibroUserSerializer(user,
+            "user": custom_serializers.VibroUserSerializer(user,
             context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
@@ -106,14 +107,14 @@ class RegisterAPI(generics.GenericAPIView):
 
 # Login API
 class LoginAPI(generics.GenericAPIView):
-    serializer_class = LoginVibroUserSerializer
+    serializer_class = custom_serializers.LoginVibroUserSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         return Response({
-            "user": VibroUserSerializer(user,
+            "user": custom_serializers.VibroUserSerializer(user,
             context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)
         })
@@ -121,9 +122,9 @@ class LoginAPI(generics.GenericAPIView):
 
 class ProfileView(viewsets.ModelViewSet):
 
-    serializer_class = CitySerializer
+    serializer_class = custom_serializers.ProfileSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
     
     def get_queryset(self):
@@ -140,7 +141,7 @@ class ProfileView(viewsets.ModelViewSet):
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.profile
         else:
-            queryset = Profile.objects.all()
+            queryset = models.Profile.objects.all()
         if name is not None:
             queryset = queryset.filter(name=name).all()
         if profile_id is not None:
@@ -150,9 +151,9 @@ class ProfileView(viewsets.ModelViewSet):
 
 class MachineView(viewsets.ModelViewSet):
     
-    serializer_class = VibroUserSerializer
+    serializer_class = custom_serializers.MachineSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -172,7 +173,7 @@ class MachineView(viewsets.ModelViewSet):
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company.machines.all()
         else:
-            queryset = Machine.objects.all()
+            queryset = models.Machine.objects.all()
         if q_id is not None:
             queryset = queryset.filter(id=q_id)
         if company is not None:
@@ -188,9 +189,9 @@ class MachineView(viewsets.ModelViewSet):
 
 class ImageView(viewsets.ModelViewSet):
 
-    serializer_class = ImageSerializer
+    serializer_class = custom_serializers.ImageSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -207,9 +208,9 @@ class ImageView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            queryset = Image.objects.filter(q_objects).all()
+            queryset = models.Image.objects.filter(q_objects).all()
         else:
-            queryset = Image.objects.all()
+            queryset = models.Image.objects.all()
         if image_id is not None:
             queryset = queryset.filter(id=image_id)
         if machine is not None:
@@ -219,9 +220,9 @@ class ImageView(viewsets.ModelViewSet):
 
 class MeasurementView(viewsets.ModelViewSet):
 
-    serializer_class = MeasurementSerializer
+    serializer_class = custom_serializers.MeasurementSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -247,9 +248,9 @@ class MeasurementView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            queryset = Measurement.objects.filter(q_objects).all()
+            queryset = models.Measurement.objects.filter(q_objects).all()
         else:
-            queryset = Image.objects.all()
+            queryset = models.Image.objects.all()
         if measurement_id is not None:
             queryset = queryset.filter(id=measurement_id)
         if severity is not None:
@@ -277,9 +278,9 @@ class MeasurementView(viewsets.ModelViewSet):
 
 class TermoImageView(viewsets.ModelViewSet):
 
-    serializer_class = TermoImageSerializer
+    serializer_class = custom_serializers.TermoImageSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -300,13 +301,13 @@ class TermoImageView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = Measurement.objects.filter(q_objects).all()
+            measurements = models.Measurement.objects.filter(q_objects).all()
             q_objects_t_image = Q()
             for me in measurements:
                 q_objects_t_image |= Q(measurement=me)
-            queryset = TermoImage.objects.filter(q_objects_t_image).all()
+            queryset = models.TermoImage.objects.filter(q_objects_t_image).all()
         else:
-            queryset = Image.objects.all()
+            queryset = models.Image.objects.all()
         if termo_iamge_id is not None:
             queryset = queryset.filter(id=termo_iamge_id)
         if image_type is not None:
@@ -320,9 +321,9 @@ class TermoImageView(viewsets.ModelViewSet):
 
 class PointView(viewsets.ModelViewSet):
 
-    serializer_class = PointSerializer
+    serializer_class = custom_serializers.PointSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -343,13 +344,13 @@ class PointView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = Measurement.objects.filter(q_objects).all()
+            measurements = models.Measurement.objects.filter(q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            queryset = Point.objects.filter(q_objects_measurement).all()
+            queryset = models.Point.objects.filter(q_objects_measurement).all()
         else:
-            queryset = Point.objects.all()
+            queryset = models.Point.objects.all()
         if point_id is not None:
             queryset = queryset.filter(id=point_id)
         if number is not None:
@@ -365,9 +366,9 @@ class PointView(viewsets.ModelViewSet):
 
 class TendencyView(viewsets.ModelViewSet):
 
-    serializer_class = TendencySerializer
+    serializer_class = custom_serializers.TendencySerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -386,17 +387,17 @@ class TendencyView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = Measurement.objects.filter(q_objects).all()
+            measurements = models.Measurement.objects.filter(q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            points = Point.objects.filter(q_objects_measurement).all()
+            points = models.Point.objects.filter(q_objects_measurement).all()
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
-            queryset = Tendency.objects.filter(q_objects_point).all()
+            queryset = models.Tendency.objects.filter(q_objects_point).all()
         else:
-            queryset = Tendency.objects.all()
+            queryset = models.models.Tendency.objects.all()
         if tendency_id is not None:
             queryset = queryset.filter(id=tendency_id)
         if point is not None:
@@ -408,9 +409,9 @@ class TendencyView(viewsets.ModelViewSet):
 
 class EspectraView(viewsets.ModelViewSet):
 
-    serializer_class = EspectraSerializer
+    serializer_class = custom_serializers.EspectraSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -430,17 +431,17 @@ class EspectraView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = Measurement.objects.filter(q_objects).all()
+            measurements = models.Measurement.objects.filter(q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            points = Point.objects.filter(q_objects_measurement).all()
+            points = models.Point.objects.filter(q_objects_measurement).all()
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
-            queryset = Espectra.objects.filter(q_objects_point).all()
+            queryset = models.Espectra.objects.filter(q_objects_point).all()
         else:
-            queryset = Tendency.objects.all()
+            queryset = models.Tendency.objects.all()
         if espectra_id is not None:
             queryset = queryset.filter(id=espectra_id)
         if identifier is not None:
@@ -454,9 +455,9 @@ class EspectraView(viewsets.ModelViewSet):
 
 class TimeSignalView(viewsets.ModelViewSet):
 
-    serializer_class = TimeSignalSerializer
+    serializer_class = custom_serializers.TimeSignalSerializer
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -476,17 +477,17 @@ class TimeSignalView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = Measurement.objects.filter(q_objects).all()
+            measurements = models.Measurement.objects.filter(q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            points = Point.objects.filter(q_objects_measurement).all()
+            points = models.Point.objects.filter(q_objects_measurement).all()
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
-            queryset = TimeSignal.objects.filter(q_objects_point).all()
+            queryset = models.TimeSignal.objects.filter(q_objects_point).all()
         else:
-            queryset = Tendency.objects.all()
+            queryset = models.Tendency.objects.all()
         if signal_id is not None:
             queryset = queryset.filter(id=signal_id)
         if identifier is not None:

@@ -54,22 +54,22 @@ class VibroUser(AbstractUser):
     user_type = models.CharField(max_length=8, choices=USER_CHOICES, default=CLIENT)
 
 
-    def has_add_permission(self, request, obj=None):
-        return request.user.is_staff
+    # def has_add_permission(self, request, obj=None):
+    #     return request.user.is_staff
 
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_staff
+    # def has_delete_permission(self, request, obj=None):
+    #     return request.user.is_staff
 
 
-    def has_change_permission(self, request, obj=None):
-        return request.user.is_superuser or (obj and obj.id == request.user.id)
+    # def has_change_permission(self, request, obj=None):
+    #     return request.user.is_superuser or (obj and obj.id == request.user.id)
 
 
 class Profile(models.Model):
 
     certifications = models.CharField(max_length=50, default='undefined')
-    picture = models.ImageField(upload_to="profile", default='default.jpg')
+    picture = models.ImageField(upload_to="profile", default='default.jpg')  # TODO create a default.jpg 
     user = models.OneToOneField(
         VibroUser,
         related_name='profile',
