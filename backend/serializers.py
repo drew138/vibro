@@ -78,6 +78,15 @@ class LoginVibroUserSerializer(serializers.Serializer):
         raise serializers.ValidationError('Credenciales Incorrectas')
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+
+    user = VibroUserSerializer()
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
 class MachineSerializer(serializers.ModelSerializer):
 
     company = CompanySerializer() 

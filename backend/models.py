@@ -66,6 +66,16 @@ class VibroUser(AbstractUser):
         return request.user.is_superuser or (obj and obj.id == request.user.id)
 
 
+class Profile(models.Model):
+
+    certifications = models.CharField(max_length=50, default='undefined')
+    picture = models.ImageField(upload_to="profile", default='default.jpg')
+    user = models.OneToOneField(
+        VibroUser,
+        related_name='profile',
+        on_delete=models.CASCADE)
+
+
 class Machine(models.Model):
 
     class Meta:
@@ -83,7 +93,7 @@ class Machine(models.Model):
 
 class Image(models.Model):
 
-    image = models.ImageField(upload_to="./media/")  # TODO make sure ./media/ is the right path
+    image = models.ImageField(upload_to="machines")  # TODO make sure ./media/ is the right path
     machine = models.ForeignKey(
         Machine,
         related_name="images",
@@ -158,7 +168,7 @@ class TermoImage(models.Model):
     measurement = models.ForeignKey(Measurement, related_name='termal_image', on_delete=models.CASCADE)
     image_type  = models.CharField(max_length=15, choices=IMAGE_CHOICES, default='undefined' )
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to="./media/termal")
+    image = models.ImageField(upload_to="termals")
 
 
 class Point(models.Model):

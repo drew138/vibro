@@ -10,7 +10,6 @@ from .serializers import *
 
 class CityView(viewsets.ModelViewSet):
 
-    queryset = City.objects.all()
     serializer_class = CitySerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
@@ -31,13 +30,12 @@ class CityView(viewsets.ModelViewSet):
         else:
             queryset = City.objects.all()
         if name is not None:
-            queryset.filter(name=name).all()
+            queryset = queryset.filter(name=name).all()
         return queryset
 
 
 class CompanyView(viewsets.ModelViewSet):
 
-    queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
@@ -64,19 +62,19 @@ class CompanyView(viewsets.ModelViewSet):
         else:
             queryset = Company.objects.all()
         if name is not None:
-            queryset.filter(name=name)
+            queryset = queryset.filter(name=name)
         if nit is not None:
-            queryset.filter(nit=nit)
+            queryset = queryset.filter(nit=nit)
         if address is not None:
-            queryset.filter(address=address)
+            queryset = queryset.filter(address=address)
         if rut_address is not None:
-            queryset.filter(rut_address=rut_address)
+            queryset = queryset.filter(rut_address=rut_address)
         if pbx is not None:
-            queryset.filter(pbx=pbx)
+            queryset = queryset.filter(pbx=pbx)
         if city is not None:
-            queryset.filter(city__id=city)
+            queryset = queryset.filter(city__id=city)
         if rut_city is not None:
-            queryset.filter(rut_city__id=rut_city)
+            queryset = queryset.filter(rut_city__id=rut_city)
         return queryset
 
 
@@ -119,6 +117,35 @@ class LoginAPI(generics.GenericAPIView):
             context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)
         })
+
+
+class ProfileView(viewsets.ModelViewSet):
+
+    serializer_class = CitySerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    
+    def get_queryset(self):
+
+        """
+        Optionally filter fields based on url. For non staff/superusers,
+        company is always filtered to prevent users them from seeing
+        unauthorized data.
+        """
+
+        profile_id = self.request.query_params.get('id', None)
+        name = self.request.query_params.get('name', None)
+
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            queryset = self.request.user.profile
+        else:
+            queryset = Profile.objects.all()
+        if name is not None:
+            queryset = queryset.filter(name=name).all()
+        if profile_id is not None:
+            queryset = queryset.filter(id=profile_id).all()
+        return queryset
 
 
 class MachineView(viewsets.ModelViewSet):
