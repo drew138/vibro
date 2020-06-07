@@ -213,6 +213,8 @@ class MeasurementView(viewsets.ModelViewSet):
         resolved = self.request.query_params.get('resolved', None)
         measurement_type = self.request.query_params.get('measurement_type', None)
         machine = self.request.query_params.get('machine', None)
+        engineer_one = self.request.query_params.get('engineer_one', None)
+        engineer_two = self.request.query_params.get('engineer_two', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
@@ -239,6 +241,10 @@ class MeasurementView(viewsets.ModelViewSet):
             queryset = queryset.filter(measurement_type=measurement_type)
         if machine is not None:
             queryset = queryset.filter(machine__id=machine)
+        if engineer_one is not None:
+            queryset = queryset.filter(engineer_one__id=engineer_one)
+        if engineer_two is not None:
+            queryset = queryset.filter(engineer_two__id=engineer_two)
         return queryset
         
 

@@ -32,6 +32,7 @@ class Company(models.Model):
 
 
 class VibroUser(AbstractUser):
+
     ADMIN = 'admin'
     ENGINEER = 'engineer'
     CLIENT = 'client'
@@ -131,10 +132,23 @@ class Measurement(models.Model):
     machine = models.ForeignKey(
         Machine,
         related_name="measurements",
-        on_delete=models.CASCADE) 
+        on_delete=models.CASCADE)
+    engineer_one = models.ForeignKey(
+        VibroUser,
+        related_name="eng_one",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
+    engineer_two = models.ForeignKey(
+        VibroUser,
+        related_name="eng_two",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
 
 
 class TermoImage(models.Model):
+
     NORMAL = 'normal'
     TERMAL = 'termal'
     IMAGE_CHOICES = [
@@ -148,6 +162,7 @@ class TermoImage(models.Model):
 
 
 class Point(models.Model):
+
     # position
     VER = 'V'  
     HOR = 'H'
