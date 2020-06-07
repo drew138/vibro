@@ -17,10 +17,21 @@ class CityView(viewsets.ModelViewSet):
     ]
     
     def get_queryset(self):
+
+        """
+        Optionally filter fields based on url. For non staff/superusers,
+        company is always filtered to prevent users them from seeing
+        unauthorized data.
+        """
+
+        name = self.request.query_params.get('name', None)
+
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company.city
         else:
             queryset = City.objects.all()
+        if name is not None:
+            queryset.filter(name=name).all()
         return queryset
 
 
@@ -33,10 +44,39 @@ class CompanyView(viewsets.ModelViewSet):
     ]
    
     def get_queryset(self):
+
+        """
+        Optionally filter fields based on url. For non staff/superusers,
+        company is always filtered to prevent users them from seeing
+        unauthorized data.
+        """
+
+        name = self.request.query_params.get('name', None)
+        nit = self.request.query_params.get('name', None)
+        address = self.request.query_params.get('address', None)
+        rut_address = self.request.query_params.get('rut_address', None)
+        pbx = self.request.query_params.get('pbx', None)
+        city = self.request.query_params.get('city', None)
+        rut_city = self.request.query_params.get('rut_city', None)
+        
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company
         else:
             queryset = Company.objects.all()
+        if name is not None:
+            queryset.filter(name=name)
+        if nit is not None:
+            queryset.filter(nit=nit)
+        if address is not None:
+            queryset.filter(address=address)
+        if rut_address is not None:
+            queryset.filter(rut_address=rut_address)
+        if pbx is not None:
+            queryset.filter(pbx=pbx)
+        if city is not None:
+            queryset.filter(city__id=city)
+        if rut_city is not None:
+            queryset.filter(rut_city__id=rut_city)
         return queryset
 
 
@@ -106,16 +146,16 @@ class MachineView(viewsets.ModelViewSet):
             queryset = self.request.user.company.machines.all()
         else:
             queryset = Machine.objects.all()
+        if q_id is not None:
+            queryset = queryset.filter(id=q_id)
         if company is not None:
-             queryset = queryset.filter(company=company)
+             queryset = queryset.filter(company__id=company)
         if identifier is not None:
             queryset = queryset.filter(identifier=identifier)
         if name is not None:
             queryset = queryset.filter(name=identifier)
         if machine_type is not None:
             queryset = queryset.filter(machine_type=identifier)
-        if q_id is not None:
-            queryset = queryset.filter(id=q_id)
         return queryset
         
 
@@ -146,7 +186,7 @@ class ImageView(viewsets.ModelViewSet):
         if image_id is not None:
             queryset = queryset.filter(id=image_id)
         if machine is not None:
-            queryset = queryset.filter(machine=machine)
+            queryset = queryset.filter(machine__id=machine)
         return queryset
 
 
@@ -198,7 +238,7 @@ class MeasurementView(viewsets.ModelViewSet):
         if measurement_type is not None:
             queryset = queryset.filter(measurement_type=measurement_type)
         if machine is not None:
-            queryset = queryset.filter(machine=machine)
+            queryset = queryset.filter(machine__id=machine)
         return queryset
         
 
@@ -241,7 +281,7 @@ class TermoImageView(viewsets.ModelViewSet):
         if machine is not None:
             queryset = queryset.filter(machine=machine)
         if measurement is not None:
-            queryset = queryset.filter(measurement=measurement)
+            queryset = queryset.filter(measurement__id=measurement)
         return queryset
 
 
@@ -286,7 +326,7 @@ class PointView(viewsets.ModelViewSet):
         if point_type is not None:
             queryset = queryset.filter(point_typed=point_type)
         if measurement is not None:
-            queryset = queryset.filter(measurement=measurement)
+            queryset = queryset.filter(measurement__id=measurement)
         return queryset
 
 
@@ -327,7 +367,7 @@ class TendencyView(viewsets.ModelViewSet):
         if tendency_id is not None:
             queryset = queryset.filter(id=tendency_id)
         if point is not None:
-            queryset = queryset.filter(point=point)
+            queryset = queryset.filter(point__id=point)
         if value is not None:
             queryset = queryset.filter(value=value)
         return queryset
@@ -373,7 +413,7 @@ class EspectraView(viewsets.ModelViewSet):
         if identifier is not None:
             queryset = queryset.filter(identifier=identifier)
         if point is not None:
-            queryset = queryset.filter(point=point)
+            queryset = queryset.filter(point__id=point)
         if value is not None:
             queryset = queryset.filter(value=value)
         return queryset
@@ -419,7 +459,7 @@ class TimeSignalView(viewsets.ModelViewSet):
         if identifier is not None:
             queryset = queryset.filter(identifier=identifier)
         if point is not None:
-            queryset = queryset.filter(point=point)
+            queryset = queryset.filter(point__id=point)
         if value is not None:
             queryset = queryset.filter(value=value)
         return queryset
