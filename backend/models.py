@@ -2,10 +2,13 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib import admin
 from django.db import models
 
-
 class City(models.Model):
 
+    class Meta:
+        unique_together = ["name", "state"]
+
     name = models.CharField(max_length=30, unique=True)
+    state = models.CharField(max_length=30, blank=True, null=True)
 
 
 class Company(models.Model):

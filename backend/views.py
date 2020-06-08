@@ -25,6 +25,7 @@ class CityView(viewsets.ModelViewSet):
         """
 
         name = self.request.query_params.get('name', None)
+        state = self.request.query_params.get('state', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company.city
@@ -32,6 +33,8 @@ class CityView(viewsets.ModelViewSet):
             queryset = models.City.objects.all()
         if name is not None:
             queryset = queryset.filter(name=name).all()
+        if state is not None:
+            queryset = queryset.filter(state=state).all()
         return queryset
 
 

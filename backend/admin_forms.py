@@ -33,7 +33,6 @@ class MyUserAdmin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'groups',
-                
             }
 
         for f in disabled_fields:
