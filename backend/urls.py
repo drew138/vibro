@@ -1,3 +1,4 @@
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from knox import views as knox_views
 from rest_framework import routers
@@ -11,7 +12,6 @@ auth_views = [
     path('api/auth/logout', knox_views.LogoutView.as_view(), name='knox_logout')
 ]
 
-
 router = routers.DefaultRouter()
 router.register('city', views.CityView, 'city')
 router.register('company', views.CompanyView, 'company')
@@ -23,6 +23,5 @@ router.register('point', views.PointView, 'point')
 router.register('tendency', views.TendencyView, 'tendency')
 router.register('espectra', views.EspectraView, 'espectra')
 router.register('timesignal', views.TimeSignalView, 'timesignal')
-
 
 urlpatterns =  auth_views + router.urls 

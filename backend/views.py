@@ -42,7 +42,7 @@ class CompanyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CompanySerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
    
     def get_queryset(self):
@@ -84,6 +84,7 @@ class CompanyView(viewsets.ModelViewSet):
 
 # Get User API
 class UserAPI(generics.RetrieveAPIView):
+
     permission_classes = [
         permissions.IsAuthenticated
     ]
@@ -95,6 +96,7 @@ class UserAPI(generics.RetrieveAPIView):
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
+
     serializer_class = custom_serializers.RegisterVibroUserSerializer
 
     def post(self, request, *args, **kwargs):
@@ -110,6 +112,7 @@ class RegisterAPI(generics.GenericAPIView):
 
 # Login API
 class LoginAPI(generics.GenericAPIView):
+
     serializer_class = custom_serializers.LoginVibroUserSerializer
 
     def post(self, request, *args, **kwargs):
@@ -119,7 +122,7 @@ class LoginAPI(generics.GenericAPIView):
         return Response({
             "user": custom_serializers.VibroUserSerializer(user,
             context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)
+            "token": AuthToken.objects.create(user)[1]
         })
 
 
@@ -127,7 +130,7 @@ class ProfileView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.ProfileSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
     
     def get_queryset(self):
@@ -156,7 +159,7 @@ class MachineView(viewsets.ModelViewSet):
     
     serializer_class = custom_serializers.MachineSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -194,7 +197,7 @@ class ImageView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.ImageSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -225,7 +228,7 @@ class MeasurementView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.MeasurementSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -283,7 +286,7 @@ class TermoImageView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TermoImageSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -326,7 +329,7 @@ class PointView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.PointSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -371,7 +374,7 @@ class TendencyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TendencySerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -400,7 +403,7 @@ class TendencyView(viewsets.ModelViewSet):
                 q_objects_point |= Q(point=p)
             queryset = custom_models.Tendency.objects.filter(q_objects_point).all()
         else:
-            queryset = custom_models.custom_models.Tendency.objects.all()
+            queryset = custom_models.Tendency.objects.all()
         if tendency_id is not None:
             queryset = queryset.filter(id=tendency_id)
         if point is not None:
@@ -414,7 +417,7 @@ class EspectraView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.EspectraSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
@@ -460,7 +463,7 @@ class TimeSignalView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TimeSignalSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
 
     def get_queryset(self):
