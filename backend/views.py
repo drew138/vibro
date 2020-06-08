@@ -1,4 +1,6 @@
 from rest_framework import viewsets, generics, permissions
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.mail import BadHeaderError, send_mail
 from rest_framework.exceptions import ValidationError
 from . import serializers as custom_serializers
 from rest_framework.response import Response
@@ -124,6 +126,49 @@ class LoginAPI(generics.GenericAPIView):
             context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
+
+
+# Reset API
+class ResetAPI(generics.GenericAPIView):
+        
+    serializer_class = custom_serializers.LoginVibroUserSerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        return Response({
+            "user": custom_serializers.VibroUserSerializer(user,
+            context=self.get_serializer_context()).data,
+            "token": AuthToken.objects.create(user)[1]
+        })
+
+    @staticmethod
+    def send_email(request):
+        subject = request.POST.get('subject', '')
+        message = request.POST.get('message', '')
+        from_email = request.POST.get('from_email', '')
+        if subject and message and from_email:
+            try:
+                send_mail(subject, message, from_email, ['admin@example.com'])
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+            return HttpResponseRedirect('/contact/thanks/')
+        else:
+            # In reality we'd use a form class
+            # to get proper validation errors.
+            return HttpResponse('Make sure all fields are entered and valid.')
+
+
+# Change Password API
+class ChangePassAPI(generics.GenericAPIView):
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def perform_update(self, serializer):
+        pass
 
 
 class ProfileView(viewsets.ModelViewSet):

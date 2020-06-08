@@ -56,7 +56,7 @@ REST_KNOX = {
   'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
   'AUTH_TOKEN_CHARACTER_LENGTH': 64,
   'TOKEN_TTL': timedelta(hours=10),
-  'TOKEN_LIMIT_PER_USER': 1,
+  'TOKEN_LIMIT_PER_USER': None,
   'AUTO_REFRESH': False,
 }
 
