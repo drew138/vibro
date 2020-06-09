@@ -101,25 +101,16 @@ DATABASES = {
     }
 }
 
-# TODO add mysql settings 
+# TODO add postgresql settings 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'OPTIONS': {
-#             'read_default_file': '/path/to/my.cnf',
-#         },
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'DATABASE NAME',
+#         'PASSWORD': 'PASSWORD',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
 #     }
 # }
-# TODO read https://stackoverflow.com/questions/19189813/setting-django-up-to-use-mysql to install packages
-# TODO create my.cnf file
-# # my.cnf
-# [client]
-# database = DB_NAME
-# host = localhost
-# user = DB_USER
-# password = DB_PASSWORD
-# default-character-set = utf8
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

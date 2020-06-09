@@ -1,10 +1,12 @@
 from rest_framework import viewsets, generics, permissions
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.mail import BadHeaderError, send_mail
 from rest_framework.exceptions import ValidationError
 from . import serializers as custom_serializers
+from v_website.settings import EMAIL_HOST_USER
+from v_website.settings import ALLOWED_HOSTS
 from rest_framework.response import Response
 from .permissions import IsStaffOrSuperUser
+from django.core.mail import send_mail
 from . import models as custom_models
 from knox.models import AuthToken
 from django.db.models import Q
@@ -144,14 +146,20 @@ class ResetAPI(generics.GenericAPIView):
         })
 
     @staticmethod
-    def send_email(request):
-        subject = request.POST.get('subject', '')
-        message = request.POST.get('message', '')
-        from_email = request.POST.get('from_email', '')
+    def send_email(request, recipient, user, token):
+        subject = 'Cambio de Contraseña'
+        message = f"""
+        Hola {user}!,\n\n
+        Recientemente pediste un cambio de contraseña.\n\n
+        Para proceder, visita el siguiente link: https://{ALLOWED_HOSTS[0]}/password/reset/{token}\n\n
+        Atentamente,\n
+        El Equipo de Vibromotajes.
+        """
+        from_email = EMAIL_HOST_USER
         if subject and message and from_email:
             try:
-                send_mail(subject, message, from_email, ['admin@example.com'])
-            except BadHeaderError:
+                send_mail(subject, message, from_email, [recipient])
+            except Exception:
                 return HttpResponse('Invalid header found.')
             return HttpResponseRedirect('/contact/thanks/')
         else:
