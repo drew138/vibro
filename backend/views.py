@@ -4,7 +4,6 @@ from rest_framework.exceptions import ValidationError
 from django.template.loader import render_to_string
 from . import serializers as custom_serializers
 from v_website.settings import EMAIL_HOST_USER
-from v_website.settings import ALLOWED_HOSTS
 from rest_framework.response import Response
 from .permissions import IsStaffOrSuperUser
 from . import models as custom_models
@@ -170,6 +169,7 @@ class ResetAPI(generics.GenericAPIView):
         
     serializer_class = custom_serializers.VibroUserSerializer
     
+    #TODO test endpoint
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
