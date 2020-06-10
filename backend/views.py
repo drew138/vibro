@@ -123,8 +123,17 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        email_data = {
+            'subject':'Bienvenido! - Vibromontajes',
+            'template': 'email/welcome.html',
+            'variables': {
+                'user': user.first_name,
+            },
+            'receiver': user.email
+        }
+        send_email(email_data)  # send welcome email
         return Response({
-            "user": custom_serializers.VibroUserSerializer(user,
+            "user": custom_serializers.RegisterVibroUserSerializer(user,
             context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
@@ -171,7 +180,6 @@ class ResetAPI(generics.GenericAPIView):
         return Response({
             "user": custom_serializers.VibroUserSerializer(user,
             context=self.get_serializer_context()).data,
-            # "token": 
         })
 
 
