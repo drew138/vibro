@@ -49,6 +49,7 @@ class VibroUser(AbstractUser):
     ]
 
     company = models.ForeignKey(Company, related_name="user", to_field="name", on_delete=models.CASCADE, null=True, blank=True)
+    email = models.EmailField(unique=True)
     phone = models.IntegerField(blank=True, null=True)
     ext = models.IntegerField(blank=True, null=True)
     celphone_one = models.IntegerField(blank=True, null=True)

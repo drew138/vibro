@@ -168,29 +168,25 @@ class LoginAPI(generics.GenericAPIView):
 # Reset API
 class ResetAPI(generics.GenericAPIView):
         
-    serializer_class = custom_serializers.LoginVibroUserSerializer
+    serializer_class = custom_serializers.VibroUserSerializer
     
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
-
         token = AuthToken.objects.create(user)[1]
         email_data = {
             'subject':'Cambio de Search Results Contraseña - Vibromontajes',
             'template': 'email/password_reset.html',
             'variables': {
                 'user': user.first_name,
-                # 'host': ,
+                'host': request.get_host(),
                 'token': token
             },
             'receiver': [user.email]
         }
         send_email(email_data)
-        return Response({
-            "user": custom_serializers.VibroUserSerializer(user,
-            context=self.get_serializer_context()).data,
-        })
+        return Response({"email": user.email })
 
 
 # Change Password API
