@@ -1,16 +1,32 @@
 from rest_framework import viewsets, generics, permissions
 from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework.exceptions import ValidationError
+from django.template.loader import render_to_string
 from . import serializers as custom_serializers
 from v_website.settings import EMAIL_HOST_USER
 from v_website.settings import ALLOWED_HOSTS
 from rest_framework.response import Response
 from .permissions import IsStaffOrSuperUser
-from django.core.mail import send_mail
+from django.core import mail
 from . import models as custom_models
 from knox.models import AuthToken
 from django.db.models import Q
 # from rest_framework import filters
+
+
+def send_email(data):
+
+    """
+    function to be used in a view to send emails.
+    """
+    
+    with mail.get_connection() as connection:
+        template = render_to_string(data.template, data.variables)
+        sender = EMAIL_HOST_USER
+        email = mail.EmailMessage(data.subject, template, sender, data.receiver, connection=connection)
+        email.content_subtype = "html"
+        email.fail_silently = False
+        email.send()
 
 
 class CityView(viewsets.ModelViewSet):
@@ -46,7 +62,7 @@ class CompanyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CompanySerializer
     permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
+        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
     ]
    
     def get_queryset(self):
@@ -139,33 +155,24 @@ class ResetAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+
+        token = AuthToken.objects.create(user)[1]
+        email_data = {
+            'subject':'Cambio de Search Results Contraseña - Vibromontajes',
+            'template': 'email/password_reset.html',
+            'variables': {
+                'user': user.first_name,
+                # 'host': ,
+                'token': token
+            },
+            'receiver': user.email
+        }
+        send_email(email_data)
         return Response({
             "user": custom_serializers.VibroUserSerializer(user,
             context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
+            # "token": 
         })
-
-    @staticmethod
-    def send_email(request, recipient, user, token):
-        subject = 'Cambio de Contraseña'
-        message = f"""
-        Hola {user}!,\n\n
-        Recientemente pediste un cambio de contraseña.\n\n
-        Para proceder, visita el siguiente link: https://{ALLOWED_HOSTS[0]}/password/reset/{token}\n\n
-        Atentamente,\n
-        El Equipo de Vibromotajes.
-        """
-        from_email = EMAIL_HOST_USER
-        if subject and message and from_email:
-            try:
-                send_mail(subject, message, from_email, [recipient])
-            except Exception:
-                return HttpResponse('Invalid header found.')
-            return HttpResponseRedirect('/contact/thanks/')
-        else:
-            # In reality we'd use a form class
-            # to get proper validation errors.
-            return HttpResponse('Make sure all fields are entered and valid.')
 
 
 # Change Password API
