@@ -7,10 +7,10 @@ from v_website.settings import EMAIL_HOST_USER
 from v_website.settings import ALLOWED_HOSTS
 from rest_framework.response import Response
 from .permissions import IsStaffOrSuperUser
-from django.core import mail
 from . import models as custom_models
 from knox.models import AuthToken
 from django.db.models import Q
+from django.core import mail
 # from rest_framework import filters
 
 
@@ -106,7 +106,7 @@ class CompanyView(viewsets.ModelViewSet):
 class UserAPI(generics.RetrieveAPIView):
 
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticated & IsStaffOrSuperUser
     ]
     serializer_class = custom_serializers.VibroUserSerializer
 
@@ -129,9 +129,19 @@ class RegisterAPI(generics.GenericAPIView):
             'variables': {
                 'user': user.first_name,
             },
-            'receiver': user.email
+            'receiver': [user.email]
         }
         send_email(email_data)  # send welcome email
+        staff_users = [vibrouser.email for vibrouser in custom_models.VibroUser.objects.filter(is_staff=True).all()]
+        staff_email = {
+            'subject':'ACTIVACION DE CUENTA - NUEVO USUARIO',
+            'template': 'email/new_user.html',
+            'variables': {
+                'user': user.first_name,
+            },
+            'receiver': staff_users
+        }
+        send_email(staff_email)  # send email to staff
         return Response({
             "user": custom_serializers.RegisterVibroUserSerializer(user,
             context=self.get_serializer_context()).data,
@@ -174,7 +184,7 @@ class ResetAPI(generics.GenericAPIView):
                 # 'host': ,
                 'token': token
             },
-            'receiver': user.email
+            'receiver': [user.email]
         }
         send_email(email_data)
         return Response({
