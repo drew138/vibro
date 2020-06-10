@@ -40,7 +40,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
 # Register Serializer
 class RegisterVibroUserSerializer(serializers.ModelSerializer):
 
-    company = CompanySerializer()
+    company = CompanySerializer(required=False)
 
     class Meta:
         model = custom_models.VibroUser
@@ -74,6 +74,33 @@ class LoginVibroUserSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError('Credenciales Incorrectas')
+
+
+# Rest Password Serializer
+class ResetSerializer(serializers.Serializer):
+
+    username = serializers.CharField(required=False)
+    first_name = serializers.CharField(required=False)
+
+    class Meta:
+        model = custom_models.VibroUser
+        fields = [
+            'username',
+            'first_name',
+            'email',
+            ]
+
+
+# Change Password Serializer
+class ChangePassSerializer(serializers.Serializer):
+
+    class Meta:
+        model = custom_models.VibroUser
+        fields = ['username', 'password']
+
+    def update(self, instance, validated_data):
+        user = custom_models.VibroUser.objects.update(**validated_data)
+        return user
 
 
 class ProfileSerializer(serializers.ModelSerializer):

@@ -105,7 +105,7 @@ class CompanyView(viewsets.ModelViewSet):
 class UserAPI(generics.RetrieveAPIView):
 
     permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
+        permissions.IsAuthenticated
     ]
     serializer_class = custom_serializers.VibroUserSerializer
 
@@ -167,7 +167,7 @@ class LoginAPI(generics.GenericAPIView):
 # Reset API
 class ResetAPI(generics.GenericAPIView):
         
-    serializer_class = custom_serializers.VibroUserSerializer
+    serializer_class = custom_serializers.ResetSerializer
     
     #TODO test endpoint
     def post(self, request, *args, **kwargs):
@@ -181,6 +181,7 @@ class ResetAPI(generics.GenericAPIView):
             'variables': {
                 'user': user.first_name,
                 'host': request.get_host(),
+                'username': user.username,
                 'token': token
             },
             'receiver': [user.email]
@@ -190,14 +191,19 @@ class ResetAPI(generics.GenericAPIView):
 
 
 # Change Password API
-class ChangePassAPI(generics.GenericAPIView):
+class ChangePassAPI(generics.UpdateAPIView):
 
     permission_classes = [
         permissions.IsAuthenticated
     ]
 
-    def perform_update(self, serializer):
-        pass
+    serializer_class = custom_serializers.ChangePassSerializer
+
+    #TODO test endpoint
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
 
 class ProfileView(viewsets.ModelViewSet):
