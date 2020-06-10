@@ -1,11 +1,11 @@
 from rest_framework import viewsets, generics, permissions
 from django.http import HttpResponse, HttpResponseRedirect
+from .permissions import IsStaffOrSuperUser, UpdatePass
 from rest_framework.exceptions import ValidationError
 from django.template.loader import render_to_string
 from . import serializers as custom_serializers
 from v_website.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
-from .permissions import IsStaffOrSuperUser
 from . import models as custom_models
 from knox.models import AuthToken
 from django.db.models import Q
@@ -194,7 +194,7 @@ class ResetAPI(generics.GenericAPIView):
 class ChangePassAPI(generics.UpdateAPIView):
 
     permission_classes = [
-        permissions.IsAuthenticated
+        permissions.IsAuthenticated & UpdatePass
     ]
 
     serializer_class = custom_serializers.ChangePassSerializer

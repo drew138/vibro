@@ -11,3 +11,15 @@ class IsStaffOrSuperUser(BasePermission):
         if (request.user.is_staff or request.user.is_superuser) or (request.method in SAFE_METHODS):
             return True
         return False
+
+
+class UpdatePass(BasePermission):
+     
+    """
+    Allow only PATCH methods.
+    """
+
+    def has_permission(self, request, view):    
+        if request.method == "PATCH":
+            return True
+        return False

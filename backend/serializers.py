@@ -32,10 +32,6 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'email',
             ]
 
-    def create(self, validated_data):
-        user = custom_models.VibroUser.objects.create_user(**validated_data)
-        return user
-
 
 # Register Serializer
 class RegisterVibroUserSerializer(serializers.ModelSerializer):
@@ -89,7 +85,7 @@ class ResetSerializer(serializers.Serializer):
             'first_name',
             'email',
             ]
-
+    
 
 # Change Password Serializer
 class ChangePassSerializer(serializers.Serializer):
