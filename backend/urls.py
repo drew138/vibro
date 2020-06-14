@@ -4,11 +4,14 @@ from knox import views as knox_views
 from rest_framework import routers
 from . import views
 
+#TODO test endpoints
 auth_views = [
     path('auth', include('knox.urls')),
     path('auth/register', views.RegisterAPI.as_view()),
     path('auth/login', views.LoginAPI.as_view()),
     path('auth/user', views.UserAPI.as_view()),
+    path('auth/reset', views.ResetAPI.as_view()),
+    path('auth/change', views.ChangePassAPI.as_view()),
     path('auth/logout', knox_views.LogoutView.as_view(), name='knox_logout')
 ]
 

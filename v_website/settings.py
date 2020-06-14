@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'frontend',
     'backend',
-    'knox'
+    'knox',
 ]
 
 AUTH_USER_MODEL = 'backend.VibroUser'

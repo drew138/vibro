@@ -1,7 +1,6 @@
+from rest_framework.exceptions import ValidationError, NotAuthenticated, NotFound
 from rest_framework import viewsets, generics, permissions
-from django.http import HttpResponse, HttpResponseRedirect
 from .permissions import IsStaffOrSuperUser, UpdatePass
-from rest_framework.exceptions import ValidationError
 from django.template.loader import render_to_string
 from . import serializers as custom_serializers
 from v_website.settings import EMAIL_HOST_USER
@@ -31,9 +30,7 @@ def send_email(data):
 class CityView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CitySerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
     
     def get_queryset(self):
 
@@ -45,11 +42,7 @@ class CityView(viewsets.ModelViewSet):
 
         name = self.request.query_params.get('name', None)
         state = self.request.query_params.get('state', None)
-
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company.city
-        else:
-            queryset = custom_models.City.objects.all()
+        queryset = custom_models.City.objects.all()
         if name is not None:
             queryset = queryset.filter(name=name).all()
         if state is not None:
@@ -60,9 +53,7 @@ class CityView(viewsets.ModelViewSet):
 class CompanyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CompanySerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
    
     def get_queryset(self):
 
@@ -169,25 +160,28 @@ class ResetAPI(generics.GenericAPIView):
         
     serializer_class = custom_serializers.ResetSerializer
     
-    #TODO test endpoint
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
-        token = AuthToken.objects.create(user)[1]
-        email_data = {
-            'subject':'Cambio de Search Results Contraseña - Vibromontajes',
-            'template': 'email/password_reset.html',
-            'variables': {
-                'user': user.first_name,
-                'host': request.get_host(),
-                'username': user.username,
-                'token': token
-            },
-            'receiver': [user.email]
-        }
-        send_email(email_data)
-        return Response({"email": user.email })
+        user = custom_models.VibroUser.objects.filter(email=request.data['email']).first()
+        if user.exists():
+            token = AuthToken.objects.create(user)[1]
+            email_data = {
+                'subject':'Cambio de Search Results Contraseña - Vibromontajes',
+                'template': 'email/password_reset.html',
+                'variables': {
+                    'id': user.id,
+                    'user': user.first_name,
+                    'host': request.get_host(),
+                    'username': user.username,
+                    'token': token
+                },
+                'receiver': [user.email]
+            }
+            send_email(email_data)
+        else:
+            raise NotFound('user not found')
+        return Response({"detail": f"an email has been sent to {user.email}" })
 
 
 # Change Password API
@@ -199,19 +193,30 @@ class ChangePassAPI(generics.UpdateAPIView):
 
     serializer_class = custom_serializers.ChangePassSerializer
 
-    #TODO test endpoint
-    def patch(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+    # def patch(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(self.get_object(), data=request.data, partial=True)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
+    # def update(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data, partial=True)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save(password=instance.password, **serializer.validated_data)
+    #     return Response(serializer.validated_data)
+
+    # def partial_update(self, request, *args, **kwargs):
+    #     kwargs['partial'] = True
+    #     return self.update(request, *args, **kwargs)
+
+    def get_object(self):
+        return self.request.user
 
 
 class ProfileView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.ProfileSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
     
     def get_queryset(self):
 
@@ -238,9 +243,7 @@ class ProfileView(viewsets.ModelViewSet):
 class MachineView(viewsets.ModelViewSet):
     
     serializer_class = custom_serializers.MachineSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -249,7 +252,7 @@ class MachineView(viewsets.ModelViewSet):
         company is always filtered in order to prevent them from seeing
         unauthorized data.
         """
-        
+
         identifier = self.request.query_params.get('identifier', None)
         name = self.request.query_params.get('name', None)
         machine_type = self.request.query_params.get('machine_type', None)
@@ -276,9 +279,7 @@ class MachineView(viewsets.ModelViewSet):
 class ImageView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.ImageSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -287,6 +288,7 @@ class ImageView(viewsets.ModelViewSet):
         company is always filtered to prevent users them from seeing
         unauthorized data.
         """
+
         image_id = self.request.query_params.get('id', None)
         machine = self.request.query_params.get('machine', None)
 
@@ -307,9 +309,7 @@ class ImageView(viewsets.ModelViewSet):
 class MeasurementView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.MeasurementSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -318,6 +318,7 @@ class MeasurementView(viewsets.ModelViewSet):
         company is always filtered in order to prevent them from seeing
         unauthorized data.
         """
+
         measurement_id = self.request.query_params.get('id', None)
         severity = self.request.query_params.get('severity', None)
         date = self.request.query_params.get('date', None)
@@ -365,9 +366,7 @@ class MeasurementView(viewsets.ModelViewSet):
 class TermoImageView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TermoImageSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -376,7 +375,7 @@ class TermoImageView(viewsets.ModelViewSet):
         company is always filtered to prevent users them from seeing
         unauthorized data.
         """
-        
+
         termo_iamge_id = self.request.query_params.get('id', None)
         image_type = self.request.query_params.get('image_type', None)
         machine = self.request.query_params.get('machine', None)
@@ -408,9 +407,7 @@ class TermoImageView(viewsets.ModelViewSet):
 class PointView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.PointSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -419,7 +416,7 @@ class PointView(viewsets.ModelViewSet):
         company is always filtered to prevent users them from seeing
         unauthorized data.
         """
-        
+
         point_id = self.request.query_params.get('id', None)
         number = self.request.query_params.get('number', None)
         position = self.request.query_params.get('position', None)
@@ -453,9 +450,7 @@ class PointView(viewsets.ModelViewSet):
 class TendencyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TendencySerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -496,9 +491,7 @@ class TendencyView(viewsets.ModelViewSet):
 class EspectraView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.EspectraSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 
@@ -542,9 +535,7 @@ class EspectraView(viewsets.ModelViewSet):
 class TimeSignalView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TimeSignalSerializer
-    permission_classes = [
-        permissions.IsAuthenticated & IsStaffOrSuperUser
-    ]
+    permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
 

@@ -38,7 +38,6 @@ class MyUserAdmin(UserAdmin):
         for f in disabled_fields:
             if f in form.base_fields:
                 form.base_fields[f].disabled = True
-
         return form
     
     def has_add_permission(self, request, obj=None):

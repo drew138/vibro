@@ -30,6 +30,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'email',
+            'company',
             ]
 
 
@@ -81,6 +82,7 @@ class ResetSerializer(serializers.Serializer):
     class Meta:
         model = custom_models.VibroUser
         fields = [
+            'id',
             'username',
             'first_name',
             'email',
@@ -89,6 +91,8 @@ class ResetSerializer(serializers.Serializer):
 
 # Change Password Serializer
 class ChangePassSerializer(serializers.Serializer):
+
+    username = serializers.CharField(required=False)
 
     class Meta:
         model = custom_models.VibroUser

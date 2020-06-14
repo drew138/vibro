@@ -8,7 +8,7 @@ class IsStaffOrSuperUser(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if (request.user.is_staff or request.user.is_superuser) or (request.method in SAFE_METHODS):
+        if (request.user.is_staff or request.user.is_superuser) or ((request.method in SAFE_METHODS) and (request.user.is_authenticated)):
             return True
         return False
 
