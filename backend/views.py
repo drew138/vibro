@@ -8,23 +8,21 @@ from rest_framework.response import Response
 from . import models as custom_models
 from knox.models import AuthToken
 from django.db.models import Q
-from django.core import mail
-# from rest_framework import filters
-
+from django.core.mail import EmailMessage
+from django.conf import settings
 
 def send_email(data):
 
     """
     function to be used in a view to send emails.
     """
-    
-    with mail.get_connection() as connection:
-        template = render_to_string(data.template, data.variables)
-        sender = EMAIL_HOST_USER
-        email = mail.EmailMessage(data.subject, template, sender, data.receiver, connection=connection)
-        email.content_subtype = "html"
-        email.fail_silently = False
-        email.send()
+
+    template = render_to_string(data['template'], data['variables'])
+    sender = settings.EMAIL_HOST_USER
+    email = EmailMessage(data['subject'], template, sender, data['receiver'])
+    email.content_subtype = "html"
+    email.fail_silently = False
+    email.send()
 
 
 class CityView(viewsets.ModelViewSet):
@@ -124,7 +122,7 @@ class RegisterAPI(generics.GenericAPIView):
         send_email(email_data)  # send welcome email
         staff_users = [vibrouser.email for vibrouser in custom_models.VibroUser.objects.filter(is_staff=True).all()]
         staff_email = {
-            'subject':'ACTIVACION DE CUENTA - NUEVO USUARIO',
+            'subject':'ACTIVACIÓN DE CUENTA - NUEVO USUARIO',
             'template': 'email/new_user.html',
             'variables': {
                 'user': user.first_name,
@@ -167,10 +165,9 @@ class ResetAPI(generics.GenericAPIView):
         if user.exists():
             token = AuthToken.objects.create(user)[1]
             email_data = {
-                'subject':'Cambio de Search Results Contraseña - Vibromontajes',
+                'subject':'Cambio de Contraseña - Vibromontajes',
                 'template': 'email/password_reset.html',
                 'variables': {
-                    'id': user.id,
                     'user': user.first_name,
                     'host': request.get_host(),
                     'username': user.username,
@@ -193,21 +190,24 @@ class ChangePassAPI(generics.UpdateAPIView):
 
     serializer_class = custom_serializers.ChangePassSerializer
 
-    # def patch(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(self.get_object(), data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
-    # def update(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save(password=instance.password, **serializer.validated_data)
-    #     return Response(serializer.validated_data)
-
-    # def partial_update(self, request, *args, **kwargs):
-    #     kwargs['partial'] = True
-    #     return self.update(request, *args, **kwargs)
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.update(self.get_object(), request.data['password'])
+        email_data = {
+                'subject':'Cambio de Contraseña - Vibromontajes',
+                'template': 'email/successful_change.html',
+                'variables': {
+                    'user': user.username,
+                },
+                'receiver': [user.email]
+            }
+        send_email(email_data)
+        return Response({
+            "user": custom_serializers.ChangePassSerializer(user,
+            context=self.get_serializer_context()).data,
+            "token": AuthToken.objects.create(user)[1]
+        })
 
     def get_object(self):
         return self.request.user

@@ -97,10 +97,17 @@ class ChangePassSerializer(serializers.Serializer):
     class Meta:
         model = custom_models.VibroUser
         fields = ['username', 'password']
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
-    def update(self, instance, validated_data):
-        user = custom_models.VibroUser.objects.update(**validated_data)
-        return user
+    def update(self, instance, password):
+
+        if password == None:
+            raise serializers.ValidationError('argument password must be provided')
+        elif len(password) < 7:
+            raise serializers.ValidationError('password must be 8 characters minimum')
+        instance.set_password(password)
+        instance.save()
+        return instance
 
 
 class ProfileSerializer(serializers.ModelSerializer):
