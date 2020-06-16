@@ -93,9 +93,7 @@ class CompanyView(viewsets.ModelViewSet):
 # Get User API
 class UserAPI(generics.RetrieveAPIView):
 
-    permission_classes = [
-        permissions.IsAuthenticated
-    ]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = custom_serializers.VibroUserSerializer
 
     def get_object(self):
