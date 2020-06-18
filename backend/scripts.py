@@ -9,6 +9,29 @@ from reportlab.lib.pagesizes import letter
 from io import BytesIO
 from reportlab.lib.colors import Color
 
+create table to generate footer and header
+
+# constants for footer
+ADDRESS = 'Calle 9A  No. 54 - 129 Guayabal'
+PHONE = 'PBX: (4) 362 00 62'
+CELPHONE = 'Cel. 312 296 84 50'
+WHATSAPP = 'WhatsApp 301  249 92 84'
+WEBSITE = 'www.vibromontajes.com'
+EMAIL = 'E-mail: servicios@vibromontajes.com'
+FOOTER_CITY = 'Medellín, Colombia'
+# constants for font colors
+HEADER_FOOTER_GREEN = Color(red=0, green=(102/255), blue=0)
+COMPANY_HEADER_BLUE = Color(red=(82/255), green=(139/255), blue=(166/255))
+# constants for paragraph styles
+STANDARD = ParagraphStyle(name='standard', fontName='Arial', fontSize=10)
+BLACK_SMALL = ParagraphStyle(name='black_small', fontName='Arial', fontSize=7)
+GREEN_SMALL = ParagraphStyle(
+    name='green_small', fontName='Arial', fontSize=7, textColor=HEADER_FOOTER_GREEN)
+BLACK_BOLD = ParagraphStyle(
+    name='black_bold', fontName='Arial-Bold', fontSize=10)
+HEADER_BLUE = ParagraphStyle(name='header_blue', fontName='Arial-Bold', fontSize=10,
+                             textColor=COMPANY_HEADER_BLUE)
+
 
 class Report(BaseDocTemplate):
 
@@ -16,40 +39,16 @@ class Report(BaseDocTemplate):
         super().__init__(self, filename, **kwargs, pagesize=letter)
         self.filename = filename
         self.querysets = querysets  # model objects to populate pdf
-
         self.toc = TableOfContents()  # table of contents object
         self.story = []
-
-        self.footer_content = ''
-        self.header_content = ''
 
         self.frame = Frame(2.5*cm, 2.5*cm, 15*cm, 25*cm, id='F1')
         self.template = PageTemplate('normal', [self.frame])
         self.addPageTemplates(template)
         # paragraph styles
-        self.style_1 = ParagraphStyle(
-            name='Heading1', fontName='Helvetica', fontSize=20)
-        self.style_2 = ParagraphStyle(
-            name='Heading2', fontName='Helvetica', fontSize=20)
-        self.style_3 = ParagraphStyle(
-            name='Heading3', fontName='Helvetica', fontSize=20)
-        self.style_3 = ParagraphStyle(
-            name='Heading3', fontName='Arial-Bold', fontSize=9)
-        self.style_4 = ParagraphStyle(name='Heading4', fontName='Arial-Bold', fontSize=11,
-                                      textColor=Color(red=(82/255), green=(139/255), blue=(166/255)))
-        self.style_5 = ParagraphStyle(
-            name='Heading5', fontName='Arial', fontSize=7, textColor=Color(red=0, green=(102/255), blue=0))
-        # footer content
-        self.address = 'Calle 9A  No. 54 - 129 Guayabal'
-        self.phone = 'PBX: (4) 362 00 62'
-        self.celphone = 'Cel. 312 296 84 50'
-        self.whatsapp = 'WhatsApp 301  249 92 84'
-        self.website = 'www.vibromontajes.com'
-        self.email = 'E-mail: servicios@vibromontajes.com'
-        self.city = 'Medellín, Colombia'
 
     @staticmethod
-    def footer(canvas, doc, content):
+    def _footer(canvas, doc, content):
         canvas.saveState()
         P = Paragraph("This is a multi-line footer.  It goes on every page.  " * 5,
                       styleN)
@@ -58,7 +57,7 @@ class Report(BaseDocTemplate):
         canvas.restoreState()
 
     @staticmethod
-    def header_footer_layout(canvas, doc):
+    def _header_footer_layout(canvas, doc):
         """
         method to be passed to PageTemplate
         objects on onPage keyword argument.
@@ -72,7 +71,7 @@ class Report(BaseDocTemplate):
         canvas.restoreState()
 
     @staticmethod
-    def footer_layout(canvas, doc):
+    def _footer_layout(canvas, doc):
         """
         method to be passed to PageTemplate
         objects on onPage keyword argument.
@@ -85,7 +84,7 @@ class Report(BaseDocTemplate):
         canvas.restoreState()
 
     @staticmethod
-    def empty_layout(canvas, doc):
+    def _empty_layout(canvas, doc):
         """
         method to be passed to PageTemplate
         objects on onPage keyword argument.
