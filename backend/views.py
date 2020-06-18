@@ -5,11 +5,11 @@ from django.template.loader import render_to_string
 from . import serializers as custom_serializers
 from v_website.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
+from django.core.mail import EmailMessage
 from . import models as custom_models
 from knox.models import AuthToken
-from django.db.models import Q
-from django.core.mail import EmailMessage
 from django.conf import settings
+from django.db.models import Q
 
 def send_email(data):
 
