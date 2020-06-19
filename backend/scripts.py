@@ -8,13 +8,15 @@ from reportlab.lib.units import cm
 from django.db import models
 from reportlab.lib.pagesizes import letter
 from io import BytesIO
-from reportlab.lib.colors import Color
+from reportlab.lib.colors import Color, black
+
+
 # from reportlab.pdfgen import canvas
 
 
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
-registerFont(TTFont('Arial', 'ARIAL.ttf'))
+registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
 registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 
 # constants for footer
@@ -25,9 +27,10 @@ WHATSAPP = 'WhatsApp 301  249 92 84'
 WEBSITE = 'www.vibromontajes.com'
 EMAIL = 'servicios@vibromontajes.com'
 FOOTER_CITY = 'Medellín, Colombia'
-# constants for font colors
+# constants for colors
 HEADER_FOOTER_GREEN = Color(red=0, green=(102/255), blue=0)
 COMPANY_HEADER_BLUE = Color(red=(82/255), green=(139/255), blue=(166/255))
+TABLE_BLUE = Color(red=(141/255), green=(179/255), blue=(226/255))
 # constants for paragraph styles
 STANDARD = ParagraphStyle(name='standard', fontName='Arial', fontSize=10)
 BLACK_SMALL = ParagraphStyle(name='black_small', fontName='Arial', fontSize=7)
@@ -46,9 +49,6 @@ LINE_TWO = Paragraph(
 LINE_THREE = Paragraph(
     text=f'{WEBSITE} E-mail: <link href="mailto:{EMAIL}">{EMAIL}</link> {FOOTER_CITY}', style=GREEN_SMALL)
 
-w, h = letter
-print(w, h, cm)
-
 
 class Report(BaseDocTemplate):
 
@@ -56,17 +56,17 @@ class Report(BaseDocTemplate):
     Create dynamic reports.
     """
 
-    def __init__(self, filename, querysets):
-        super().__init__(self, filename, **kwargs, pagesize=letter)
+    def __init__(self, filename, querysets, **kwargs):
+        super().__init__(filename, **kwargs)
         self.filename = filename
         self.querysets = querysets  # model objects to populate pdf
         self.toc = TableOfContents()  # table of contents object
-
+        self.pagesize = letter
         self.story = []
-        self.width, self.height = pagesize
+        self.width, self.height = self.pagesize
         self.frame = Frame(2.5*cm, 2.5*cm, 15*cm, 25*cm, id='F1')
         self.template = PageTemplate('normal', [self.frame])
-        self.addPageTemplates(template)
+        # self.addPageTemplates(template)
         self.footer = Table([(LINE_ONE,), (LINE_TWO,), (LINE_THREE,)])
 
     @staticmethod
@@ -93,10 +93,10 @@ class Report(BaseDocTemplate):
         """
 
         canvas.saveState()
-        P = Paragraph("This is a multi-line footer.  It goes on every page.  " * 5,
-                      styleN)
-        w, h = P.wrap(doc.width, doc.bottomMargin)
-        P.drawOn(canvas, doc.leftMargin, h)
+        # P = Paragraph("This is a multi-line footer.  It goes on every page.  " * 5,
+        #               styleN)
+        # w, h = P.wrap(doc.width, doc.bottomMargin)
+        # P.drawOn(canvas, doc.leftMargin, h)
         canvas.restoreState()
 
     @staticmethod
@@ -112,7 +112,8 @@ class Report(BaseDocTemplate):
 
         canvas.restoreState()
 
-    def create_table_header(self, date, comp):
+    @staticmethod
+    def create_table_header(date, comp):
         """
         create table to manage
         elements in custom header.
@@ -162,7 +163,33 @@ class Report(BaseDocTemplate):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
         ]
-        table = Table(data, colWidths=self.width)
+        table = Table(data, colWidths=[self.width - 50])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    def graph_table(self, title, graph):
+        data = [[title], [graph]]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
+            ('GRID', (0, 0), (-1, -1), 0.25, black)
+        ]
+        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    def pictures_table(self):
+        data = None
+        styles = None
+        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    def machine_specifications_table(self):
+        data = None
+        styles = None
+        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -176,3 +203,6 @@ class Report(BaseDocTemplate):
                 self.notify('TOCEntry', (0, text, self.page))
             if style == 'Heading2':
                 self.notify('TOCEntry', (1, text, self.page))
+
+    def build_doc(self):
+        self.multiBuild(self.story)
