@@ -4,7 +4,7 @@ from knox import views as knox_views
 from rest_framework import routers
 from . import views
 
-#TODO test endpoints
+# TODO test endpoints
 auth_views = [
     path('auth', include('knox.urls')),
     path('auth/register', views.RegisterAPI.as_view()),
@@ -26,5 +26,6 @@ router.register('point', views.PointView, 'point')
 router.register('tendency', views.TendencyView, 'tendency')
 router.register('espectra', views.EspectraView, 'espectra')
 router.register('timesignal', views.TimeSignalView, 'timesignal')
+router.register('report', views.ReportView, 'report')
 
-urlpatterns =  auth_views + router.urls 
+urlpatterns = auth_views + router.urls

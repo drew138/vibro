@@ -4,7 +4,7 @@ from . import models as custom_models
 
 
 class CitySerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = custom_models.City
         fields = '__all__'
@@ -31,7 +31,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'company',
-            ]
+        ]
 
 
 # Register Serializer
@@ -52,8 +52,8 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
             'ext',
             'celphone_one',
             'celphone_two'
-            ]
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}  # TODO check if kwargs are valid
+        ]
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def create(self, validated_data):
         user = custom_models.VibroUser.objects.create_user(**validated_data)
@@ -86,8 +86,8 @@ class ResetSerializer(serializers.Serializer):
             'username',
             'first_name',
             'email',
-            ]
-    
+        ]
+
 
 # Change Password Serializer
 class ChangePassSerializer(serializers.Serializer):
@@ -102,9 +102,11 @@ class ChangePassSerializer(serializers.Serializer):
     def update(self, instance, password):
 
         if password == None:
-            raise serializers.ValidationError('argument password must be provided')
+            raise serializers.ValidationError(
+                'argument password must be provided')
         elif len(password) < 7:
-            raise serializers.ValidationError('password must be 8 characters minimum')
+            raise serializers.ValidationError(
+                'password must be 8 characters minimum')
         instance.set_password(password)
         instance.save()
         return instance
@@ -121,7 +123,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class MachineSerializer(serializers.ModelSerializer):
 
-    company = CompanySerializer() 
+    company = CompanySerializer()
 
     class Meta:
         model = custom_models.Machine

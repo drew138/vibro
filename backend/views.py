@@ -1,18 +1,21 @@
 from rest_framework.exceptions import ValidationError, NotAuthenticated, NotFound
+from .permissions import IsStaffOrSuperUser, UpdatePass, ReportPermissions
 from rest_framework import viewsets, generics, permissions
-from .permissions import IsStaffOrSuperUser, UpdatePass
 from django.template.loader import render_to_string
 from . import serializers as custom_serializers
 from v_website.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import EmailMessage
 from . import models as custom_models
+from django.http import FileResponse
 from knox.models import AuthToken
 from django.conf import settings
 from django.db.models import Q
+from .scripts import Report
+import io
+
 
 def send_email(data):
-
     """
     function to be used in a view to send emails.
     """
@@ -29,9 +32,8 @@ class CityView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CitySerializer
     permission_classes = [IsStaffOrSuperUser]
-    
-    def get_queryset(self):
 
+    def get_queryset(self):
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -52,9 +54,8 @@ class CompanyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CompanySerializer
     permission_classes = [IsStaffOrSuperUser]
-   
-    def get_queryset(self):
 
+    def get_queryset(self):
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -68,7 +69,7 @@ class CompanyView(viewsets.ModelViewSet):
         pbx = self.request.query_params.get('pbx', None)
         city = self.request.query_params.get('city', None)
         rut_city = self.request.query_params.get('rut_city', None)
-        
+
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company
         else:
@@ -110,7 +111,7 @@ class RegisterAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         email_data = {
-            'subject':'Bienvenido! - Vibromontajes',
+            'subject': 'Bienvenido! - Vibromontajes',
             'template': 'email/welcome.html',
             'variables': {
                 'user': user.first_name,
@@ -118,9 +119,10 @@ class RegisterAPI(generics.GenericAPIView):
             'receiver': [user.email]
         }
         send_email(email_data)  # send welcome email
-        staff_users = [vibrouser.email for vibrouser in custom_models.VibroUser.objects.filter(is_staff=True).all()]
+        staff_users = [vibrouser.email for vibrouser in custom_models.VibroUser.objects.filter(
+            is_staff=True).all()]
         staff_email = {
-            'subject':'ACTIVACIÓN DE CUENTA - NUEVO USUARIO',
+            'subject': 'ACTIVACIÓN DE CUENTA - NUEVO USUARIO',
             'template': 'email/new_user.html',
             'variables': {
                 'user': user.first_name,
@@ -130,7 +132,7 @@ class RegisterAPI(generics.GenericAPIView):
         send_email(staff_email)  # send email to staff
         return Response({
             "user": custom_serializers.RegisterVibroUserSerializer(user,
-            context=self.get_serializer_context()).data,
+                                                                   context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
 
@@ -146,24 +148,25 @@ class LoginAPI(generics.GenericAPIView):
         user = serializer.validated_data
         return Response({
             "user": custom_serializers.VibroUserSerializer(user,
-            context=self.get_serializer_context()).data,
+                                                           context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
 
 
 # Reset API
 class ResetAPI(generics.GenericAPIView):
-        
+
     serializer_class = custom_serializers.ResetSerializer
-    
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = custom_models.VibroUser.objects.filter(email=request.data['email']).first()
+        user = custom_models.VibroUser.objects.filter(
+            email=request.data['email']).first()
         if user.exists():
             token = AuthToken.objects.create(user)[1]
             email_data = {
-                'subject':'Cambio de Contraseña - Vibromontajes',
+                'subject': 'Cambio de Contraseña - Vibromontajes',
                 'template': 'email/password_reset.html',
                 'variables': {
                     'user': user.first_name,
@@ -176,7 +179,7 @@ class ResetAPI(generics.GenericAPIView):
             send_email(email_data)
         else:
             raise NotFound('user not found')
-        return Response({"detail": f"an email has been sent to {user.email}" })
+        return Response({"detail": f"an email has been sent to {user.email}"})
 
 
 # Change Password API
@@ -193,17 +196,17 @@ class ChangePassAPI(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.update(self.get_object(), request.data['password'])
         email_data = {
-                'subject':'Cambio de Contraseña - Vibromontajes',
-                'template': 'email/successful_change.html',
-                'variables': {
-                    'user': user.username,
-                },
-                'receiver': [user.email]
-            }
+            'subject': 'Cambio de Contraseña - Vibromontajes',
+            'template': 'email/successful_change.html',
+            'variables': {
+                'user': user.username,
+            },
+            'receiver': [user.email]
+        }
         send_email(email_data)
         return Response({
             "user": custom_serializers.ChangePassSerializer(user,
-            context=self.get_serializer_context()).data,
+                                                            context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
 
@@ -215,9 +218,8 @@ class ProfileView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.ProfileSerializer
     permission_classes = [IsStaffOrSuperUser]
-    
-    def get_queryset(self):
 
+    def get_queryset(self):
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -239,12 +241,11 @@ class ProfileView(viewsets.ModelViewSet):
 
 
 class MachineView(viewsets.ModelViewSet):
-    
+
     serializer_class = custom_serializers.MachineSerializer
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered in order to prevent them from seeing
@@ -264,7 +265,7 @@ class MachineView(viewsets.ModelViewSet):
         if q_id is not None:
             queryset = queryset.filter(id=q_id)
         if company is not None:
-             queryset = queryset.filter(company__id=company)
+            queryset = queryset.filter(company__id=company)
         if identifier is not None:
             queryset = queryset.filter(identifier=identifier)
         if name is not None:
@@ -272,7 +273,7 @@ class MachineView(viewsets.ModelViewSet):
         if machine_type is not None:
             queryset = queryset.filter(machine_type=identifier)
         return queryset
-        
+
 
 class ImageView(viewsets.ModelViewSet):
 
@@ -280,7 +281,6 @@ class ImageView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -310,7 +310,6 @@ class MeasurementView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered in order to prevent them from seeing
@@ -324,7 +323,8 @@ class MeasurementView(viewsets.ModelViewSet):
         recomendation = self.request.query_params.get('recomendation', None)
         revised = self.request.query_params.get('revised', None)
         resolved = self.request.query_params.get('resolved', None)
-        measurement_type = self.request.query_params.get('measurement_type', None)
+        measurement_type = self.request.query_params.get(
+            'measurement_type', None)
         machine = self.request.query_params.get('machine', None)
         engineer_one = self.request.query_params.get('engineer_one', None)
         engineer_two = self.request.query_params.get('engineer_two', None)
@@ -333,7 +333,8 @@ class MeasurementView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            queryset = custom_models.Measurement.objects.filter(q_objects).all()
+            queryset = custom_models.Measurement.objects.filter(
+                q_objects).all()
         else:
             queryset = custom_models.Image.objects.all()
         if measurement_id is not None:
@@ -341,7 +342,8 @@ class MeasurementView(viewsets.ModelViewSet):
         if severity is not None:
             queryset = queryset.filter(severity=severity)
         if date is not None:
-            queryset = queryset.filter(date=date)  # requires further specification on date
+            # requires further specification on date
+            queryset = queryset.filter(date=date)
         if analysis is not None:
             queryset = queryset.filter(analysis=analysis)
         if recomendation is not None:
@@ -359,7 +361,30 @@ class MeasurementView(viewsets.ModelViewSet):
         if engineer_two is not None:
             queryset = queryset.filter(engineer_two__id=engineer_two)
         return queryset
-        
+
+
+class ReportView(viewsets.ModelViewSet):
+
+    permission_classes = [ReportPermissions]
+
+    def get(self, request, format=None):
+        company = request.query_params.get('company', None)
+        company = request.query_params.get('company', None)
+        company = request.query_params.get('company', None)
+        if request.user.is_staff or request.user.is_superuser:
+            queryset = custom_models.Measurement.objects.filter(
+                company=company)
+
+        buffer = io.BytesIO()
+        company = None
+        date = None
+        querysets = None
+
+        pdf = Report(buffer, querysets)
+        pdf.write_pdf().build_doc()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename=f'PREDICTIVO_{company}_{date}.pdf')
+
 
 class TermoImageView(viewsets.ModelViewSet):
 
@@ -367,7 +392,6 @@ class TermoImageView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -379,16 +403,17 @@ class TermoImageView(viewsets.ModelViewSet):
         machine = self.request.query_params.get('machine', None)
         measurement = self.request.query_params.get('measurement', None)
 
-
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(q_objects).all()
+            measurements = custom_models.Measurement.objects.filter(
+                q_objects).all()
             q_objects_t_image = Q()
             for me in measurements:
                 q_objects_t_image |= Q(measurement=me)
-            queryset = custom_models.TermoImage.objects.filter(q_objects_t_image).all()
+            queryset = custom_models.TermoImage.objects.filter(
+                q_objects_t_image).all()
         else:
             queryset = custom_models.Image.objects.all()
         if termo_iamge_id is not None:
@@ -408,7 +433,6 @@ class PointView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -425,11 +449,13 @@ class PointView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(q_objects).all()
+            measurements = custom_models.Measurement.objects.filter(
+                q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            queryset = custom_models.Point.objects.filter(q_objects_measurement).all()
+            queryset = custom_models.Point.objects.filter(
+                q_objects_measurement).all()
         else:
             queryset = custom_models.Point.objects.all()
         if point_id is not None:
@@ -451,7 +477,6 @@ class TendencyView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -466,15 +491,18 @@ class TendencyView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(q_objects).all()
+            measurements = custom_models.Measurement.objects.filter(
+                q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            points = custom_models.Point.objects.filter(q_objects_measurement).all()
+            points = custom_models.Point.objects.filter(
+                q_objects_measurement).all()
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
-            queryset = custom_models.Tendency.objects.filter(q_objects_point).all()
+            queryset = custom_models.Tendency.objects.filter(
+                q_objects_point).all()
         else:
             queryset = custom_models.Tendency.objects.all()
         if tendency_id is not None:
@@ -492,7 +520,6 @@ class EspectraView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -508,15 +535,18 @@ class EspectraView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(q_objects).all()
+            measurements = custom_models.Measurement.objects.filter(
+                q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            points = custom_models.Point.objects.filter(q_objects_measurement).all()
+            points = custom_models.Point.objects.filter(
+                q_objects_measurement).all()
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
-            queryset = custom_models.Espectra.objects.filter(q_objects_point).all()
+            queryset = custom_models.Espectra.objects.filter(
+                q_objects_point).all()
         else:
             queryset = custom_models.Tendency.objects.all()
         if espectra_id is not None:
@@ -536,7 +566,6 @@ class TimeSignalView(viewsets.ModelViewSet):
     permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
-
         """
         Optionally filter fields based on url. For non staff/superusers,
         company is always filtered to prevent users them from seeing
@@ -552,15 +581,18 @@ class TimeSignalView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines:
                 q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(q_objects).all()
+            measurements = custom_models.Measurement.objects.filter(
+                q_objects).all()
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            points = custom_models.Point.objects.filter(q_objects_measurement).all()
+            points = custom_models.Point.objects.filter(
+                q_objects_measurement).all()
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
-            queryset = custom_models.TimeSignal.objects.filter(q_objects_point).all()
+            queryset = custom_models.TimeSignal.objects.filter(
+                q_objects_point).all()
         else:
             queryset = custom_models.Tendency.objects.all()
         if signal_id is not None:

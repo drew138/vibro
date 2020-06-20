@@ -119,12 +119,9 @@ class Report(BaseDocTemplate):
         elements in custom header.
         """
 
-        logo = Image('static/images/logo.jpg')
-        skf = Image('static/images/skf.jpg')
-        logo.drawWidth = 8.65 * cm
-        logo.drawHeight = 2.51 * cm
-        skf.drawWidth = 1.76 * cm
-        skf.drawHeight = 0.47 * cm
+        logo = Image('static/images/logo.jpg',
+                     width=8.65 * cm, height=2.51 * cm)
+        skf = Image('static/images/skf.jpg', width=1.76 * cm, height=0.47 * cm)
         skf_text = Paragraph('Con tecnología', style=GREEN_SMALL)
         report_date = Paragraph(date.upper(), style=STANDARD)
         company = Paragraph(comp.upper(), style=BLUE_HF)
@@ -152,7 +149,8 @@ class Report(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    def create_footer_table(self):
+    @staticmethod
+    def create_footer_table():
         """
         create table to manage
         elements in footer.
@@ -163,11 +161,18 @@ class Report(BaseDocTemplate):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
         ]
-        table = Table(data, colWidths=[self.width - 50])
+        table = Table(data, colWidths=[18 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
-    def graph_table(self, title, graph):
+    @staticmethod
+    def graph_table(title, graph):
+        """
+        create a table containing 
+        an especified image.
+        """
+
+        graph = Image(graph, width=17 * cm, height=7 * cm)
         data = [[title], [graph]]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -179,10 +184,26 @@ class Report(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    def pictures_table(self):
-        data = None
-        styles = None
-        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
+    @staticmethod
+    def pictures_table(diagram_img, machine_img):
+        """
+        create a table containing the 
+        diagram image and the machine image.
+        """
+
+        diagram_img = Image(diagram_img)
+        machine_img = Image(machine_img)
+        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD)
+        machine = Paragraph('IMAGEN MAQUINA', style=STANDARD)
+        data = [[diagram, machine], [diagram_img, machine_img]]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE)
+        ]
+        table = Table(data, colWidths=[
+                      9 * cm, 9 * cm], rowHeights=[0.5 * cm, 6 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -203,6 +224,10 @@ class Report(BaseDocTemplate):
                 self.notify('TOCEntry', (0, text, self.page))
             if style == 'Heading2':
                 self.notify('TOCEntry', (1, text, self.page))
+
+    def write_pdf(self):
+        # TODO
+        return self
 
     def build_doc(self):
         self.multiBuild(self.story)
