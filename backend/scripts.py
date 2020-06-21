@@ -74,7 +74,7 @@ class Report(BaseDocTemplate):
     Create dynamic reports.
     """
 
-    def __init__(self, filename, querysets, company, date, ** kwargs):
+    def __init__(self, filename, querysets, company, date, **kwargs):
         super().__init__(filename, **kwargs)
         self.filename = filename
         self.querysets = querysets  # model objects to populate pdf
@@ -82,16 +82,19 @@ class Report(BaseDocTemplate):
         self.date = date
         self.toc = TableOfContents()  # table of contents object
         self.story = []
-        self.width, self.height = letter
+        self.width = 18 * cm
+        self.leftMargin = 1.8 * cm
+        self.bottomMargin = 2 * cm
         self.templates = [
             PageTemplate('normal', [STANDARD_FRAME]),
             PageTemplate('measurement',
                          [MACHINE_FRAME],
-                         onPage=self._header,
+                         onPage=self._header_one,
                          onPageEnd=self._footer),
             PageTemplate('measurement_two',
                          [STANDARD_FRAME],
-                         onPageEnd=self._footer),
+                         onPage=self._header_two,
+                         onPageEnd=self._footer)
         ]
 
     # finished
@@ -163,8 +166,8 @@ class Report(BaseDocTemplate):
         header_one = Paragraph('ANÁLISIS DE VIBRACIÓN', style=STANDARD_CENTER)
         header_two = Paragraph(
             'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER)
-        analysis = Paragraph(analysis, style=STANDARD_JUSTIFIED)
-        recomendation = Paragraph(recomendation, style=STANDARD_JUSTIFIED)
+        analysis = Paragraph(analysis, style=STANDARD)
+        recomendation = Paragraph(recomendation, style=STANDARD)
 
         data = [[header_one], [analysis], [header_two], [recomendation]]
         styles = [
@@ -172,6 +175,26 @@ class Report(BaseDocTemplate):
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
         ]
         table = Table(data, colWidths=[18 * cm])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    @staticmethod
+    def graph_table(title, graph):
+        """
+        create a table containing 
+        an especified graphic.
+        """
+
+        title = Paragraph(title, style=STANDARD_CENTER)
+        graph = Image(graph, width=17 * cm, height=6 * cm)
+        data = [[title], [graph]]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
+            ('GRID', (0, 0), (-1, -1), 0.25, black)
+        ]
+        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -184,20 +207,31 @@ class Report(BaseDocTemplate):
 
     # TODO
 
-    @staticmethod
-    def _header(self, canvas, doc):
+    def _header_one(self, canvas, doc):
         """
         method to be passed to PageTemplate
         objects on onPage keyword argument 
-        to generate headers.
+        to generate headers of measurements.
         """
 
         canvas.saveState()
 
-        # TODO retrieve company and date
-
         table = self._create_header_table()
 
+        canvas.restoreState()
+
+    def _header_two(self, canvas, doc):
+        """
+        method to be passed to PageTemplate
+        objects on onPage keyword argument 
+        to generate basic headers.
+        """
+
+        canvas.saveState()
+        page = Paragraph(doc.page, style=BLACK_SMALL)
+        w, h = page.wrap(self.width, 1 * cm)
+        page.drawOn(canvas, self.leftMargin +
+                    ((self.width - w) / 2), (26.5 * cm) - h)
         canvas.restoreState()
 
     def _footer(self, canvas, doc):
@@ -212,26 +246,6 @@ class Report(BaseDocTemplate):
         table = self._create_footer_table()
 
         canvas.restoreState()
-
-    @staticmethod
-    def graph_table(title, graph):
-        """
-        create a table containing 
-        an especified image.
-        """
-
-        title = Paragraph(title, style=STANDARD_CENTER)
-        graph = Image(graph, width=17 * cm, height=7 * cm)
-        data = [[title], [graph]]
-        styles = [
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
-            ('GRID', (0, 0), (-1, -1), 0.25, black)
-        ]
-        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
-        table.setStyle(TableStyle(styles))
-        return table
 
     @staticmethod
     def pictures_table(diagram_img, machine_img):
