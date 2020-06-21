@@ -36,9 +36,9 @@ TABLE_BLUE = Color(red=(141/255), green=(179/255), blue=(226/255))
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
-STANDAR_CENTER = ParagraphStyle(
+STANDARD_CENTER = ParagraphStyle(
     name='standard_center', fontName='Arial', fontSize=10, alignment=1)
-STANDAR_HEADER = ParagraphStyle(
+STANDARD_HEADER = ParagraphStyle(
     name='standard_header', fontName='Arial', fontSize=10, alignment=2)
 STANDARD_JUSTIFIED = ParagraphStyle(
     name='standard_justified', fontName='Arial', fontSize=10, alignment=4)
@@ -59,7 +59,13 @@ LINE_ONE = Paragraph('_' * 91, style=BLUE_CENTER)
 LINE_TWO = Paragraph(
     f'{ADDRESS} {PHONE} {CELPHONE} {WHATSAPP}', style=BLACK_SMALL)
 LINE_THREE = Paragraph(
-    text=f'{WEBSITE} E-mail: <link href="mailto:{EMAIL}">{EMAIL}</link> {FOOTER_CITY}', style=GREEN_SMALL)
+    text=f'{WEBSITE} E-mail: <a href="mailto:{EMAIL}">{EMAIL}</a> {FOOTER_CITY}', style=GREEN_SMALL)
+# Frames used for templates
+STANDARD_FRAME = Frame(1.8*cm, 2*cm, 18*cm, 24*cm, id='standard')
+MACHINE_FRAME = Frame(1.8*cm, 2*cm, 18*cm, 22*cm, id='big_header')
+
+w, h = letter
+print(w / cm, h / cm, cm)
 
 
 class Report(BaseDocTemplate):
@@ -68,22 +74,35 @@ class Report(BaseDocTemplate):
     Create dynamic reports.
     """
 
-    def __init__(self, filename, querysets, **kwargs):
+    def __init__(self, filename, querysets, company, date, ** kwargs):
         super().__init__(filename, **kwargs)
         self.filename = filename
         self.querysets = querysets  # model objects to populate pdf
+        self.company = company
+        self.date = date
         self.toc = TableOfContents()  # table of contents object
-        self.pagesize = letter
         self.story = []
-        self.width, self.height = self.pagesize
-        self.frame = Frame(2.5*cm, 2.5*cm, 15*cm, 25*cm, id='F1')
-        self.template = PageTemplate('normal', [self.frame])
-        # self.addPageTemplates(template)
-        self.footer = Table([(LINE_ONE,), (LINE_TWO,), (LINE_THREE,)])
+        self.width, self.height = letter
+        self.templates = [
+            PageTemplate('normal', [STANDARD_FRAME]),
+            PageTemplate('measurement',
+                         [MACHINE_FRAME],
+                         onPage=self._header,
+                         onPageEnd=self._footer),
+            PageTemplate('measurement_two',
+                         [STANDARD_FRAME],
+                         onPageEnd=self._footer),
+        ]
 
     # finished
-    @staticmethod
-    def _create_table_header(date, comp):
+    def afterInit(self):
+        """
+        add page templates after class is initialized.
+        """
+
+        self.addPageTemplates(self.templates)
+
+    def _create_header_table(self):
         """
         create table to manage
         elements in custom header.
@@ -93,8 +112,8 @@ class Report(BaseDocTemplate):
                      width=8.65 * cm, height=2.51 * cm)
         skf = Image('static/images/skf.jpg', width=1.76 * cm, height=0.47 * cm)
         skf_text = Paragraph('Con tecnología', style=GREEN_SMALL)
-        report_date = Paragraph(date.upper(), style=STANDARD_HEADER)
-        company = Paragraph(comp.upper(), style=BLUE_HEADER)
+        report_date = Paragraph(self.date.upper(), style=STANDARD_HEADER)
+        company = Paragraph(self.company.upper(), style=BLUE_HEADER)
         data = [[logo, skf_text, report_date], ['', skf, company]]
         styles = [
             # align first column to the left horizontally
@@ -141,9 +160,9 @@ class Report(BaseDocTemplate):
         create table of analysis.
         """
 
-        header_one = Paragraph('ANÁLISIS DE VIBRACIÓN', style=STANDAR_CENTER)
+        header_one = Paragraph('ANÁLISIS DE VIBRACIÓN', style=STANDARD_CENTER)
         header_two = Paragraph(
-            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDAR_CENTER)
+            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER)
         analysis = Paragraph(analysis, style=STANDARD_JUSTIFIED)
         recomendation = Paragraph(recomendation, style=STANDARD_JUSTIFIED)
 
@@ -166,45 +185,31 @@ class Report(BaseDocTemplate):
     # TODO
 
     @staticmethod
-    def _header_footer_layout(canvas, doc, content):
+    def _header(self, canvas, doc):
         """
         method to be passed to PageTemplate
-        objects on onPage keyword argument.
-        In this case, it will dynamically
-        add a footer and header to each page.
+        objects on onPage keyword argument 
+        to generate headers.
         """
 
         canvas.saveState()
-        canvas.setPageSize(letter)
-        # add header/footer
+
+        # TODO retrieve company and date
+
+        table = self._create_header_table()
+
         canvas.restoreState()
 
-    @staticmethod
-    def _footer_layout(canvas, doc):
+    def _footer(self, canvas, doc):
         """
         method to be passed to PageTemplate
-        objects on onPage keyword argument.
-        In this case, it will dynamically
-        add a footer to each page.
+        objects on onPageEnd keyword argument
+        to generate footers.
         """
 
         canvas.saveState()
-        # P = Paragraph("This is a multi-line footer.  It goes on every page.  " * 5,
-        #               styleN)
-        # w, h = P.wrap(doc.width, doc.bottomMargin)
-        # P.drawOn(canvas, doc.leftMargin, h)
-        canvas.restoreState()
 
-    @staticmethod
-    def _empty_layout(canvas, doc):
-        """
-        method to be passed to PageTemplate
-        objects on onPage keyword argument.
-        In this case, it will not add further
-        elements to the page.
-        """
-
-        canvas.saveState()
+        table = self._create_footer_table()
 
         canvas.restoreState()
 
@@ -215,7 +220,7 @@ class Report(BaseDocTemplate):
         an especified image.
         """
 
-        title = Paragraph(title, style=STANDAR_CENTER)
+        title = Paragraph(title, style=STANDARD_CENTER)
         graph = Image(graph, width=17 * cm, height=7 * cm)
         data = [[title], [graph]]
         styles = [
@@ -252,6 +257,11 @@ class Report(BaseDocTemplate):
         return table
 
     def machine_specifications_table(self):
+        """
+        create table detailing especifications 
+        of each machine and their current severity.
+        """
+
         data = None
         styles = None
         table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
@@ -279,7 +289,7 @@ class Report(BaseDocTemplate):
 
     def create_table(self, engine_name, previous_date, current_date, data):
         """
-        create table graph for word doc
+        create table graph for word.
         """
 
         fig, ax = plt.subplots()  # create axes and figure objects
@@ -322,10 +332,12 @@ class Report(BaseDocTemplate):
 
     def create_graph(self, g, title, save):
         """
-        create chart graph of global values for vel or acc.
+        create chart graph of tendency
+        values for vel or acc.
         """
-        labels = g['name'].unique(
-        )  # obtain the unique values for the 'name' column of the dataframe
+
+        labels = g['name'].unique()
+        # obtain the unique values for the 'name' column of the dataframe
         # if name's 2nd character is not numeric and 3rd character is equal to V unit is mm/s, if A it will b g - RMS
         if not labels[0][1].isnumeric():
             if labels[0][2] == 'V':
