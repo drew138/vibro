@@ -1,4 +1,4 @@
-from reportlab.platypus import PageBreak, PageTemplate, BaseDocTemplate, Paragraph, FrameBreak, NextPageTemplate, TableStyle, Image
+from reportlab.platypus import PageBreak, PageTemplate, BaseDocTemplate, Paragraph, NextPageTemplate, TableStyle, Image, Spacer
 from reportlab.platypus.tables import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle
@@ -12,15 +12,39 @@ from reportlab.lib.colors import Color, black
 import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
-
+import os
 # from reportlab.pdfgen import canvas
-
+import datetime
 
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
 registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
 registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 
+
+# file location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOGO = os.path.join(BASE_DIR, 'static\\images\\logo.jpg')
+SKF = os.path.join(BASE_DIR, 'static\\images\\skf.jpg')
+# datetime constants
+MONTHS = (
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre'
+)
+NOW = datetime.dateime.now()
+CURRENT_YEAR = NOW.year
+CURRENT_MONTH = NOW.month
+CURRENT_DAY = NOW.day
 # constants for footer
 ADDRESS = 'Calle 9A  No. 54 - 129 Guayabal'
 PHONE = 'PBX: (4) 362 00 62'
@@ -33,6 +57,7 @@ FOOTER_CITY = 'Medellín, Colombia'
 HEADER_FOOTER_GREEN = Color(red=0, green=(102/255), blue=0)
 COMPANY_HEADER_BLUE = Color(red=(82/255), green=(139/255), blue=(166/255))
 TABLE_BLUE = Color(red=(141/255), green=(179/255), blue=(226/255))
+FOOTER_BLUE = Color(red=(84/255), green=(141/255), blue=(212/255))
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
@@ -48,24 +73,23 @@ BLACK_BOLD_CENTER = ParagraphStyle(
     name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
 BLUE_HEADER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
                              textColor=COMPANY_HEADER_BLUE, alignment=2)
-BLUE_CENTER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
-                             textColor=COMPANY_HEADER_BLUE, alignment=1)
+BLUE_FOOTER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
+                             textColor=FOOTER_BLUE, alignment=1)
 BLACK_SMALL = ParagraphStyle(
     name='black_small', fontName='Arial', fontSize=7, alignment=1)
 GREEN_SMALL = ParagraphStyle(
     name='green_small', fontName='Arial', fontSize=7, textColor=HEADER_FOOTER_GREEN, alignment=1)
 # footer paragraph lines
-LINE_ONE = Paragraph('_' * 91, style=BLUE_CENTER)
+LINE_ONE = Paragraph('_' * 80, style=BLUE_FOOTER)
 LINE_TWO = Paragraph(
     f'{ADDRESS} {PHONE} {CELPHONE} {WHATSAPP}', style=BLACK_SMALL)
 LINE_THREE = Paragraph(
-    text=f'{WEBSITE} E-mail: <a href="mailto:{EMAIL}">{EMAIL}</a> {FOOTER_CITY}', style=GREEN_SMALL)
+    text=f'{WEBSITE} E-mail: <a href="mailto:{EMAIL}"><font color="blue">{EMAIL}</font></a> {FOOTER_CITY}', style=GREEN_SMALL)
 # Frames used for templates
-STANDARD_FRAME = Frame(1.8*cm, 2*cm, 18*cm, 24*cm, id='standard')
-MACHINE_FRAME = Frame(1.8*cm, 2*cm, 18*cm, 22*cm, id='big_header')
-
-w, h = letter
-print(w / cm, h / cm, cm)
+STANDARD_FRAME = Frame(1.6*cm, 2*cm, 18*cm, 26*cm,
+                       id='standard')
+MACHINE_FRAME = Frame(1.6*cm, 2*cm, 18*cm, 23*cm,
+                      id='big_header')
 
 
 class Report(BaseDocTemplate):
@@ -83,27 +107,23 @@ class Report(BaseDocTemplate):
         self.toc = TableOfContents()  # table of contents object
         self.story = []
         self.width = 18 * cm
-        self.leftMargin = 1.8 * cm
+        self.leftMargin = 1.6 * cm
         self.bottomMargin = 2 * cm
         self.templates = [
-            PageTemplate('normal', [STANDARD_FRAME]),
-            PageTemplate('measurement',
-                         [MACHINE_FRAME],
+            PageTemplate(id='measurement',
+                         frames=[MACHINE_FRAME],
                          onPage=self._header_one,
                          onPageEnd=self._footer),
-            PageTemplate('measurement_two',
-                         [STANDARD_FRAME],
+            PageTemplate(id='measurement_two',
+                         frames=[STANDARD_FRAME],
                          onPage=self._header_two,
-                         onPageEnd=self._footer)
+                         onPageEnd=self._footer),
+            PageTemplate(id='normal', frames=[
+                         STANDARD_FRAME], onPage=self._header_two),
         ]
+        self.addPageTemplates(self.templates)
 
     # finished
-    def afterInit(self):
-        """
-        add page templates after class is initialized.
-        """
-
-        self.addPageTemplates(self.templates)
 
     def _create_header_table(self):
         """
@@ -111,9 +131,8 @@ class Report(BaseDocTemplate):
         elements in custom header.
         """
 
-        logo = Image('static/images/logo.jpg',
-                     width=8.65 * cm, height=2.51 * cm)
-        skf = Image('static/images/skf.jpg', width=1.76 * cm, height=0.47 * cm)
+        logo = Image(LOGO, width=8.65 * cm, height=2.51 * cm)
+        skf = Image(SKF, width=1.76 * cm, height=0.47 * cm)
         skf_text = Paragraph('Con tecnología', style=GREEN_SMALL)
         report_date = Paragraph(self.date.upper(), style=STANDARD_HEADER)
         company = Paragraph(self.company.upper(), style=BLUE_HEADER)
@@ -137,7 +156,7 @@ class Report(BaseDocTemplate):
             ('SPAN', (0, 0), (0, -1)),
         ]
         table = Table(data, colWidths=[
-                      9 * cm, 2 * cm, 7 * cm], rowHeights=[1.26 * cm, 1.26 * cm])
+                      9 * cm, 2.5 * cm, 6.5 * cm], rowHeights=[1.26 * cm, 1.26 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -153,7 +172,8 @@ class Report(BaseDocTemplate):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
         ]
-        table = Table(data, colWidths=[18 * cm])
+        table = Table(data, colWidths=[18 * cm],
+                      rowHeights=[0.5 * cm, 0.4 * cm, 0.4 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -163,13 +183,15 @@ class Report(BaseDocTemplate):
         create table of analysis.
         """
 
-        header_one = Paragraph('ANÁLISIS DE VIBRACIÓN', style=STANDARD_CENTER)
+        header_one = Paragraph(
+            'ANÁLISIS DE VIBRACIÓN', style=STANDARD_CENTER)
         header_two = Paragraph(
             'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER)
         analysis = Paragraph(analysis, style=STANDARD)
         recomendation = Paragraph(recomendation, style=STANDARD)
 
-        data = [[header_one], [analysis], [header_two], [recomendation]]
+        data = [[header_one], [analysis],
+                [header_two], [recomendation]]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
@@ -178,10 +200,10 @@ class Report(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
+    @ staticmethod
     def graph_table(title, graph):
         """
-        create a table containing 
+        create a table containing
         an especified graphic.
         """
 
@@ -198,15 +220,6 @@ class Report(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    def build_doc(self):
-        """
-        build document.
-        """
-
-        self.multiBuild(self.story)
-
-    # TODO
-
     def _header_one(self, canvas, doc):
         """
         method to be passed to PageTemplate
@@ -215,9 +228,13 @@ class Report(BaseDocTemplate):
         """
 
         canvas.saveState()
-
+        page = Paragraph(str(doc.page), style=BLACK_SMALL)
+        w, h = page.wrap(self.width, 1 * cm)
+        page.drawOn(canvas, self.leftMargin +
+                    ((self.width - w) / 2), (29 * cm) - h)
         table = self._create_header_table()
-
+        _, ht = table.wrap(self.width, 3 * cm)
+        table.drawOn(canvas, self.leftMargin, 28 * cm - ht)
         canvas.restoreState()
 
     def _header_two(self, canvas, doc):
@@ -228,10 +245,10 @@ class Report(BaseDocTemplate):
         """
 
         canvas.saveState()
-        page = Paragraph(doc.page, style=BLACK_SMALL)
+        page = Paragraph(str(doc.page), style=BLACK_SMALL)
         w, h = page.wrap(self.width, 1 * cm)
         page.drawOn(canvas, self.leftMargin +
-                    ((self.width - w) / 2), (26.5 * cm) - h)
+                    ((self.width - w) / 2), (29 * cm) - h)
         canvas.restoreState()
 
     def _footer(self, canvas, doc):
@@ -242,10 +259,38 @@ class Report(BaseDocTemplate):
         """
 
         canvas.saveState()
-
         table = self._create_footer_table()
-
+        _, h = table.wrap(self.width, self.bottomMargin)
+        table.drawOn(canvas, self.leftMargin, (2 * cm - h) / 2)
         canvas.restoreState()
+
+    # TODO
+
+    def build_doc(self):
+        """
+        build document.
+        """
+        self.addPageTemplates(self.templates)
+        self.story += [Paragraph(
+            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), NextPageTemplate("measurement"), PageBreak(), Paragraph(
+            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), self._create_analysis_table('aaaaaaa<br/>asdasdasdasd ' * 10, 'asdasdasdadds ' * 90)]
+        self.write_pdf()
+
+        self.multiBuild(self.story)
+
+    def create_letter_one(self):
+        pass
+
+    def create_letter_two(self):
+        pass
+
+    def write_pdf(self):
+        """
+        generate document flowables
+        according to queryset.
+        """
+        # TODO
+        return self
 
     @staticmethod
     def pictures_table(diagram_img, machine_img):
@@ -292,14 +337,6 @@ class Report(BaseDocTemplate):
                 self.notify('TOCEntry', (0, text, self.page))
             if style == 'Heading2':
                 self.notify('TOCEntry', (1, text, self.page))
-
-    def write_pdf(self):
-        """
-        generate document flowables
-        according to queryset.
-        """
-        # TODO
-        return self
 
     def create_table(self, engine_name, previous_date, current_date, data):
         """
@@ -381,7 +418,7 @@ class Report(BaseDocTemplate):
         ]
         index = 0
         # create figure and axes objects
-        fig, ax = plt.subplots(figsize=(10, 3.5))
+        fig, ax = plt.subplots(figsize=(17, 6))
         for label in labels:  # plot a line for every label
             # obtain the dates for every label in the dataframe
             dates = [datetime.datetime(int(f[:4]), int(f[4:6]), int(
@@ -407,3 +444,6 @@ class Report(BaseDocTemplate):
         plt.tight_layout()  # adjust plot params
         plt.savefig(save, bbox_inches="tight", transparent=True,
                     dpi=300)  # save figure to be placed in document
+
+
+Report('test.pdf', 'hi', 'company', 'date').build_doc()
