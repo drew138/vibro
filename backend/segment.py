@@ -71,5 +71,28 @@ class Segment(Graphs):
     def create_letter_two(self):
         pass
 
-    def create_pred(self):
-        pass
+    def create_pred(self, query_instance):
+        especifications = self.machine_specifications_table()
+        diagram = self.pictures_table(
+            query_instance.machine.images.diagram,
+            query_instance.machine.images.image)
+        title = self.create_table_title()
+
+        # TODO add logic to create table and graphs
+        ###############
+
+        ##############
+
+        analysis = self._create_analysis_table(
+            query_instance.analysis,
+            query_instance.recomendation)
+
+        self.story += [
+            especifications, Spacer(self.width, 1 * cm),
+            NextPageTemplate('measurement_two'),
+            diagram,
+            Spacer(self.width, 0.5 * cm),
+            title,
+            # TODO add remaining flawables
+            analysis,
+        ]

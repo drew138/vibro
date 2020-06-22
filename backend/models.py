@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib import admin
 from django.db import models
 
+
 class City(models.Model):
 
     class Meta:
@@ -48,19 +49,22 @@ class VibroUser(AbstractUser):
         (SUPPORT, 'Support')
     ]
 
-    company = models.ForeignKey(Company, related_name="user", to_field="name", on_delete=models.CASCADE, null=True, blank=True)
+    company = models.ForeignKey(Company, related_name="user",
+                                to_field="name", on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(unique=True)
     phone = models.IntegerField(blank=True, null=True)
     ext = models.IntegerField(blank=True, null=True)
     celphone_one = models.IntegerField(blank=True, null=True)
-    celphone_two = models.IntegerField(blank=True, null=True) 
-    user_type = models.CharField(max_length=8, choices=USER_CHOICES, default=CLIENT)
+    celphone_two = models.IntegerField(blank=True, null=True)
+    user_type = models.CharField(
+        max_length=8, choices=USER_CHOICES, default=CLIENT)
 
 
 class Profile(models.Model):
 
     certifications = models.CharField(max_length=50, default='undefined')
-    picture = models.ImageField(upload_to="profile", default='default.jpg')  # TODO create a default.jpg 
+    # TODO create a default.jpg
+    picture = models.ImageField(upload_to="profile", default='default.jpg')
     user = models.OneToOneField(
         VibroUser,
         related_name='profile',
@@ -74,7 +78,7 @@ class Machine(models.Model):
 
     identifier = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=50)
-    machine_type = models.CharField(max_length=50) 
+    machine_type = models.CharField(max_length=50)
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -84,8 +88,9 @@ class Machine(models.Model):
 
 class Image(models.Model):
 
-    image = models.ImageField(upload_to="machines")  # TODO make sure ./media/ is the right path
-    machine = models.ForeignKey(
+    # TODO make sure ./media/ is the right path
+    image = models.ImageField(upload_to="machines")
+    machine = models.OneToOneField(
         Machine,
         related_name="images",
         on_delete=models.CASCADE)
@@ -96,7 +101,7 @@ class Measurement(models.Model):
     class Meta:
         unique_together = ['measurement_type', 'date', 'machine']
 
-    #severity
+    # severity
     RED = "red"
     GREEN = 'green'
     YELLOW = 'yellow'
@@ -112,15 +117,16 @@ class Measurement(models.Model):
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
         (BLACK, 'Black')
-        ]
+    ]
     MEASUREMENT_CHOICES = [
         (PRED, 'Predictivo'),
         (ESP, 'Especial'),
         (TER, 'Termografía'),
         (ULT, 'Ultrasonido'),
         (AIR, 'Aire y Cauldal')
-        ]
-    severity = models.CharField(max_length=6, choices=SEVERITY_CHOICES, default=BLACK)
+    ]
+    severity = models.CharField(
+        max_length=6, choices=SEVERITY_CHOICES, default=BLACK)
     date = models.DateTimeField()
     analysis = models.TextField()
     recomendation = models.TextField()
@@ -155,9 +161,11 @@ class TermoImage(models.Model):
     IMAGE_CHOICES = [
         (NORMAL, 'Normal'),
         (TERMAL, 'Termal')
-        ]
-    measurement = models.ForeignKey(Measurement, related_name='termal_image', on_delete=models.CASCADE)
-    image_type  = models.CharField(max_length=15, choices=IMAGE_CHOICES, default='undefined' )
+    ]
+    measurement = models.ForeignKey(
+        Measurement, related_name='termal_image', on_delete=models.CASCADE)
+    image_type = models.CharField(
+        max_length=15, choices=IMAGE_CHOICES, default='undefined')
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="termals")
 
@@ -165,7 +173,7 @@ class TermoImage(models.Model):
 class Point(models.Model):
 
     # position
-    VER = 'V'  
+    VER = 'V'
     HOR = 'H'
     AX = 'A'
     # type
@@ -174,7 +182,7 @@ class Point(models.Model):
     DEZ = 'D'  # Desplazamiento
     ENV = 'E'  # Envolvente
     HFD = 'H'  # HFD
-    
+
     POSITION_CHOICES = [(VER, 'Vertical'), (HOR, 'Horizontal'), (AX, 'Axial')]
     TYPE_CHOICES = [
         (VEL, 'Velocity'),
@@ -182,11 +190,13 @@ class Point(models.Model):
         (DEZ, 'Displacement'),
         (ENV, 'Envol'),
         (HFD, 'HFD')
-        ]
-    
+    ]
+
     number = models.IntegerField()
-    position = models.CharField(max_length=1, choices=POSITION_CHOICES, default='undefined')
-    point_type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='undefined')
+    position = models.CharField(
+        max_length=1, choices=POSITION_CHOICES, default='undefined')
+    point_type = models.CharField(
+        max_length=1, choices=TYPE_CHOICES, default='undefined')
     measurement = models.ForeignKey(
         Measurement,
         related_name="point",
@@ -195,7 +205,8 @@ class Point(models.Model):
 
 class Tendency(models.Model):
 
-    point = models.OneToOneField(Point, on_delete=models.CASCADE, primary_key=True)
+    point = models.OneToOneField(
+        Point, on_delete=models.CASCADE, primary_key=True)
     value = models.DecimalField(decimal_places=2, max_digits=4)
 
 

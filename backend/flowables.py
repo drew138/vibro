@@ -96,14 +96,15 @@ class Flowables(BaseDocTemplate):
     used in the creation of documents.
     """
 
-    def __init__(self, filename, querysets, date, user, **kwargs):
+    def __init__(self, filename, querysets, company, date, user, **kwargs):
         super().__init__(filename, **kwargs)
         self.filename = filename
         self.querysets = querysets  # model objects to populate pdf
-        # self.company = self.user.company TODO uncomment
-        # self.date = self.querysets.first().date TODO uncomment and remove self.date
-        self.date = date
         self.user = user
+        self.company = company
+        self.date = date
+        # self.company = self.user.company # TODO uncomment and remove self.company
+        # self.date = self.querysets.first().date TODO uncomment and remove self.date
         self.toc = TableOfContents()  # table of contents object
         self.story = []
         self.width = 18 * cm
@@ -298,6 +299,30 @@ class Flowables(BaseDocTemplate):
         """
 
         title = Paragraph('GRAFICAS TENDENCIAS (En el tiempo)',
+                          style=STANDARD_CENTER)
+        return title
+
+    @staticmethod
+    def create_espectra_title():
+        """
+        create a paragraph flowable to
+        be used as a title for the 
+        tendency graphs. 
+        """
+
+        title = Paragraph('GRAFICAS ESPECTROS',
+                          style=STANDARD_CENTER)
+        return title
+
+    @staticmethod
+    def create_time_signal_title():
+        """
+        create a paragraph flowable to
+        be used as a title for the 
+        tendency graphs. 
+        """
+
+        title = Paragraph('GRAFICAS SEÑAL EN EL TIEMPO',
                           style=STANDARD_CENTER)
         return title
 
