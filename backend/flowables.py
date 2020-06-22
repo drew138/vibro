@@ -94,16 +94,15 @@ class Flowables(BaseDocTemplate):
     used in the creation of documents.
     """
 
-    def __init__(self, filename, querysets, company, date, user, **kwargs):
+    def __init__(self, filename, queryset, user, **kwargs):
         super().__init__(filename, **kwargs)
         self.filename = filename
-        self.querysets = querysets  # model objects to populate pdf
+        self.queryset = queryset  # model objects to populate pdf
         self.user = user
         self.company = self.user.company
-        self.date = date
-        # self.date = self.querysets.first().date TODO uncomment and remove self.date
-        # self.engineer_one = self.querysets.first().engineer_one TODO uncomment
-        # self.engineer_two = self.querysets.first().engineer_two TODO uncomment
+        self.date = self.queryset.first().date
+        self.engineer_one = self.queryset.first().engineer_one
+        self.engineer_two = self.queryset.first().engineer_two
         self.toc = TableOfContents()  # table of contents object
         self.story = []
         self.width = 18 * cm
@@ -170,16 +169,20 @@ class Flowables(BaseDocTemplate):
 
         self.create_signature_name
         line = '_'*36
+        first_engineer_full_name = f"""{self.engineer_one.first_name}
+         {self.engineer_one.last_name}""".upper()  # space inbetween
 
-        if self.engineer_two:
+        if self.engineer_two.first_name:
+            second_engineer_name = f"""{self.engineer_two.first_name}
+             {self.engineer_two.last_name}""".upper()  # space inbetween
             data = [
                 [
                     self.create_signature_line(line),
                     self.create_signature_line(line)
                 ],
                 [
-                    self.create_signature_name(self.engineer_one),
-                    self.create_signature_name(self.engineer_two)
+                    self.create_signature_name(first_engineer_full_name),
+                    self.create_signature_name(second_engineer_name)
                 ],
                 [  # TODO verify linebreaks \t in certifications of each engineer
                     self.create_signature_line(
@@ -191,7 +194,7 @@ class Flowables(BaseDocTemplate):
         else:
             data = [
                 [self.create_signature_line(line), ''],
-                [self.create_signature_name(self.engineer_one), ''],
+                [self.create_signature_name(first_engineer_full_name), ''],
                 [self.create_signature_line(
                     self.engineer_one.profile.certifications),
                     '']
@@ -206,9 +209,9 @@ class Flowables(BaseDocTemplate):
                 9 * cm,
                 9 * cm],
             rowHeights=[
-                0.6 * cm,
-                0.6 * cm,
-                0.6 * cm
+                0.4 * cm,
+                0.5 * cm,
+                0.5 * cm
             ])
         table.setStyle(TableStyle(styles))
         return table
@@ -240,7 +243,8 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def _create_analysis_table(analysis, recomendation):
         """
-        create table of analysis.
+        create table of analysis
+        of a measurement.
         """
 
         header_one = Paragraph(
@@ -405,14 +409,14 @@ class Flowables(BaseDocTemplate):
         return title
 
     @staticmethod
-    def create_signature_line(string)
-    return Paragraph(string, style=STANDARD)
+    def create_signature_line(string):
+        return Paragraph(string, style=STANDARD)
 
     @staticmethod
-    def create_signature_name(string)
-    return Paragraph(string, style=BLACK_BOLD)
+    def create_signature_name(string):
+        return Paragraph(string, style=BLACK_BOLD)
 
-    # TODO
+    # TODO finish these methods
 
     @staticmethod
     def pictures_table(diagram_img, machine_img):
@@ -421,8 +425,8 @@ class Flowables(BaseDocTemplate):
         diagram image and the machine image.
         """
 
-        diagram_img = Image(diagram_img)
-        machine_img = Image(machine_img)
+        diagram_img = Image(diagram_img)  # requires size management
+        machine_img = Image(machine_img)  # requires size management
         diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD)
         machine = Paragraph('IMAGEN MAQUINA', style=STANDARD)
         data = [[diagram, machine], [diagram_img, machine_img]]

@@ -25,7 +25,6 @@ class Report(Segment):
             self.graph_table('asdasdasd', os.path.join(os.path.dirname(
                 os.path.abspath(__file__)), 'static\\images\\logo.jpg'))
         ]
-        
 
         self.multiBuild(self.story)
 
@@ -51,13 +50,33 @@ class Report(Segment):
                 self.notify('TOCEntry', (1, text, self.page))
 
 
+
+ # classes used for debugging
+class Profile:
+    def __init__(self):
+        self.certifications = 'Ing. de Servicios de Mantenimiento'
+
+
 class User:
     def __init__(self):
         self.company = 'some company'
         self.email = 'person@email.com'
         self.first_name = 'andres'
         self.last_name = "asdasdasd"
+        self.profile = Profile()
 
 user = User()
 
-Report('test.pdf', 'hi', 'company', 'date', user).build_doc()
+
+class QuerySet:
+    def __init__(self):
+        self.date = 'date'
+        self.engineer_one = User()
+        self.engineer_two = User()
+
+    def first(self):
+        return self
+
+queryset = QuerySet()
+
+Report('test.pdf', queryset, user).build_doc()
