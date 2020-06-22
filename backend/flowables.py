@@ -1,19 +1,17 @@
 from reportlab.platypus import PageBreak, PageTemplate, BaseDocTemplate, Paragraph, NextPageTemplate, TableStyle, Image, Spacer
-from reportlab.platypus.tables import Table
 from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.colors import Color, black
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus.tables import Table
 from reportlab.platypus.frames import Frame
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
-from django.db import models
-from reportlab.lib.pagesizes import letter
-from io import BytesIO
-from reportlab.lib.colors import Color, black
-
-import os
+# from django.db import models
 import datetime
-from reportlab.pdfbase.pdfmetrics import registerFont
-from reportlab.pdfbase.ttfonts import TTFont
+import os
+
 
 registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
 registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
@@ -101,10 +99,11 @@ class Flowables(BaseDocTemplate):
         self.filename = filename
         self.querysets = querysets  # model objects to populate pdf
         self.user = user
-        self.company = company
+        self.company = self.user.company
         self.date = date
-        # self.company = self.user.company # TODO uncomment and remove self.company
         # self.date = self.querysets.first().date TODO uncomment and remove self.date
+        # self.engineer_one = self.querysets.first().engineer_one TODO uncomment
+        # self.engineer_two = self.querysets.first().engineer_two TODO uncomment
         self.toc = TableOfContents()  # table of contents object
         self.story = []
         self.width = 18 * cm
@@ -119,8 +118,9 @@ class Flowables(BaseDocTemplate):
                          frames=[STANDARD_FRAME],
                          onPage=self._header_two,
                          onPageEnd=self._footer),
-            PageTemplate(id='normal', frames=[
-                         STANDARD_FRAME], onPage=self._header_two),
+            PageTemplate(id='normal',
+                         frames=[STANDARD_FRAME],
+                         onPage=self._header_two),
         ]
         self.addPageTemplates(self.templates)
 
@@ -148,8 +148,68 @@ class Flowables(BaseDocTemplate):
             ('ALIGN', (2, 0), (2, -1), 'LEFT'),
             ('SPAN', (0, 0), (0, -1)),
         ]
-        table = Table(data, colWidths=[
-                      9 * cm, 2.5 * cm, 6.5 * cm], rowHeights=[1.26 * cm, 1.26 * cm])
+        table = Table(
+            data,
+            colWidths=[
+                9 * cm,
+                2.5 * cm,
+                6.5 * cm],
+            rowHeights=[
+                1.26 * cm,
+                1.26 * cm
+            ])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    def create_signatures_table(self):
+        """
+        create table to manage
+        signatures in of engineers 
+        in first letter.
+        """
+
+        self.create_signature_name
+        line = '_'*36
+
+        if self.engineer_two:
+            data = [
+                [
+                    self.create_signature_line(line),
+                    self.create_signature_line(line)
+                ],
+                [
+                    self.create_signature_name(self.engineer_one),
+                    self.create_signature_name(self.engineer_two)
+                ],
+                [  # TODO verify linebreaks \t in certifications of each engineer
+                    self.create_signature_line(
+                        self.engineer_one.profile.certifications),
+                    self.create_signature_line(
+                        self.engineer_two.profile.certifications)
+                ]
+            ]
+        else:
+            data = [
+                [self.create_signature_line(line), ''],
+                [self.create_signature_name(self.engineer_one), ''],
+                [self.create_signature_line(
+                    self.engineer_one.profile.certifications),
+                    '']
+            ]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT')
+        ]
+        table = Table(
+            data,
+            colWidths=[
+                9 * cm,
+                9 * cm],
+            rowHeights=[
+                0.6 * cm,
+                0.6 * cm,
+                0.6 * cm
+            ])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -165,8 +225,15 @@ class Flowables(BaseDocTemplate):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
         ]
-        table = Table(data, colWidths=[18 * cm],
-                      rowHeights=[0.5 * cm, 0.4 * cm, 0.4 * cm])
+        table = Table(
+            data,
+            colWidths=[
+                18 * cm],
+            rowHeights=[
+                0.5 * cm,
+                0.4 * cm,
+                0.4 * cm
+            ])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -177,19 +244,30 @@ class Flowables(BaseDocTemplate):
         """
 
         header_one = Paragraph(
-            'ANÁLISIS DE VIBRACIÓN', style=STANDARD_CENTER)
+            'ANÁLISIS DE VIBRACIÓN',
+            style=STANDARD_CENTER)
         header_two = Paragraph(
-            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER)
-        analysis = Paragraph(analysis, style=STANDARD)
-        recomendation = Paragraph(recomendation, style=STANDARD)
-
-        data = [[header_one], [analysis],
-                [header_two], [recomendation]]
+            'CORRECTIVOS Y/O RECOMENDACIONES',
+            style=STANDARD_CENTER)
+        analysis = Paragraph(
+            analysis,
+            style=STANDARD)
+        recomendation = Paragraph(
+            recomendation,
+            style=STANDARD)
+        data = [
+            [header_one],
+            [analysis],
+            [header_two],
+            [recomendation]
+        ]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER')
         ]
-        table = Table(data, colWidths=[18 * cm])
+        table = Table(
+            data,
+            colWidths=[18 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
@@ -200,7 +278,7 @@ class Flowables(BaseDocTemplate):
         an especified graphic.
         """
 
-        title = Paragraph(title, style=STANDARD_CENTER)
+        title = Paragraph(title.upper(), style=STANDARD_CENTER)
         graph = Image(graph, width=17 * cm, height=6 * cm)
         data = [[title], [graph]]
         styles = [
@@ -265,8 +343,8 @@ class Flowables(BaseDocTemplate):
 
         name = f'{self.user.first_name} {self.user.last_name}'
         date = Paragraph(
-            f'Medellín, {CURRENT_DAY} de {MONTHS[CURRENT_MONTH - 1]} de {CURRENT_YEAR},', style=STANDARD)
-
+            f'Medellín, {CURRENT_DAY} de {MONTHS[CURRENT_MONTH - 1]} de {CURRENT_YEAR},',
+            style=STANDARD)
         engineer_client = Paragraph(
             f"""Ingeniero:<br/><font name="Arial-Bold">{name.upper()}
             </font><br/>Dpto. de Mantenimiento <br/>Email: 
@@ -326,6 +404,14 @@ class Flowables(BaseDocTemplate):
                           style=STANDARD_CENTER)
         return title
 
+    @staticmethod
+    def create_signature_line(string)
+    return Paragraph(string, style=STANDARD)
+
+    @staticmethod
+    def create_signature_name(string)
+    return Paragraph(string, style=BLACK_BOLD)
+
     # TODO
 
     @staticmethod
@@ -346,8 +432,15 @@ class Flowables(BaseDocTemplate):
             ('GRID', (0, 0), (-1, -1), 0.25, black),
             ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE)
         ]
-        table = Table(data, colWidths=[
-                      9 * cm, 9 * cm], rowHeights=[0.5 * cm, 6 * cm])
+        table = Table(
+            data,
+            colWidths=[
+                9 * cm,
+                9 * cm],
+            rowHeights=[
+                0.5 * cm,
+                6 * cm
+            ])
         table.setStyle(TableStyle(styles))
         return table
 

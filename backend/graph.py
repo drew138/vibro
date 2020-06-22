@@ -1,8 +1,8 @@
-from .flowables import Flowables
-import datetime
-import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
+from .flowables import Flowables
+import matplotlib.pyplot as plt
 from io import BytesIO
+import datetime
 
 
 class Graphs(Flowables):

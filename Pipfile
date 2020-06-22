@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+autopep8 = "*"
 
 [packages]
 asgiref = "==3.2.7"
@@ -24,7 +25,7 @@ sqlparse = "==0.3.1"
 zipp = "==3.1.0"
 xhtml2pdf = "*"
 reportlab = "*"
-matplotlib = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.8"

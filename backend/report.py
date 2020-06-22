@@ -1,6 +1,7 @@
+from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
 from .segment import Segment
 from .flowables import STANDARD_CENTER
-from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
+import os  # TODO remove this dependency
 
 
 class Report(Segment):
@@ -17,12 +18,14 @@ class Report(Segment):
         """
         build document.
         """
-        self.addPageTemplates(self.templates)
-        self.create_letter_one()
+        self.write_pdf()
         self.story += [Paragraph(
             'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), NextPageTemplate("measurement"), PageBreak(), Paragraph(
-            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), self._create_analysis_table('aaaaaaa<br/>asdasdasdasd ' * 10, 'asdasdasdadds ' * 90)]
-        self.write_pdf()
+            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), self._create_analysis_table('aaaaaaa<br/>asdasdasdasd ' * 10, 'asdasdasdadds ' * 90),
+            self.graph_table('asdasdasd', os.path.join(os.path.dirname(
+                os.path.abspath(__file__)), 'static\\images\\logo.jpg'))
+        ]
+        
 
         self.multiBuild(self.story)
 
@@ -31,6 +34,8 @@ class Report(Segment):
         generate document flowables
         according to queryset.
         """
+
+        self.create_letter_one()
         # TODO
         return self
 
@@ -46,4 +51,13 @@ class Report(Segment):
                 self.notify('TOCEntry', (1, text, self.page))
 
 
-Report('test.pdf', 'hi', 'company', 'date').build_doc()
+class User:
+    def __init__(self):
+        self.company = 'some company'
+        self.email = 'person@email.com'
+        self.first_name = 'andres'
+        self.last_name = "asdasdasd"
+
+user = User()
+
+Report('test.pdf', 'hi', 'company', 'date', user).build_doc()

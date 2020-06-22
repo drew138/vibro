@@ -1,7 +1,7 @@
-from .flowables import STANDARD
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
-from .graph import Graphs
 from reportlab.lib.units import cm
+from .flowables import STANDARD
+from .graph import Graphs
 
 
 class Segment(Graphs):
@@ -59,14 +59,17 @@ class Segment(Graphs):
             Atentamente, 
             """, style=STANDARD)
 
+        engineer = self.create_signatures_table()
+
         self.story += [
             *letter_header,
             NextPageTemplate('normal'),
             Spacer(self.width, 1 * cm),
             msg,
             Spacer(self.width, 1.5 * cm),
-            # engineer,
-            PageBreak()]
+            engineer,
+            PageBreak()
+        ]
 
     def create_letter_two(self):
         pass
