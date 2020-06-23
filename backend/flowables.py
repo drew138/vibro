@@ -359,6 +359,104 @@ class Flowables(BaseDocTemplate):
         return flowables
 
     @staticmethod
+    def create_letter_two_table():
+        """
+        create a table containing
+        an especified graphic.
+        """
+        
+        title_one = Paragraph('Rango de Velocidad efectiva RMS (mm/seg.)', style=BLACK_BOLD_CENTER)
+        title_two = Paragraph('Tipos de Máquinas', style=BLACK_BOLD_CENTER)
+        data = [
+            [title_one, '', title_two,'', '', ''], 
+            ['', '', 'Clase l', 'Clase ll', 'Clase lll', 'Clase lV'],
+            ['', '', '', '', '', ''],
+            ['28', '', 'D', 'D', 'D', 'D'],
+            ['18', '', '', '', '', 'C'],
+            ['11.2', '', '', '', 'C', ''],
+            ['7.1', '', '', 'C', '', 'B'],
+            ['4.5', '', 'C', '', 'B', ''],
+            ['2.8', '', '', 'B', '', 'A'],
+            ['1.8', '', 'B', '', 'A', ''],
+            ['1.12', '', '', 'A', '', ''],
+            ['0.71', '', 'A', '', '', ''],
+            ['0.45', '', '', '', '', ''],
+            ['0.28', '', '', '', '', ''],
+            ]
+        styles = [
+            ('SPAN', (0, 0), (1, 2)),
+            ('SPAN', (2, 0), (5, 0)),
+            ('SPAN', (2, 1), (2, 2)),
+            ('SPAN', (3, 1), (3, 2)),
+            ('SPAN', (4, 1), (4, 2)),
+            ('SPAN', (5, 1), (5, 2)),
+            ('SPAN', (0, 3), (1, 3)),
+            ('SPAN', (0, 4), (1, 4)),
+            ('SPAN', (0, 5), (1, 5)),
+            ('SPAN', (0, 6), (1, 6)),
+            ('SPAN', (0, 7), (1, 7)),
+            ('SPAN', (0, 8), (1, 8)),
+            ('SPAN', (0, 9), (1, 9)),
+            ('SPAN', (0, 10), (1, 10)),
+            ('SPAN', (0, 11), (1, 11)),
+            ('SPAN', (0, 12), (1, 12)),
+            ('SPAN', (0, 13), (1, 13)),
+            ('SPAN', (2, 3), (2, 6)),     
+            ('SPAN', (2, 7), (2, 8)),
+            ('SPAN', (2, 9), (2, 10)),
+            ('SPAN', (2, 11), (2, 13)),
+            ('SPAN', (3, 3), (3, 5)),
+            ('SPAN', (3, 6), (3, 7)),
+            ('SPAN', (3, 8), (3, 9)),
+            ('SPAN', (3, 10), (3, 13)),
+            ('SPAN', (4, 3), (4, 4)),
+            ('SPAN', (4, 5), (4, 6)),
+            ('SPAN', (4, 7), (4, 8)),
+            ('SPAN', (4, 9), (4, 13)),
+            ('SPAN', (5, 3), (5, 3)),
+            ('SPAN', (5, 4), (5, 5)),
+            ('SPAN', (5, 6), (5, 7)),
+            ('SPAN', (5, 8), (5, 13)),
+            #RED BACKGROUND
+            ('BACKGROUND', (2, 3), (2, 6), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (3, 3), (3, 5), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (4, 3), (4, 4), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (5, 3), (5, 3), Color(red=1, green=0, blue=0)),
+            #YELLOW BACKGROUND
+            ('BACKGROUND', (2, 7), (2, 8), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (3, 6), (3, 7), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (4, 5), (4, 6), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (5, 4), (5, 5), Color(red=1, green=1, blue=0)),
+            #GREEN ONE BACKGROUND
+            ('BACKGROUND', (2, 9), (2, 10), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (3, 8), (3, 9), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (4, 7), (4, 8), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (5, 6), (5, 7), Color(red=0, green=1, blue=0)),
+            #GREEN TWO BACKGROUND
+            ('BACKGROUND', (2, 11), (2, 13), Color(red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (3, 10), (3, 13), Color(red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (4, 9), (4, 13), Color(red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (5, 8), (5, 13), Color(red=(153/255), green=1, blue=(153/255))),
+            # FONT GRID AND ALIGNMENT
+            ('FONTNAME', (0,3), (0, 13), 'Arial'),
+            ('FONTNAME', (0,0), (5, 2), 'Arial-Bold'),
+            ('FONTNAME', (2,3), (-1, -1), 'Arial-Bold'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('BOX', (0, 0), (-1, -1), 2, black),
+            ('BOX', (0, 0), (-1, -1), 1, Color(red=0, green=0, blue=0)),
+        ]
+        table = Table(
+            data, 
+            colWidths=[2 * cm for _ in range(6)], 
+            rowHeights=[0.5 * cm for _ in range(14)]
+            )
+        table.setStyle(TableStyle(styles))
+        return table
+
+
+    @staticmethod
     def create_table_title():
         """
         create a paragraph flowable to

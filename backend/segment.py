@@ -56,7 +56,7 @@ class Segment(Graphs):
         engineer = self.create_signatures_table()
         self.story += [
             *letter_header,
-            NextPageTemplate('normal'),
+            # NextPageTemplate('normal'),
             Spacer(self.width, 1 * cm),
             msg,
             Spacer(self.width, 1.5 * cm),
@@ -75,16 +75,16 @@ class Segment(Graphs):
         Cordial saludo:<br/><br/><br/>A continuación les 
         entregamos una pequeña explicación de cómo funciona 
         la configuración del predictivo.<br/><br/>
-        <ol><li>En cada uno de los diagramas esquemáticos 
+        1. En cada uno de los diagramas esquemáticos 
         de los equipos se especifica claramente el lugar 
         de medición, el número que le corresponde y el tipo 
-        de medición a realizar.</li><li>Orden de la medición 
+        de medición a realizar.<br/><br/>2. Orden de la medición 
         por equipo:<br/><br/>El orden de medición por equipo 
         está estandarizado y se inicia desde la potencia hacia 
         delante, es decir, el punto 1 siempre será el rodamiento 
         motor lado libre, el punto dos (2) siempre será el 
         rodamiento motor lado transmisión y así avanza hacía el 
-        equipo hasta terminar los puntos de medición.</li></ol>
+        equipo hasta terminar los puntos de medición.</l></En>
         <br/><br/>Ejemplo:
         """, style=STANDARD)
 
@@ -118,7 +118,8 @@ class Segment(Graphs):
         a baja velocidad.""", style=STANDARD)
 
         header = Paragraph(
-            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ', style=STANDARD)
+            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ', 
+            style=BLACK_BOLD_CENTER)
 
         table = None
 
@@ -139,26 +140,26 @@ class Segment(Graphs):
             NextPageTemplate('measurement_two'),
             Spacer(self.width, 1 * cm),
             msg_one,
-            diagram_one,
+            # diagram_one,
             PageBreak(),
             msg_two,
             NextPageTemplate('measurement'),
             Spacer(self.width, 1 * cm),
-            diagram_two,
+            # diagram_two,
             Spacer(self.width, 1 * cm),
             msg_three,
             PageBreak(),
             header,
             Spacer(self.width, 1 * cm),
-            table,
+            # table,
             Spacer(self.width, 1 * cm),
             title_one,
             Spacer(self.width, 1 * cm),
-            especifications_one,
+            # especifications_one,
             Spacer(self.width, 1 * cm),
             title_two,
             Spacer(self.width, 1 * cm),
-            especifications_two,
+            # especifications_two,
 
         ]
 
