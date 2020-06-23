@@ -20,6 +20,7 @@ registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGO = os.path.join(BASE_DIR, 'static\\images\\logo.jpg')
 SKF = os.path.join(BASE_DIR, 'static\\images\\skf.jpg')
+DIAGRAM = os.path.join(BASE_DIR, 'static\\images\\Numeration.png')
 # datetime constants
 MONTHS = (
     'enero',
@@ -452,6 +453,37 @@ class Flowables(BaseDocTemplate):
             colWidths=[2 * cm for _ in range(6)], 
             rowHeights=[0.5 * cm for _ in range(14)]
             )
+        table.setStyle(TableStyle(styles))
+        return table
+
+    @staticmethod
+    def create_letter_two_diagram_one():
+        """
+        create a table containing the 
+        diagram image of the letter two.
+        """
+
+        img_width = 8.5 * cm
+        img_height = 6.9 * cm
+        img = Image(
+            DIAGRAM,
+            width=img_width,
+            height=img_height)
+        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD)
+        data = [[diagram], [img]]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE)
+        ]
+        table = Table(
+            data,
+            colWidths=[8.6 * cm],
+            rowHeights=[
+                0.5 * cm,
+                7 * cm
+            ])
         table.setStyle(TableStyle(styles))
         return table
 
