@@ -20,19 +20,13 @@ class Segment(Graphs):
         create first segment of the document.
         """
 
-        # TODO edit these varriables
-        ###########################
-        dates = 'some dates'
-        ###################
-
         letter_header = self.create_letter_header()
-
         msg = Paragraph(f"""
             Cordial saludo;<br/><br/> 
             Adjuntamos informes de mantenimiento
             predictivo e informe administrativo,
             por correo electrónico, de los equipos 
-            de planta, medidos en {dates} del año
+            de planta, medidos en {self.date} del año
             en curso.<br/><br/>Cada que le realicemos
             un mantenimiento predictivo tener presente
             que el análisis corresponde a la condición
@@ -58,9 +52,7 @@ class Segment(Graphs):
             Gracias por contar con nosotros.<br/><br/><br/>  
             Atentamente, 
             """, style=STANDARD)
-
         engineer = self.create_signatures_table()
-
         self.story += [
             *letter_header,
             NextPageTemplate('normal'),

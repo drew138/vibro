@@ -16,8 +16,11 @@ class Report(Segment):
 
     def build_doc(self):
         """
-        build document.
+        call write_pdf method to 
+        build all segments of the 
+        pdf to then build report.
         """
+
         self.write_pdf()
         self.story += [Paragraph(
             'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), NextPageTemplate("measurement"), PageBreak(), Paragraph(
@@ -30,8 +33,7 @@ class Report(Segment):
 
     def write_pdf(self):
         """
-        generate document flowables
-        according to queryset.
+        generate document segments.
         """
 
         self.create_letter_one()
@@ -49,9 +51,9 @@ class Report(Segment):
             if style == 'Heading2':
                 self.notify('TOCEntry', (1, text, self.page))
 
+ # moack data used for debugging
 
 
- # classes used for debugging
 class Profile:
     def __init__(self):
         self.certifications = 'Ing. de Servicios de Mantenimiento'
@@ -65,8 +67,6 @@ class User:
         self.last_name = "asdasdasd"
         self.profile = Profile()
 
-user = User()
-
 
 class QuerySet:
     def __init__(self):
@@ -76,6 +76,9 @@ class QuerySet:
 
     def first(self):
         return self
+
+
+user = User()
 
 queryset = QuerySet()
 

@@ -8,7 +8,6 @@ from reportlab.platypus.tables import Table
 from reportlab.platypus.frames import Frame
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
-# from django.db import models
 import datetime
 import os
 
@@ -97,13 +96,13 @@ class Flowables(BaseDocTemplate):
     def __init__(self, filename, queryset, user, **kwargs):
         super().__init__(filename, **kwargs)
         self.filename = filename
-        self.queryset = queryset  # model objects to populate pdf
+        self.queryset = queryset  # model object that populate pdf
         self.user = user
         self.company = self.user.company
         self.date = self.queryset.first().date
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
-        self.toc = TableOfContents()  # table of contents object
+        self.toc = TableOfContents()
         self.story = []
         self.width = 18 * cm
         self.leftMargin = 1.6 * cm
@@ -122,8 +121,6 @@ class Flowables(BaseDocTemplate):
                          onPage=self._header_two),
         ]
         self.addPageTemplates(self.templates)
-
-    # finished
 
     def _create_header_table(self):
         """
