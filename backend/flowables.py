@@ -170,11 +170,11 @@ class Flowables(BaseDocTemplate):
         self.create_signature_name
         line = '_'*36
         first_engineer_full_name = f"""{self.engineer_one.first_name}
-         {self.engineer_one.last_name}""".upper()  # space inbetween
+         {self.engineer_one.last_name}""".upper()  # space inbetween string
 
         if self.engineer_two.first_name:
             second_engineer_name = f"""{self.engineer_two.first_name}
-             {self.engineer_two.last_name}""".upper()  # space inbetween
+             {self.engineer_two.last_name}""".upper()  # space inbetween string
             data = [
                 [
                     self.create_signature_line(line),
@@ -416,8 +416,6 @@ class Flowables(BaseDocTemplate):
     def create_signature_name(string):
         return Paragraph(string, style=BLACK_BOLD)
 
-    # TODO finish these methods
-
     @staticmethod
     def pictures_table(diagram_img, machine_img):
         """
@@ -425,8 +423,16 @@ class Flowables(BaseDocTemplate):
         diagram image and the machine image.
         """
 
-        diagram_img = Image(diagram_img)  # requires size management
-        machine_img = Image(machine_img)  # requires size management
+        img_width = 7 * cm
+        img_height = 6 * cm
+        diagram_img = Image(
+            diagram_img,
+            width=img_width,
+            height=img_height)
+        machine_img = Image(
+            machine_img,
+            width=img_width,
+            height=img_height)
         diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD)
         machine = Paragraph('IMAGEN MAQUINA', style=STANDARD)
         data = [[diagram, machine], [diagram_img, machine_img]]
@@ -447,6 +453,8 @@ class Flowables(BaseDocTemplate):
             ])
         table.setStyle(TableStyle(styles))
         return table
+
+    # TODO finish these methods
 
     def machine_specifications_table(self):
         """
