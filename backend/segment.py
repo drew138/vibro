@@ -1,6 +1,6 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
 from reportlab.lib.units import cm
-from .flowables import STANDARD
+from .flowables import STANDARD, BLACK_BOLD_CENTER
 from .graph import Graphs
 
 
@@ -21,6 +21,7 @@ class Segment(Graphs):
         """
 
         letter_header = self.create_letter_header()
+        # TODO msg string needs editting
         msg = Paragraph(f"""
             Cordial saludo;<br/><br/> 
             Adjuntamos informes de mantenimiento
@@ -64,7 +65,102 @@ class Segment(Graphs):
         ]
 
     def create_letter_two(self):
-        pass
+        """
+        create second segment of the pdf.
+        """
+
+        letter_header = self.create_letter_header()
+        msg_one = Paragraph("""
+        REF.  Explicación Configuración Predictivo.<br/><br/>
+        Cordial saludo:<br/><br/><br/>A continuación les 
+        entregamos una pequeña explicación de cómo funciona 
+        la configuración del predictivo.<br/><br/>
+        <ol><li>En cada uno de los diagramas esquemáticos 
+        de los equipos se especifica claramente el lugar 
+        de medición, el número que le corresponde y el tipo 
+        de medición a realizar.</li><li>Orden de la medición 
+        por equipo:<br/><br/>El orden de medición por equipo 
+        está estandarizado y se inicia desde la potencia hacia 
+        delante, es decir, el punto 1 siempre será el rodamiento 
+        motor lado libre, el punto dos (2) siempre será el 
+        rodamiento motor lado transmisión y así avanza hacía el 
+        equipo hasta terminar los puntos de medición.</li></ol>
+        <br/><br/>Ejemplo:
+        """, style=STANDARD)
+
+        diagram_one = None
+
+        msg_two = Paragraph('something', style=STANDARD)
+
+        diagram_two = None
+
+        msg_three = Paragraph("""
+        <ol><li>Corresponde a la posición de la medición y 
+        puede variar tanto, como puntos de medición tenga el 
+        equipo.<br/><br/>Para el ejemplo, el 1 corresponde al 
+        rodamiento motor lado libre.<br/><br/></li><li>El segundo 
+        dígito  siempre será una letra, y corresponde a la posición 
+        del sensor en el momento de la medición. Ejemplo:<br/><br/> 
+        <center>H = Horizontal</center><br/><center>V = Vertical
+        </center><br/><center>A = Axial</center><br/><br/><br/></li>
+        <li>El tercer dígito también será una letra y corresponde 
+        a la unidad en la cual se realiza la medición.<br/><br/><br/>
+        <center>V = Velocidad</center><br/><center>A = Aceleración</center>
+        <br/><center>D  = Desplazamiento </center><br/></li></ol><br/> 
+        En resumen:<br/><br/>1 H V =  Rodamiento motor lado libre, medida 
+        horizontal en velocidad. <font name="Arial-Bold">Con respecto a las 
+        unidades de  Vibración:</font> En la tabla de valores se expresa sus 
+        niveles globales de vibración, en mms/s pico, para la variable velocidad, 
+        siendo necesario multiplicar por 0.707 dicho valor, si se requiere 
+        conocer su amplitud en mms/s rms, como lo expresa la Norma ISO 10816-1.<br/> 
+        Medir en unidades pico (P.k) permite identificar con más claridad en el 
+        espectro, condiciones de los componentes de máquina que operan 
+        a baja velocidad.""", style=STANDARD)
+
+        header = Paragraph(
+            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ', style=STANDARD)
+
+        table = None
+
+        title_one = Paragraph(
+            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>',
+            style=BLACK_BOLD_CENTER)
+
+        especifications_one = None
+
+        title_two = Paragraph(
+            '<u>CALIDAD DE LA VIBRACIÓN</u>',
+            style=BLACK_BOLD_CENTER)
+
+        especifications_two = None
+
+        self.story += [
+            *letter_header,
+            NextPageTemplate('measurement_two'),
+            Spacer(self.width, 1 * cm),
+            msg_one,
+            diagram_one,
+            PageBreak(),
+            msg_two,
+            NextPageTemplate('measurement'),
+            Spacer(self.width, 1 * cm),
+            diagram_two,
+            Spacer(self.width, 1 * cm),
+            msg_three,
+            PageBreak(),
+            header,
+            Spacer(self.width, 1 * cm),
+            table,
+            Spacer(self.width, 1 * cm),
+            title_one,
+            Spacer(self.width, 1 * cm),
+            especifications_one,
+            Spacer(self.width, 1 * cm),
+            title_two,
+            Spacer(self.width, 1 * cm),
+            especifications_two,
+
+        ]
 
     def create_pred(self, query_instance):
         especifications = self.machine_specifications_table()
