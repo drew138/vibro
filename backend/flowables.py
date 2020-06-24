@@ -123,6 +123,52 @@ class Flowables(BaseDocTemplate):
         ]
         self.addPageTemplates(self.templates)
 
+    # header/footers methods used in templates
+    def _header_one(self, canvas, doc):
+        """
+        method to be passed to PageTemplate
+        objects on onPage keyword argument 
+        to generate headers of measurements.
+        """
+
+        canvas.saveState()
+        page = Paragraph(str(doc.page), style=BLACK_SMALL)
+        w, h = page.wrap(self.width, 1 * cm)
+        page.drawOn(canvas, self.leftMargin +
+                    ((self.width - w) / 2), (29 * cm) - h)
+        table = self._create_header_table()
+        _, ht = table.wrap(self.width, 3 * cm)
+        table.drawOn(canvas, self.leftMargin, 28 * cm - ht)
+        canvas.restoreState()
+
+    def _header_two(self, canvas, doc):
+        """
+        method to be passed to PageTemplate
+        objects on onPage keyword argument 
+        to generate basic headers.
+        """
+
+        canvas.saveState()
+        page = Paragraph(str(doc.page), style=BLACK_SMALL)
+        w, h = page.wrap(self.width, 1 * cm)
+        page.drawOn(canvas, self.leftMargin +
+                    ((self.width - w) / 2), (29 * cm) - h)
+        canvas.restoreState()
+
+    def _footer(self, canvas, doc):
+        """
+        method to be passed to PageTemplate
+        objects on onPageEnd keyword argument
+        to generate footers.
+        """
+
+        canvas.saveState()
+        table = self._create_footer_table()
+        _, h = table.wrap(self.width, self.bottomMargin)
+        table.drawOn(canvas, self.leftMargin, (2 * cm - h) / 2)
+        canvas.restoreState()
+
+    # flowables used in footers/headers
     def _create_header_table(self):
         """
         create table to manage
@@ -157,6 +203,103 @@ class Flowables(BaseDocTemplate):
             ])
         table.setStyle(TableStyle(styles))
         return table
+
+    # flowables used in first letter
+
+    @staticmethod
+    def _create_footer_table():
+        """
+        create table to manage
+        elements in footer.
+        """
+
+        data = [[LINE_ONE], [LINE_TWO], [LINE_THREE]]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER')
+        ]
+        table = Table(
+            data,
+            colWidths=[
+                18 * cm],
+            rowHeights=[
+                0.5 * cm,
+                0.4 * cm,
+                0.4 * cm
+            ])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    # flowables used in both letters
+    def create_letter_header(self):
+        """"
+        create header containing engineer
+        name and introduction line of date.
+        """
+
+        name = f'{self.user.first_name} {self.user.last_name}'
+        date = Paragraph(
+            f'Medellín, {CURRENT_DAY} de {MONTHS[CURRENT_MONTH - 1]} de {CURRENT_YEAR},',
+            style=STANDARD)
+        engineer_client = Paragraph(
+            f"""Ingeniero:<br/><font name="Arial-Bold">{name.upper()}
+            </font><br/>Dpto. de Mantenimiento <br/>Email: 
+            <font color='blue'><a href={f'mailto:{self.user.email}'}>{self.user.email}</a></font>""",
+            style=STANDARD)
+        flowables = [
+            date,
+            Spacer(self.width, 1 * cm),
+            engineer_client
+        ]
+        return flowables
+
+    # flowables used in first letter
+    def create_first_letter_paragraph(self):
+        """
+        returns Paragraph flowable 
+        containing text for the first letter.
+        """
+
+        # TODO msg string needs editting
+        return Paragraph(f""" 
+            Cordial saludo;<br/><br/> 
+            Adjuntamos informes de mantenimiento
+            predictivo e informe administrativo,
+            por correo electrónico, de los equipos 
+            de planta, medidos en {self.date} del año
+            en curso.<br/><br/>Cada que le realicemos
+            un mantenimiento predictivo tener presente
+            que el análisis corresponde a la condición
+            del equipo en el momento en que fue medido,
+            no a la condición posterior o hechos fortuitos
+            que puedan alterar la normal operación
+            del equipo.<br/><br/>Para optimizar los resultados
+            del mantenimiento predictivo y disminución
+            de costos de mantenimiento, es recomendable
+            que estas mediciones se realicen, mínimo
+            cada tres meses.<br/><br/> Verificar el listado,
+            nombre de los equipos medidos y ficha técnica;
+            favor informarnos datos faltantes y/o datos
+            a corregir o modificar.<br/><br/> Recomendamos
+            corregir oportunamente y/o inspeccionar los
+            equipos que hayan sido reportados con
+            funcionamiento no satisfactorio.<br/><br/> 
+            NOTA: Favor mantener en cada equipo la placa
+            de identificación y nombre del equipo, con el
+            fin de evitar incoherencia en la toma de medición
+            y la interpretación del análisis. Cualquier 
+            inquietud con gusto será aclarada.<br/><br/><br/> 
+            Gracias por contar con nosotros.<br/><br/><br/>  
+            Atentamente, 
+            """, style=STANDARD)
+
+    @staticmethod
+    def create_signature_line(string):
+        return Paragraph(string, style=STANDARD)
+
+    @staticmethod
+    def create_signature_name(string):
+        return Paragraph(string, style=BLACK_BOLD)
 
     def create_signatures_table(self):
         """
@@ -214,247 +357,41 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
-    def _create_footer_table():
-        """
-        create table to manage
-        elements in footer.
-        """
-
-        data = [[LINE_ONE], [LINE_TWO], [LINE_THREE]]
-        styles = [
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER')
-        ]
-        table = Table(
-            data,
-            colWidths=[
-                18 * cm],
-            rowHeights=[
-                0.5 * cm,
-                0.4 * cm,
-                0.4 * cm
-            ])
-        table.setStyle(TableStyle(styles))
-        return table
+    # flowables used in second letter
 
     @staticmethod
-    def _create_analysis_table(analysis, recomendation):
+    def create_second_letter_paragraph_one():
         """
-        create table of analysis
-        of a measurement.
-        """
-
-        header_one = Paragraph(
-            'ANÁLISIS DE VIBRACIÓN',
-            style=STANDARD_CENTER)
-        header_two = Paragraph(
-            'CORRECTIVOS Y/O RECOMENDACIONES',
-            style=STANDARD_CENTER)
-        analysis = Paragraph(
-            analysis,
-            style=STANDARD)
-        recomendation = Paragraph(
-            recomendation,
-            style=STANDARD)
-        data = [
-            [header_one],
-            [analysis],
-            [header_two],
-            [recomendation]
-        ]
-        styles = [
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER')
-        ]
-        table = Table(
-            data,
-            colWidths=[18 * cm])
-        table.setStyle(TableStyle(styles))
-        return table
-
-    @ staticmethod
-    def graph_table(title, graph):
-        """
-        create a table containing
-        an especified graphic.
+        returns initial praragraph of letter two.
         """
 
-        title = Paragraph(title.upper(), style=STANDARD_CENTER)
-        graph = Image(graph, width=17 * cm, height=6 * cm)
-        data = [[title], [graph]]
-        styles = [
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
-            ('GRID', (0, 0), (-1, -1), 0.25, black)
-        ]
-        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
-        table.setStyle(TableStyle(styles))
-        return table
+        Paragraph("""
+        REF.  Explicación Configuración Predictivo.<br/><br/>
+        Cordial saludo:<br/><br/><br/>A continuación les 
+        entregamos una pequeña explicación de cómo funciona 
+        la configuración del predictivo.<br/><br/>""",
+                  style=STANDARD)
 
-    def _header_one(self, canvas, doc):
-        """
-        method to be passed to PageTemplate
-        objects on onPage keyword argument 
-        to generate headers of measurements.
-        """
+        Paragraph(
+            """
+        1. En cada uno de los diagramas esquemáticos 
+        de los equipos se especifica claramente el lugar 
+        de medición, el número que le corresponde y el tipo 
+        de medición a realizar.<br/><br/>2. Orden de la medición 
+        por equipo:<br/><br/>El orden de medición por equipo 
+        está estandarizado y se inicia desde la potencia hacia 
+        delante, es decir, el punto 1 siempre será el rodamiento 
+        motor lado libre, el punto dos (2) siempre será el 
+        rodamiento motor lado transmisión y así avanza hacía el 
+        equipo hasta terminar los puntos de medición.</l></En>
+        <br/><br/>Ejemplo:
+        """, style=STANDARD)
 
-        canvas.saveState()
-        page = Paragraph(str(doc.page), style=BLACK_SMALL)
-        w, h = page.wrap(self.width, 1 * cm)
-        page.drawOn(canvas, self.leftMargin +
-                    ((self.width - w) / 2), (29 * cm) - h)
-        table = self._create_header_table()
-        _, ht = table.wrap(self.width, 3 * cm)
-        table.drawOn(canvas, self.leftMargin, 28 * cm - ht)
-        canvas.restoreState()
+    def create_bullets_one(self):
+        pass
 
-    def _header_two(self, canvas, doc):
-        """
-        method to be passed to PageTemplate
-        objects on onPage keyword argument 
-        to generate basic headers.
-        """
-
-        canvas.saveState()
-        page = Paragraph(str(doc.page), style=BLACK_SMALL)
-        w, h = page.wrap(self.width, 1 * cm)
-        page.drawOn(canvas, self.leftMargin +
-                    ((self.width - w) / 2), (29 * cm) - h)
-        canvas.restoreState()
-
-    def _footer(self, canvas, doc):
-        """
-        method to be passed to PageTemplate
-        objects on onPageEnd keyword argument
-        to generate footers.
-        """
-
-        canvas.saveState()
-        table = self._create_footer_table()
-        _, h = table.wrap(self.width, self.bottomMargin)
-        table.drawOn(canvas, self.leftMargin, (2 * cm - h) / 2)
-        canvas.restoreState()
-
-    def create_letter_header(self):
-        """"
-        create header containing engineer
-        name and introduction line of date.
-        """
-
-        name = f'{self.user.first_name} {self.user.last_name}'
-        date = Paragraph(
-            f'Medellín, {CURRENT_DAY} de {MONTHS[CURRENT_MONTH - 1]} de {CURRENT_YEAR},',
-            style=STANDARD)
-        engineer_client = Paragraph(
-            f"""Ingeniero:<br/><font name="Arial-Bold">{name.upper()}
-            </font><br/>Dpto. de Mantenimiento <br/>Email: 
-            <font color='blue'><a href={f'mailto:{self.user.email}'}>{self.user.email}</a></font>""",
-            style=STANDARD)
-        flowables = [
-            date,
-            Spacer(self.width, 1 * cm),
-            engineer_client
-        ]
-        return flowables
-
-    @staticmethod
-    def create_letter_two_table():
-        """
-        create a table containing
-        an especified graphic.
-        """
-        
-        title_one = Paragraph('Rango de Velocidad efectiva RMS (mm/seg.)', style=BLACK_BOLD_CENTER)
-        title_two = Paragraph('Tipos de Máquinas', style=BLACK_BOLD_CENTER)
-        data = [
-            [title_one, '', title_two,'', '', ''], 
-            ['', '', 'Clase l', 'Clase ll', 'Clase lll', 'Clase lV'],
-            ['', '', '', '', '', ''],
-            ['28', '', 'D', 'D', 'D', 'D'],
-            ['18', '', '', '', '', 'C'],
-            ['11.2', '', '', '', 'C', ''],
-            ['7.1', '', '', 'C', '', 'B'],
-            ['4.5', '', 'C', '', 'B', ''],
-            ['2.8', '', '', 'B', '', 'A'],
-            ['1.8', '', 'B', '', 'A', ''],
-            ['1.12', '', '', 'A', '', ''],
-            ['0.71', '', 'A', '', '', ''],
-            ['0.45', '', '', '', '', ''],
-            ['0.28', '', '', '', '', ''],
-            ]
-        styles = [
-            ('SPAN', (0, 0), (1, 2)),
-            ('SPAN', (2, 0), (5, 0)),
-            ('SPAN', (2, 1), (2, 2)),
-            ('SPAN', (3, 1), (3, 2)),
-            ('SPAN', (4, 1), (4, 2)),
-            ('SPAN', (5, 1), (5, 2)),
-            ('SPAN', (0, 3), (1, 3)),
-            ('SPAN', (0, 4), (1, 4)),
-            ('SPAN', (0, 5), (1, 5)),
-            ('SPAN', (0, 6), (1, 6)),
-            ('SPAN', (0, 7), (1, 7)),
-            ('SPAN', (0, 8), (1, 8)),
-            ('SPAN', (0, 9), (1, 9)),
-            ('SPAN', (0, 10), (1, 10)),
-            ('SPAN', (0, 11), (1, 11)),
-            ('SPAN', (0, 12), (1, 12)),
-            ('SPAN', (0, 13), (1, 13)),
-            ('SPAN', (2, 3), (2, 6)),     
-            ('SPAN', (2, 7), (2, 8)),
-            ('SPAN', (2, 9), (2, 10)),
-            ('SPAN', (2, 11), (2, 13)),
-            ('SPAN', (3, 3), (3, 5)),
-            ('SPAN', (3, 6), (3, 7)),
-            ('SPAN', (3, 8), (3, 9)),
-            ('SPAN', (3, 10), (3, 13)),
-            ('SPAN', (4, 3), (4, 4)),
-            ('SPAN', (4, 5), (4, 6)),
-            ('SPAN', (4, 7), (4, 8)),
-            ('SPAN', (4, 9), (4, 13)),
-            ('SPAN', (5, 3), (5, 3)),
-            ('SPAN', (5, 4), (5, 5)),
-            ('SPAN', (5, 6), (5, 7)),
-            ('SPAN', (5, 8), (5, 13)),
-            #RED BACKGROUND
-            ('BACKGROUND', (2, 3), (2, 6), Color(red=1, green=0, blue=0)),
-            ('BACKGROUND', (3, 3), (3, 5), Color(red=1, green=0, blue=0)),
-            ('BACKGROUND', (4, 3), (4, 4), Color(red=1, green=0, blue=0)),
-            ('BACKGROUND', (5, 3), (5, 3), Color(red=1, green=0, blue=0)),
-            #YELLOW BACKGROUND
-            ('BACKGROUND', (2, 7), (2, 8), Color(red=1, green=1, blue=0)),
-            ('BACKGROUND', (3, 6), (3, 7), Color(red=1, green=1, blue=0)),
-            ('BACKGROUND', (4, 5), (4, 6), Color(red=1, green=1, blue=0)),
-            ('BACKGROUND', (5, 4), (5, 5), Color(red=1, green=1, blue=0)),
-            #GREEN ONE BACKGROUND
-            ('BACKGROUND', (2, 9), (2, 10), Color(red=0, green=1, blue=0)),
-            ('BACKGROUND', (3, 8), (3, 9), Color(red=0, green=1, blue=0)),
-            ('BACKGROUND', (4, 7), (4, 8), Color(red=0, green=1, blue=0)),
-            ('BACKGROUND', (5, 6), (5, 7), Color(red=0, green=1, blue=0)),
-            #GREEN TWO BACKGROUND
-            ('BACKGROUND', (2, 11), (2, 13), Color(red=(153/255), green=1, blue=(153/255))),
-            ('BACKGROUND', (3, 10), (3, 13), Color(red=(153/255), green=1, blue=(153/255))),
-            ('BACKGROUND', (4, 9), (4, 13), Color(red=(153/255), green=1, blue=(153/255))),
-            ('BACKGROUND', (5, 8), (5, 13), Color(red=(153/255), green=1, blue=(153/255))),
-            # FONT GRID AND ALIGNMENT
-            ('FONTNAME', (0,3), (0, 13), 'Arial'),
-            ('FONTNAME', (0,0), (5, 2), 'Arial-Bold'),
-            ('FONTNAME', (2,3), (-1, -1), 'Arial-Bold'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('GRID', (0, 0), (-1, -1), 0.25, black),
-            ('BOX', (0, 0), (-1, -1), 2, black),
-            ('BOX', (0, 0), (-1, -1), 1, Color(red=0, green=0, blue=0)),
-        ]
-        table = Table(
-            data, 
-            colWidths=[2 * cm for _ in range(6)], 
-            rowHeights=[0.5 * cm for _ in range(14)]
-            )
-        table.setStyle(TableStyle(styles))
-        return table
+    def create_bullets_two(self):
+        pass
 
     @staticmethod
     def create_letter_two_diagram_one():
@@ -469,7 +406,7 @@ class Flowables(BaseDocTemplate):
             DIAGRAM,
             width=img_width,
             height=img_height)
-        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD)
+        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD_CENTER)
         data = [[diagram], [img]]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -487,61 +424,168 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
+    def create_bullets_three(self):
+        pass
 
     @staticmethod
-    def create_table_title():
-        """
-        create a paragraph flowable to
-        be used as a title for the tables.
-        """
+    def create_letter_two_diagram_two():
+        pass
 
-        title = Paragraph(
-            'LECTURAS REGISTRADAS (@ptitude - SKF)', style=STANDARD_CENTER)
-        return title
+    def create_bullets_four(self):
+        pass
 
     @staticmethod
-    def create_tendendy_title():
+    def create_second_letter_paragraph_two():
         """
-        create a paragraph flowable to
-        be used as a title for the 
-        tendency graphs. 
+        returns second paragraph of letter two.
         """
 
-        title = Paragraph('GRAFICAS TENDENCIAS (En el tiempo)',
-                          style=STANDARD_CENTER)
-        return title
+        return Paragraph(
+            """En resumen:<br/><br/>1 H V =  Rodamiento motor lado libre, medida 
+        horizontal en velocidad. <font name="Arial-Bold">Con respecto a las 
+        unidades de  Vibración:</font> En la tabla de valores se expresa sus 
+        niveles globales de vibración, en mms/s pico, para la variable velocidad, 
+        siendo necesario multiplicar por 0.707 dicho valor, si se requiere 
+        conocer su amplitud en mms/s rms, como lo expresa la Norma ISO 10816-1.<br/> 
+        Medir en unidades pico (P.k) permite identificar con más claridad en el 
+        espectro, condiciones de los componentes de máquina que operan 
+        a baja velocidad.""", style=STANDARD)
 
     @staticmethod
-    def create_espectra_title():
+    def create_letter_two_diagram_three():
         """
-        create a paragraph flowable to
-        be used as a title for the 
-        tendency graphs. 
+        create a table containing
+        an especified graphic.
         """
 
-        title = Paragraph('GRAFICAS ESPECTROS',
-                          style=STANDARD_CENTER)
-        return title
+        title_one = Paragraph(
+            'Rango de Velocidad efectiva RMS (mm/seg.)', style=BLACK_BOLD_CENTER)
+        title_two = Paragraph('Tipos de Máquinas', style=BLACK_BOLD_CENTER)
+        data = [
+            [title_one, '', title_two, '', '', ''],
+            ['', '', 'Clase l', 'Clase ll', 'Clase lll', 'Clase lV'],
+            ['', '', '', '', '', ''],
+            ['28', '', 'D', 'D', 'D', 'D'],
+            ['18', '', '', '', '', 'C'],
+            ['11.2', '', '', '', 'C', ''],
+            ['7.1', '', '', 'C', '', 'B'],
+            ['4.5', '', 'C', '', 'B', ''],
+            ['2.8', '', '', 'B', '', 'A'],
+            ['1.8', '', 'B', '', 'A', ''],
+            ['1.12', '', '', 'A', '', ''],
+            ['0.71', '', 'A', '', '', ''],
+            ['0.45', '', '', '', '', ''],
+            ['0.28', '', '', '', '', ''],
+        ]
+        styles = [
+            # DEFINE TABLE CELLS
+            ('SPAN', (0, 0), (1, 2)),
+            ('SPAN', (2, 0), (5, 0)),
+            ('SPAN', (2, 1), (2, 2)),
+            ('SPAN', (3, 1), (3, 2)),
+            ('SPAN', (4, 1), (4, 2)),
+            ('SPAN', (5, 1), (5, 2)),
+            ('SPAN', (0, 3), (1, 3)),
+            ('SPAN', (0, 4), (1, 4)),
+            ('SPAN', (0, 5), (1, 5)),
+            ('SPAN', (0, 6), (1, 6)),
+            ('SPAN', (0, 7), (1, 7)),
+            ('SPAN', (0, 8), (1, 8)),
+            ('SPAN', (0, 9), (1, 9)),
+            ('SPAN', (0, 10), (1, 10)),
+            ('SPAN', (0, 11), (1, 11)),
+            ('SPAN', (0, 12), (1, 12)),
+            ('SPAN', (0, 13), (1, 13)),
+            ('SPAN', (2, 3), (2, 6)),
+            ('SPAN', (2, 7), (2, 8)),
+            ('SPAN', (2, 9), (2, 10)),
+            ('SPAN', (2, 11), (2, 13)),
+            ('SPAN', (3, 3), (3, 5)),
+            ('SPAN', (3, 6), (3, 7)),
+            ('SPAN', (3, 8), (3, 9)),
+            ('SPAN', (3, 10), (3, 13)),
+            ('SPAN', (4, 3), (4, 4)),
+            ('SPAN', (4, 5), (4, 6)),
+            ('SPAN', (4, 7), (4, 8)),
+            ('SPAN', (4, 9), (4, 13)),
+            ('SPAN', (5, 3), (5, 3)),
+            ('SPAN', (5, 4), (5, 5)),
+            ('SPAN', (5, 6), (5, 7)),
+            ('SPAN', (5, 8), (5, 13)),
+            # RED BACKGROUND
+            ('BACKGROUND', (2, 3), (2, 6), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (3, 3), (3, 5), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (4, 3), (4, 4), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (5, 3), (5, 3), Color(red=1, green=0, blue=0)),
+            # YELLOW BACKGROUND
+            ('BACKGROUND', (2, 7), (2, 8), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (3, 6), (3, 7), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (4, 5), (4, 6), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (5, 4), (5, 5), Color(red=1, green=1, blue=0)),
+            # GREEN ONE BACKGROUND
+            ('BACKGROUND', (2, 9), (2, 10), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (3, 8), (3, 9), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (4, 7), (4, 8), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (5, 6), (5, 7), Color(red=0, green=1, blue=0)),
+            # GREEN TWO BACKGROUND
+            ('BACKGROUND', (2, 11), (2, 13), Color(
+                red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (3, 10), (3, 13), Color(
+                red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (4, 9), (4, 13), Color(
+                red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (5, 8), (5, 13), Color(
+                red=(153/255), green=1, blue=(153/255))),
+            # FONT GRID AND ALIGNMENT
+            ('FONTNAME', (0, 3), (0, 13), 'Arial'),
+            ('FONTNAME', (0, 0), (5, 2), 'Arial-Bold'),
+            ('FONTNAME', (2, 3), (-1, -1), 'Arial-Bold'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('BOX', (0, 0), (-1, -1), 2.5, black),
+            ('BOX', (0, 0), (-1, -1), 1.25, Color(red=1, green=1, blue=1)),
+        ]
+        table = Table(
+            data,
+            colWidths=[2 * cm for _ in range(6)],
+            rowHeights=[0.5 * cm for _ in range(14)]
+        )
+        table.setStyle(TableStyle(styles))
+        return table
 
     @staticmethod
-    def create_time_signal_title():
+    def create_second_letter_title(string):
         """
-        create a paragraph flowable to
-        be used as a title for the 
-        tendency graphs. 
+        return title paragraph 
+        used in second letter. 
         """
 
-        title = Paragraph('GRAFICAS SEÑAL EN EL TIEMPO',
-                          style=STANDARD_CENTER)
-        return title
+        return Paragraph(string, style=BLACK_BOLD_CENTER)
 
     @staticmethod
-    def create_signature_line(string):
-        return Paragraph(string, style=STANDARD)
+    def create_second_letter_especifications_one():
+        pass
 
     @staticmethod
-    def create_signature_name(string):
-        return Paragraph(string, style=BLACK_BOLD)
+    def create_second_letter_especifications_two():
+        pass
+
+    # Pred flowables
+
+    # TODO finish these methods
+
+    def machine_specifications_table(self):
+        """
+        create table detailing especifications 
+        of each machine and their current severity.
+        """
+
+        data = None
+        styles = None
+        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
+        table.setStyle(TableStyle(styles))
+        return table
 
     @staticmethod
     def pictures_table(diagram_img, machine_img):
@@ -581,16 +625,100 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    # TODO finish these methods
-
-    def machine_specifications_table(self):
+    @staticmethod
+    def create_table_title():
         """
-        create table detailing especifications 
-        of each machine and their current severity.
+        create a paragraph flowable to
+        be used as a title for the tables.
         """
 
-        data = None
-        styles = None
+        return Paragraph(
+            'LECTURAS REGISTRADAS (@ptitude - SKF)', style=STANDARD_CENTER)
+
+    @staticmethod
+    def create_analysis_table(analysis, recomendation):
+        """
+        create table of analysis
+        of a measurement.
+        """
+
+        header_one = Paragraph(
+            'ANÁLISIS DE VIBRACIÓN',
+            style=STANDARD_CENTER)
+        header_two = Paragraph(
+            'CORRECTIVOS Y/O RECOMENDACIONES',
+            style=STANDARD_CENTER)
+        analysis = Paragraph(
+            analysis,
+            style=STANDARD)
+        recomendation = Paragraph(
+            recomendation,
+            style=STANDARD)
+        data = [
+            [header_one],
+            [analysis],
+            [header_two],
+            [recomendation]
+        ]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER')
+        ]
+        table = Table(
+            data,
+            colWidths=[18 * cm])
+        table.setStyle(TableStyle(styles))
+        return table
+
+    @staticmethod
+    def graph_table(title, graph):
+        """
+        create a table containing
+        an especified graphic.
+        """
+
+        title = Paragraph(title.upper(), style=STANDARD_CENTER)
+        graph = Image(graph, width=17 * cm, height=6 * cm)
+        data = [[title], [graph]]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
+            ('GRID', (0, 0), (-1, -1), 0.25, black)
+        ]
         table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
         table.setStyle(TableStyle(styles))
         return table
+
+    @staticmethod
+    def create_tendendy_title():
+        """
+        create a paragraph flowable to
+        be used as a title for the 
+        tendency graphs. 
+        """
+
+        return Paragraph('GRAFICAS TENDENCIAS (En el tiempo)',
+                         style=STANDARD_CENTER)
+
+    @staticmethod
+    def create_espectra_title():
+        """
+        create a paragraph flowable to
+        be used as a title for the 
+        tendency graphs. 
+        """
+
+        return Paragraph('GRAFICAS ESPECTROS',
+                         style=STANDARD_CENTER)
+
+    @staticmethod
+    def create_time_signal_title():
+        """
+        create a paragraph flowable to
+        be used as a title for the 
+        tendency graphs. 
+        """
+
+        return Paragraph('GRAFICAS SEÑAL EN EL TIEMPO',
+                         style=STANDARD_CENTER)

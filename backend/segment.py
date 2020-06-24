@@ -1,6 +1,6 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
-from reportlab.lib.units import cm
 from .flowables import STANDARD, BLACK_BOLD_CENTER
+from reportlab.lib.units import cm
 from .graph import Graphs
 
 
@@ -15,48 +15,17 @@ class Segment(Graphs):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def create_letter_one(self):
+    def create_first_letter(self):
         """
         create first segment of the document.
         """
 
         letter_header = self.create_letter_header()
-        # TODO msg string needs editting
-        msg = Paragraph(f"""
-            Cordial saludo;<br/><br/> 
-            Adjuntamos informes de mantenimiento
-            predictivo e informe administrativo,
-            por correo electrónico, de los equipos 
-            de planta, medidos en {self.date} del año
-            en curso.<br/><br/>Cada que le realicemos
-            un mantenimiento predictivo tener presente
-            que el análisis corresponde a la condición
-            del equipo en el momento en que fue medido,
-            no a la condición posterior o hechos fortuitos
-            que puedan alterar la normal operación
-            del equipo.<br/><br/>Para optimizar los resultados
-            del mantenimiento predictivo y disminución
-            de costos de mantenimiento, es recomendable
-            que estas mediciones se realicen, mínimo
-            cada tres meses.<br/><br/> Verificar el listado,
-            nombre de los equipos medidos y ficha técnica;
-            favor informarnos datos faltantes y/o datos
-            a corregir o modificar.<br/><br/> Recomendamos
-            corregir oportunamente y/o inspeccionar los
-            equipos que hayan sido reportados con
-            funcionamiento no satisfactorio.<br/><br/> 
-            NOTA: Favor mantener en cada equipo la placa
-            de identificación y nombre del equipo, con el
-            fin de evitar incoherencia en la toma de medición
-            y la interpretación del análisis. Cualquier 
-            inquietud con gusto será aclarada.<br/><br/><br/> 
-            Gracias por contar con nosotros.<br/><br/><br/>  
-            Atentamente, 
-            """, style=STANDARD)
+        msg = self.create_first_letter_paragraph()
         engineer = self.create_signatures_table()
         self.story += [
             *letter_header,
-            # NextPageTemplate('normal'),
+            NextPageTemplate('normal'),
             Spacer(self.width, 1 * cm),
             msg,
             Spacer(self.width, 1.5 * cm),
@@ -70,29 +39,15 @@ class Segment(Graphs):
         """
 
         letter_header = self.create_letter_header()
-        msg_one = Paragraph("""
-        REF.  Explicación Configuración Predictivo.<br/><br/>
-        Cordial saludo:<br/><br/><br/>A continuación les 
-        entregamos una pequeña explicación de cómo funciona 
-        la configuración del predictivo.<br/><br/>
-        1. En cada uno de los diagramas esquemáticos 
-        de los equipos se especifica claramente el lugar 
-        de medición, el número que le corresponde y el tipo 
-        de medición a realizar.<br/><br/>2. Orden de la medición 
-        por equipo:<br/><br/>El orden de medición por equipo 
-        está estandarizado y se inicia desde la potencia hacia 
-        delante, es decir, el punto 1 siempre será el rodamiento 
-        motor lado libre, el punto dos (2) siempre será el 
-        rodamiento motor lado transmisión y así avanza hacía el 
-        equipo hasta terminar los puntos de medición.</l></En>
-        <br/><br/>Ejemplo:
-        """, style=STANDARD)
+        para_one = self.create_second_letter_paragraph_one()
+        bullets_one = None
+        bullets_two = None
 
-        diagram_one = None
+        diagram_one = self.create_letter_two_diagram_one()
 
         msg_two = Paragraph('something', style=STANDARD)
 
-        diagram_two = None
+        diagram_two = self.create_letter_two_diagram_two()
 
         msg_three = Paragraph("""
         <ol><li>Corresponde a la posición de la medición y 
@@ -107,40 +62,31 @@ class Segment(Graphs):
         a la unidad en la cual se realiza la medición.<br/><br/><br/>
         <center>V = Velocidad</center><br/><center>A = Aceleración</center>
         <br/><center>D  = Desplazamiento </center><br/></li></ol><br/> 
-        En resumen:<br/><br/>1 H V =  Rodamiento motor lado libre, medida 
-        horizontal en velocidad. <font name="Arial-Bold">Con respecto a las 
-        unidades de  Vibración:</font> En la tabla de valores se expresa sus 
-        niveles globales de vibración, en mms/s pico, para la variable velocidad, 
-        siendo necesario multiplicar por 0.707 dicho valor, si se requiere 
-        conocer su amplitud en mms/s rms, como lo expresa la Norma ISO 10816-1.<br/> 
-        Medir en unidades pico (P.k) permite identificar con más claridad en el 
-        espectro, condiciones de los componentes de máquina que operan 
-        a baja velocidad.""", style=STANDARD)
+        """, style=STANDARD)
 
-        header = Paragraph(
-            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ', 
-            style=BLACK_BOLD_CENTER)
+        msg_four = self.create_second_letter_paragraph_two()
 
-        table = None
+        title_one = self.create_second_letter_title(
+            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ')
 
-        title_one = Paragraph(
-            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>',
-            style=BLACK_BOLD_CENTER)
+        diagram_three = self.create_letter_two_diagram_three()
+
+        title_two = self.create_second_letter_title(
+            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>')
 
         especifications_one = None
 
-        title_two = Paragraph(
-            '<u>CALIDAD DE LA VIBRACIÓN</u>',
-            style=BLACK_BOLD_CENTER)
+        title_three = self.create_second_letter_title(
+            '<u>CALIDAD DE LA VIBRACIÓN</u>')
 
         especifications_two = None
 
         self.story += [
-            *letter_header,
+            *letter_header,  # conatins a list of flowables thus needs to be spread
             NextPageTemplate('measurement_two'),
             Spacer(self.width, 1 * cm),
-            msg_one,
-            # diagram_one,
+            para_one,
+            diagram_one,
             PageBreak(),
             msg_two,
             NextPageTemplate('measurement'),
@@ -149,33 +95,32 @@ class Segment(Graphs):
             Spacer(self.width, 1 * cm),
             msg_three,
             PageBreak(),
-            header,
+            title_one,
             Spacer(self.width, 1 * cm),
             # table,
             Spacer(self.width, 1 * cm),
-            title_one,
+            title_two,
             Spacer(self.width, 1 * cm),
             # especifications_one,
             Spacer(self.width, 1 * cm),
-            title_two,
+            title_three,
             Spacer(self.width, 1 * cm),
             # especifications_two,
-
         ]
 
     def create_pred(self, query_instance):
         especifications = self.machine_specifications_table()
         diagram = self.pictures_table(
-            query_instance.machine.images.diagram,
-            query_instance.machine.images.image)
+            query_instance.machine.images.first().diagram,
+            query_instance.machine.images.first().image)
         title = self.create_table_title()
 
-        # TODO add logic to create table and graphs
+        # TODO add logic to create measurements tables and graphs
         ###############
 
         ##############
 
-        analysis = self._create_analysis_table(
+        analysis = self.create_analysis_table(
             query_instance.analysis,
             query_instance.recomendation)
 

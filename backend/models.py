@@ -89,7 +89,8 @@ class Machine(models.Model):
 class Image(models.Model):
 
     # TODO make sure ./media/ is the right path
-    image = models.ImageField(upload_to="machines")
+    image = models.ImageField(upload_to="machines/images")
+    diagram = models.ImageField(upload_to="machines/diagrams")
     machine = models.OneToOneField(
         Machine,
         related_name="images",

@@ -26,7 +26,7 @@ class Report(Segment):
             'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), NextPageTemplate("measurement"), PageBreak(), Paragraph(
             'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), self._create_analysis_table('aaaaaaa<br/>asdasdasdasd ' * 10, 'asdasdasdadds ' * 90),
             self.graph_table('asdasdasd', os.path.join(os.path.dirname(
-                os.path.abspath(__file__)), 'static\\images\\logo.jpg')), self.create_letter_two_table()
+                os.path.abspath(__file__)), 'static\\images\\logo.jpg')), self.create_letter_two_table(), self.create_letter_two_diagram_one()
         ]
 
         self.multiBuild(self.story)
