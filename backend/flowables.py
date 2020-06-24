@@ -107,6 +107,7 @@ class Flowables(BaseDocTemplate):
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
         self.toc = TableOfContents()
+        self.measurement_types = set()
         self.story = []
         self.width = 18 * cm
         self.leftMargin = 1.6 * cm
