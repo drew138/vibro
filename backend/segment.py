@@ -17,15 +17,15 @@ class Segment(Graphs):
 
     def create_first_letter(self):
         """
-        create first segment of the document.
+        create first letter of the document.
         """
 
         letter_header = self.create_letter_header()
         msg = self.create_first_letter_paragraph()
         engineer = self.create_signatures_table()
         self.story += [
-            *letter_header,
-            NextPageTemplate('normal'),
+            *letter_header,  # conatins a list of flowables thus needs to be spread
+            NextPageTemplate('measurement'),
             Spacer(self.width, 1 * cm),
             msg,
             Spacer(self.width, 1.5 * cm),
@@ -33,82 +33,100 @@ class Segment(Graphs):
             PageBreak()
         ]
 
-    def create_letter_two(self):
+    def create_second_letter(self):
         """
-        create second segment of the pdf.
+        create second letter of the pdf.
+        Note: goes after table of contents (TOC)
         """
 
+        spacer_one = Spacer(self.width, 1 * cm)
+        spacer_two = Spacer(self.width, 0.5 * cm)
+        # add following to story in this exact order
         letter_header = self.create_letter_header()
         para_one = self.create_second_letter_paragraph_one()
-        bullets_one = None
-        bullets_two = None
-
+        bullets_one = self.create_second_letter_bullet_one()
+        bullets_two = self.create_second_letter_bullet_two()
+        para_two = Paragraph('Ejemplo:', style=STANDARD)
         diagram_one = self.create_letter_two_diagram_one()
-
-        msg_two = Paragraph('something', style=STANDARD)
-
-        diagram_two = self.create_letter_two_diagram_two()
-
-        msg_three = Paragraph("""
-        <ol><li>Corresponde a la posición de la medición y 
-        puede variar tanto, como puntos de medición tenga el 
-        equipo.<br/><br/>Para el ejemplo, el 1 corresponde al 
-        rodamiento motor lado libre.<br/><br/></li><li>El segundo 
-        dígito  siempre será una letra, y corresponde a la posición 
-        del sensor en el momento de la medición. Ejemplo:<br/><br/> 
-        <center>H = Horizontal</center><br/><center>V = Vertical
-        </center><br/><center>A = Axial</center><br/><br/><br/></li>
-        <li>El tercer dígito también será una letra y corresponde 
-        a la unidad en la cual se realiza la medición.<br/><br/><br/>
-        <center>V = Velocidad</center><br/><center>A = Aceleración</center>
-        <br/><center>D  = Desplazamiento </center><br/></li></ol><br/> 
-        """, style=STANDARD)
-
-        msg_four = self.create_second_letter_paragraph_two()
-
+        bullets_three = self.create_second_letter_bullet_three()
+        # diagram_two = self.create_letter_two_diagram_two()
+        bullets_four = self.create_second_letter_bullet_four()
+        bullets_five = self.create_second_letter_bullet_five()
+        indent_one = self.create_indented_paragraph('H = Horizontal')
+        indent_two = self.create_indented_paragraph('V = Vertical')
+        indent_three = self.create_indented_paragraph('A = Axial')
+        bullets_six = self.create_second_letter_bullet_six()
+        indent_four = self.create_indented_paragraph('V = Velocidad')
+        indent_five = self.create_indented_paragraph('A = Aceleración')
+        indent_six = self.create_indented_paragraph('D = Desplazamiento')
+        para_three = self.create_second_letter_paragraph_three()
         title_one = self.create_second_letter_title(
             '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ')
-
         diagram_three = self.create_letter_two_diagram_three()
-
         title_two = self.create_second_letter_title(
             '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>')
-
-        especifications_one = None
-
+        especifications_one = self.create_second_letter_especifications_one()
         title_three = self.create_second_letter_title(
             '<u>CALIDAD DE LA VIBRACIÓN</u>')
-
-        especifications_two = None
+        especifications_two = self.create_second_letter_especifications_two()
 
         self.story += [
-            *letter_header,  # conatins a list of flowables thus needs to be spread
+            *letter_header,
             NextPageTemplate('measurement_two'),
-            Spacer(self.width, 1 * cm),
+            spacer_one,
             para_one,
+            spacer_two,
+            bullets_one,
+            spacer_two,
+            bullets_two,
+            spacer_two,
+            para_two,
+            spacer_one,
             diagram_one,
             PageBreak(),
-            msg_two,
-            NextPageTemplate('measurement'),
-            Spacer(self.width, 1 * cm),
+            bullets_three,
+            spacer_one,
             # diagram_two,
-            Spacer(self.width, 1 * cm),
-            msg_three,
+            spacer_one,
+            bullets_four,
+            spacer_one,
+            bullets_five,
+            spacer_two,
+            # TODO finish bullets and indents
+            ########
+            indent_one,
+            indent_two,
+            indent_three,
+            spacer_one,
+            bullets_six,
+            spacer_one,
+            indent_four,
+            indent_five,
+            indent_six,
+            ########
+            para_three,
+            NextPageTemplate('measurement'),
             PageBreak(),
             title_one,
-            Spacer(self.width, 1 * cm),
-            # table,
-            Spacer(self.width, 1 * cm),
+            spacer_one,
+            diagram_three,
+            spacer_one,
             title_two,
-            Spacer(self.width, 1 * cm),
-            # especifications_one,
-            Spacer(self.width, 1 * cm),
+            spacer_one,
+            especifications_one,
+            spacer_one,
             title_three,
-            Spacer(self.width, 1 * cm),
-            # especifications_two,
+            spacer_one,
+            especifications_two
+            # TODO add nextpagetemplate
         ]
 
     def create_pred(self, query_instance):
+        """
+        creates a measurement segment 
+        for measurement instance.
+        """
+
         especifications = self.machine_specifications_table()
         diagram = self.pictures_table(
             query_instance.machine.images.first().diagram,
@@ -132,4 +150,6 @@ class Segment(Graphs):
             title,
             # TODO add remaining flawables
             analysis,
+            NextPageTemplate('measurement'),
+            PageBreak()
         ]

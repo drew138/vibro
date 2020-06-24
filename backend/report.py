@@ -22,13 +22,6 @@ class Report(Segment):
         """
 
         self.write_pdf()
-        self.story += [Paragraph(
-            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), NextPageTemplate("measurement"), PageBreak(), Paragraph(
-            'CORRECTIVOS Y/O RECOMENDACIONES', style=STANDARD_CENTER), self._create_analysis_table('aaaaaaa<br/>asdasdasdasd ' * 10, 'asdasdasdadds ' * 90),
-            self.graph_table('asdasdasd', os.path.join(os.path.dirname(
-                os.path.abspath(__file__)), 'static\\images\\logo.jpg')), self.create_letter_two_table(), self.create_letter_two_diagram_one()
-        ]
-
         self.multiBuild(self.story)
 
     def write_pdf(self):
@@ -36,10 +29,9 @@ class Report(Segment):
         generate document segments.
         """
 
-        self.create_letter_one()
-        self.create_letter_two()
-        # TODO
-        return self
+        self.create_first_letter()
+        self.create_second_letter()
+        # TODO add remaining methods
 
     def afterFlowable(self, flowable):
         "Registers TOC entries."

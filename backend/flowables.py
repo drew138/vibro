@@ -62,6 +62,9 @@ STANDARD_HEADER = ParagraphStyle(
     name='standard_header', fontName='Arial', fontSize=10, alignment=2)
 STANDARD_JUSTIFIED = ParagraphStyle(
     name='standard_justified', fontName='Arial', fontSize=10, alignment=4)
+STANDARD_INDENTED = ParagraphStyle(
+    name='standard_indented', fontName='Arial', fontSize=10, leftIndent=130
+)
 BLACK_BOLD = ParagraphStyle(
     name='black_bold', fontName='Arial-Bold', fontSize=10)
 BLACK_BOLD_CENTER = ParagraphStyle(
@@ -358,40 +361,54 @@ class Flowables(BaseDocTemplate):
         return table
 
     # flowables used in second letter
-
     @staticmethod
     def create_second_letter_paragraph_one():
         """
         returns initial praragraph of letter two.
         """
 
-        Paragraph("""
+        return Paragraph("""
         REF.  Explicación Configuración Predictivo.<br/><br/>
         Cordial saludo:<br/><br/><br/>A continuación les 
         entregamos una pequeña explicación de cómo funciona 
-        la configuración del predictivo.<br/><br/>""",
-                  style=STANDARD)
+        la configuración del predictivo.""", style=STANDARD)
 
-        Paragraph(
-            """
-        1. En cada uno de los diagramas esquemáticos 
+    @staticmethod
+    def create_second_letter_bullet_point(string, bulletText):
+        """
+        return a paragraph flowable 
+        editted to have custom a
+        bulletpoint number.
+        """
+
+        return Paragraph(string, style=STANDARD, bulletText=bulletText)
+
+    def create_second_letter_bullet_one(self):
+        """
+        return paragraph containing 
+        1st bullet point in second letter.
+        """
+
+        return self.create_second_letter_bullet_point(
+            """En cada uno de los diagramas esquemáticos 
         de los equipos se especifica claramente el lugar 
         de medición, el número que le corresponde y el tipo 
-        de medición a realizar.<br/><br/>2. Orden de la medición 
-        por equipo:<br/><br/>El orden de medición por equipo 
-        está estandarizado y se inicia desde la potencia hacia 
-        delante, es decir, el punto 1 siempre será el rodamiento 
-        motor lado libre, el punto dos (2) siempre será el 
-        rodamiento motor lado transmisión y así avanza hacía el 
-        equipo hasta terminar los puntos de medición.</l></En>
-        <br/><br/>Ejemplo:
-        """, style=STANDARD)
+        de medición a realizar.""", '1.')
 
-    def create_bullets_one(self):
-        pass
+    def create_second_letter_bullet_two(self):
+        """
+        return paragraph containing 
+        2nd bullet point in second letter.
+        """
 
-    def create_bullets_two(self):
-        pass
+        return self.create_second_letter_bullet_point(
+            """Orden de la medición por equipo:<br/><br/>
+        El orden de medición por equipo está estandarizado 
+        y se inicia desde la potencia hacia delante, es 
+        decir, el punto 1 siempre será el rodamiento motor 
+        lado libre, el punto dos (2) siempre será el rodamiento 
+        motor lado transmisión y así avanza hacía el equipo 
+        hasta terminar los puntos de medición.""", '2.')
 
     @staticmethod
     def create_letter_two_diagram_one():
@@ -424,25 +441,76 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    def create_bullets_three(self):
-        pass
+    def create_second_letter_bullet_three(self):
+        """
+        return paragraph containing 
+        3rd bullet point in second letter.
+        """
+
+        return self.create_second_letter_bullet_point(
+            """Tipo de medición: La especificación del 
+        tipo de medición está dada por la siguiente 
+        configuración.""", '3.')
 
     @staticmethod
     def create_letter_two_diagram_two():
         pass
 
-    def create_bullets_four(self):
-        pass
+    def create_second_letter_bullet_four(self):
+        """
+        return paragraph containing 
+        4th bullet point in second letter.
+        Note: number is 1.
+        """
+
+        return self.create_second_letter_bullet_point(
+            """Corresponde a la posición de la medición 
+            y puede variar tanto, como puntos de medición 
+            tenga el equipo.<br/>Para el ejemplo, el 1 
+            corresponde al rodamiento motor lado libre.
+            """, '1.')
+
+    def create_second_letter_bullet_five(self):
+        """
+        return paragraph containing 
+        4th bullet point in second letter.
+        Note: number is 2.
+        """
+
+        return self.create_second_letter_bullet_point(
+            """El segundo dígito  siempre será una letra, 
+            y corresponde a la posición del  sensor en 
+            el momento de la medición. Ejemplo.""", '2.')
+
+    def create_second_letter_bullet_six(self):
+        """
+        return paragraph containing 
+        4th bullet point in second letter.
+        Note: number is 2.
+        """
+
+        return self.create_second_letter_bullet_point(
+            """El tercer dígito también será una letra y 
+            corresponde a la unidad en la cual se 
+            realiza la medición. """, '3.')
 
     @staticmethod
-    def create_second_letter_paragraph_two():
+    def create_indented_paragraph(string):
+        """
+        returns a paragraph indented to the left.
+        """
+
+        return Paragraph(string, style=STANDARD_INDENTED)
+
+    @staticmethod
+    def create_second_letter_paragraph_three():
         """
         returns second paragraph of letter two.
         """
 
         return Paragraph(
-            """En resumen:<br/><br/>1 H V =  Rodamiento motor lado libre, medida 
-        horizontal en velocidad. <font name="Arial-Bold">Con respecto a las 
+            """En resumen:<br/><br/>1 H V = Rodamiento motor lado libre, medida 
+        horizontal en velocidad.<br/><br/><br/><font name="Arial-Bold">Con respecto a las 
         unidades de  Vibración:</font> En la tabla de valores se expresa sus 
         niveles globales de vibración, en mms/s pico, para la variable velocidad, 
         siendo necesario multiplicar por 0.707 dicho valor, si se requiere 
@@ -564,16 +632,66 @@ class Flowables(BaseDocTemplate):
         return Paragraph(string, style=BLACK_BOLD_CENTER)
 
     @staticmethod
-    def create_second_letter_especifications_one():
-        pass
+    def _create_especifications_table(data):
+        """
+        return basic table populated 
+        by the data it is passed.
+        """
 
-    @staticmethod
-    def create_second_letter_especifications_two():
-        pass
+        styles = [
+            ('VALIGN', (0, 0), (1, 3), 'MIDDLE'),
+            ('ALIGN', (0, 0), (1, 3), 'CENTER'),
+            ('ALIGN', (2, 0), (2, 3), 'LEFT'),
+
+        ]
+        table = Table(
+            data,
+            colWidths=[2 * cm,
+                       2 * cm,
+                       10 * cm],
+            # rowHeights=[0.6 * cm for _ in range(4)]
+        )
+        table.setStyle(TableStyle(styles))
+        return table
+
+    def create_second_letter_especifications_one(self):
+        """
+        returns first especifications table.
+        """
+
+        para_one = Paragraph(
+            'Máquinas pequeñas de 15 KW. (20 HP).', style=STANDARD)
+        para_two = Paragraph(
+            'Máquinas de Tamaño mediano de 15 a 75 KW., o máquinas rígidamente montadas hasta 300 KW.', style=STANDARD)
+        para_three = Paragraph(
+            'Máquinas grandes sobre 300 KW. Montadas en soportes rígidos.', style=STANDARD)
+        para_four = Paragraph(
+            'Máquinas grandes sobre 300 KW. Montadas en soportes flexibles.', style=STANDARD)
+
+        data = [
+            ['Clase I', ':', para_one],
+            ['Clase II', ':', para_two],
+            ['Clase III', ':', para_three],
+            ['Clase IV', ':', para_four],
+        ]
+        return self._create_especifications_table(data)
+
+    def create_second_letter_especifications_two(self):
+        """
+        returns second especificatiosn table.
+        """
+
+        data = [
+            ['A ', ':', 'Buena'],
+            ['B', ':', 'Satisfactoria'],
+            ['C', ':', 'Insatisfactoria'],
+            ['D', ':', 'Inaceptable'],
+        ]
+        return self._create_especifications_table(data)
 
     # Pred flowables
 
-    # TODO finish these methods
+    # TODO finish machine especifications method
 
     def machine_specifications_table(self):
         """
