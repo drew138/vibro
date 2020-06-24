@@ -319,7 +319,7 @@ class Flowables(BaseDocTemplate):
 
         if self.engineer_two.first_name:
             second_engineer_name = f"""{self.engineer_two.first_name}
-             {self.engineer_two.last_name}""".upper()  # space inbetween string
+             {self.engineer_two.last_name}""".upper()
             data = [
                 [
                     self.create_signature_line(line),
@@ -455,6 +455,17 @@ class Flowables(BaseDocTemplate):
 
     @staticmethod
     def create_letter_two_diagram_two():
+        """
+        returns diagram containing 
+        explanation of measured points.
+        """
+
+        # TODO finish method
+        """
+        1 -> 1
+        H -> 2
+        V -> 3
+        """
         pass
 
     def create_second_letter_bullet_four(self):

@@ -14,6 +14,20 @@ class Graphs(Flowables):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.custom_colors = [
+            '#0000FF',
+            '#FF0000',
+            '#006600',
+            '#ff66cc',
+            '#00ff00',
+            '#ffff00',
+            '#660066',
+            '#00ffff',
+            '#F39C12',
+            '#148F77',
+            '#C0392B',
+            '#0E6251'
+        ]
 
     def create_table_graph(self, engine_name, previous_date, current_date, data):
         """
@@ -79,20 +93,7 @@ class Graphs(Flowables):
             else:
                 units = 'g - RMS'
         # colors for all 12 possible lines in a plot
-        my_colors = [
-            'b',
-            'r',
-            '#006600',
-            '#ff66cc',
-            '#00ff00',
-            '#ffff00',
-            '#660066',
-            '#00ffff',
-            '#F39C12',
-            '#148F77',
-            '#C0392B',
-            '#0E6251'
-        ]
+
         index = 0
         # create figure and axes objects
         fig, ax = plt.subplots(figsize=(17, 6))
@@ -104,20 +105,26 @@ class Graphs(Flowables):
             data = [float(v)
                     for v in g.loc[g['name'] == label]['global'].values]
             ax.plot_date(dates, data, linestyle='solid', label=label,
-                         color=my_colors[index], marker='.')  # plot label
+                         color=self.custom_colors[index], marker='.')  # plot label
             index += 1
-        plt.style.use('seaborn-ticks')  # define style for graph
-        date_format = mpl_dates.DateFormatter(
-            '%d/%m/%Y')  # define date format for x axis
-        ax.xaxis.set_major_formatter(date_format)  # set format to axis
+
         # set title accorind to title and last label variables
         ax.set_title(f'Tendencia\n{title}\\{labels[-1]}, Canal X')
-        # set x axis label and separate from axis
-        ax.set_xlabel('Fecha', labelpad=5)
-        ax.set_ylabel(units)  # set y axis label
-        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True,
-                  shadow=True, ncol=1)  # set legend location and other parameters
-        plt.grid(True)  # add grid to plot
+
+        plt.style.use('seaborn-ticks')
+        plt.grid(True)
         plt.tight_layout()  # adjust plot params
-        plt.savefig(save, bbox_inches="tight", transparent=True,
-                    dpi=300)  # save figure to be placed in document
+        date_format = mpl_dates.DateFormatter('%d/%m/%Y')
+        ax.xaxis.set_major_formatter(date_format)  # set format to axis
+        ax.set_xlabel('Fecha', labelpad=5)
+        ax.set_ylabel(units)
+        ax.legend(
+            loc='center left',
+            bbox_to_anchor=(1, 0.5),
+            fancybox=True,
+            shadow=True, ncol=1)
+        plt.savefig(
+            save,
+            bbox_inches="tight",
+            transparent=True,
+            dpi=300)

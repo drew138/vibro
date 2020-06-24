@@ -92,8 +92,6 @@ class Segment(Graphs):
             spacer_one,
             bullets_five,
             spacer_two,
-            # TODO finish bullets and indents
-            ########
             indent_one,
             indent_two,
             indent_three,
@@ -103,7 +101,6 @@ class Segment(Graphs):
             indent_four,
             indent_five,
             indent_six,
-            ########
             para_three,
             NextPageTemplate('measurement'),
             PageBreak(),
@@ -129,8 +126,8 @@ class Segment(Graphs):
 
         especifications = self.machine_specifications_table()
         diagram = self.pictures_table(
-            query_instance.machine.images.first().diagram,
-            query_instance.machine.images.first().image)
+            query_instance.machine.images.all().first().diagram,
+            query_instance.machine.images.all().first().image)
         title = self.create_table_title()
 
         # TODO add logic to create measurements tables and graphs
