@@ -1,18 +1,19 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
-from .segment import Segment
 from .flowables import STANDARD_CENTER
-import os  # TODO remove this dependency
+from .segment import Segment
 
 
 class Report(Segment):
 
     """
     class that calls methods to 
-    combine different segments of the pdf.
+    combine different segments 
+    of the pdf.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.measurement_types = set()
 
     def build_doc(self):
         """
@@ -30,6 +31,7 @@ class Report(Segment):
         """
 
         self.create_first_letter()
+        self.create_toc()
         self.create_second_letter()
         # TODO add remaining methods
 

@@ -1,5 +1,6 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
-from .flowables import STANDARD, BLACK_BOLD_CENTER
+from .flowables import STANDARD, BLACK_BOLD_CENTER, LEVEL_ONE, LEVEL_TWO
+from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.units import cm
 from .graph import Graphs
 
@@ -14,6 +15,8 @@ class Segment(Graphs):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.toc = TableOfContents()
+        self.story = []
 
     def create_first_letter(self):
         """
@@ -25,11 +28,26 @@ class Segment(Graphs):
         engineer = self.create_signatures_table()
         self.story += [
             *letter_header,  # conatins a list of flowables thus needs to be spread
-            NextPageTemplate('measurement'),
+            NextPageTemplate('normal'),
             Spacer(self.width, 1 * cm),
             msg,
             Spacer(self.width, 1.5 * cm),
             engineer,
+            PageBreak()
+        ]
+
+    def create_toc(self):
+        """
+        insert table of contents to pdf.
+        """
+
+        title = self.create_toc_title()
+        self.toc.levelStyles = [LEVEL_ONE, LEVEL_TWO]
+        self.story += [
+            title,
+            Spacer(self.width, 1 * cm),
+            self.toc,
+            NextPageTemplate('measurement'),
             PageBreak()
         ]
 

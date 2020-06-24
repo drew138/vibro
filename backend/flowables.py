@@ -1,5 +1,4 @@
 from reportlab.platypus import PageBreak, PageTemplate, BaseDocTemplate, Paragraph, NextPageTemplate, TableStyle, Image, Spacer
-from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.colors import Color, black
@@ -53,6 +52,14 @@ HEADER_FOOTER_GREEN = Color(red=0, green=(102/255), blue=0)
 COMPANY_HEADER_BLUE = Color(red=(82/255), green=(139/255), blue=(166/255))
 TABLE_BLUE = Color(red=(141/255), green=(179/255), blue=(226/255))
 FOOTER_BLUE = Color(red=(84/255), green=(141/255), blue=(212/255))
+RED = Color(red=1, green=0, blue=0)
+YELLOW = Color(red=1, green=1, blue=0)
+GREEN = Color(red=0, green=1, blue=0)
+WHITE = Color(red=1, green=1, blue=1)
+FADED_GREEN = Color(
+    red=(153/255),
+    green=1,
+    blue=(153/255))
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
@@ -69,6 +76,8 @@ BLACK_BOLD = ParagraphStyle(
     name='black_bold', fontName='Arial-Bold', fontSize=10)
 BLACK_BOLD_CENTER = ParagraphStyle(
     name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
+BLACK_BOLD_BIG_CENTER = ParagraphStyle(
+    name='black_bold_big_center', fontName='Arial-Bold', fontSize=15, alignment=1)
 BLUE_HEADER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
                              textColor=COMPANY_HEADER_BLUE, alignment=2)
 BLUE_FOOTER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
@@ -77,6 +86,11 @@ BLACK_SMALL = ParagraphStyle(
     name='black_small', fontName='Arial', fontSize=7, alignment=1)
 GREEN_SMALL = ParagraphStyle(
     name='green_small', fontName='Arial', fontSize=7, textColor=HEADER_FOOTER_GREEN, alignment=1)
+# paragraph styles for TOC
+LEVEL_ONE = ParagraphStyle(
+    name='level_one', fontName='Arial', fontSize=12, endDots=' . ')
+LEVEL_TWO = ParagraphStyle(
+    name='level_two', fontName='Arial', fontSize=10, leftIndent=30, endDots=' . ')
 # footer paragraph lines
 LINE_ONE = Paragraph('_' * 80, style=BLUE_FOOTER)
 LINE_TWO = Paragraph(
@@ -93,7 +107,7 @@ MACHINE_FRAME = Frame(1.6*cm, 2*cm, 18*cm, 23*cm,
 class Flowables(BaseDocTemplate):
 
     """
-    class containing all minor flowables 
+    class containing all minor flowables
     used in the creation of documents.
     """
 
@@ -106,9 +120,6 @@ class Flowables(BaseDocTemplate):
         self.date = self.queryset.first().date
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
-        self.toc = TableOfContents()
-        self.measurement_types = set()
-        self.story = []
         self.width = 18 * cm
         self.leftMargin = 1.6 * cm
         self.bottomMargin = 2 * cm
@@ -131,7 +142,7 @@ class Flowables(BaseDocTemplate):
     def _header_one(self, canvas, doc):
         """
         method to be passed to PageTemplate
-        objects on onPage keyword argument 
+        objects on onPage keyword argument
         to generate headers of measurements.
         """
 
@@ -148,7 +159,7 @@ class Flowables(BaseDocTemplate):
     def _header_two(self, canvas, doc):
         """
         method to be passed to PageTemplate
-        objects on onPage keyword argument 
+        objects on onPage keyword argument
         to generate basic headers.
         """
 
@@ -247,7 +258,7 @@ class Flowables(BaseDocTemplate):
             style=STANDARD)
         engineer_client = Paragraph(
             f"""Ingeniero:<br/><font name="Arial-Bold">{name.upper()}
-            </font><br/>Dpto. de Mantenimiento <br/>Email: 
+            </font><br/>Dpto. de Mantenimiento <br/>Email:
             <font color='blue'><a href={f'mailto:{self.user.email}'}>{self.user.email}</a></font>""",
             style=STANDARD)
         flowables = [
@@ -257,19 +268,30 @@ class Flowables(BaseDocTemplate):
         ]
         return flowables
 
+    # flowables used in TOC
+    @staticmethod
+    def create_toc_title():
+        """
+        returns a paragraph flowable 
+        to be used as title in the 
+        table of contents.
+        """
+
+        return Paragraph('Tabla de Contenidos', style=BLACK_BOLD_BIG_CENTER)
+
     # flowables used in first letter
     def create_first_letter_paragraph(self):
         """
-        returns Paragraph flowable 
+        returns Paragraph flowable
         containing text for the first letter.
         """
 
         # TODO msg string needs editting
-        return Paragraph(f""" 
-            Cordial saludo;<br/><br/> 
+        return Paragraph(f"""
+            Cordial saludo;<br/><br/>
             Adjuntamos informes de mantenimiento
             predictivo e informe administrativo,
-            por correo electrónico, de los equipos 
+            por correo electrónico, de los equipos
             de planta, medidos en {self.date} del año
             en curso.<br/><br/>Cada que le realicemos
             un mantenimiento predictivo tener presente
@@ -287,14 +309,14 @@ class Flowables(BaseDocTemplate):
             a corregir o modificar.<br/><br/> Recomendamos
             corregir oportunamente y/o inspeccionar los
             equipos que hayan sido reportados con
-            funcionamiento no satisfactorio.<br/><br/> 
+            funcionamiento no satisfactorio.<br/><br/>
             NOTA: Favor mantener en cada equipo la placa
             de identificación y nombre del equipo, con el
             fin de evitar incoherencia en la toma de medición
-            y la interpretación del análisis. Cualquier 
-            inquietud con gusto será aclarada.<br/><br/><br/> 
-            Gracias por contar con nosotros.<br/><br/><br/>  
-            Atentamente, 
+            y la interpretación del análisis. Cualquier
+            inquietud con gusto será aclarada.<br/><br/><br/>
+            Gracias por contar con nosotros.<br/><br/><br/>
+            Atentamente,
             """, style=STANDARD)
 
     @staticmethod
@@ -308,7 +330,7 @@ class Flowables(BaseDocTemplate):
     def create_signatures_table(self):
         """
         create table to manage
-        signatures in of engineers 
+        signatures in of engineers
         in first letter.
         """
 
@@ -370,14 +392,14 @@ class Flowables(BaseDocTemplate):
 
         return Paragraph("""
         REF.  Explicación Configuración Predictivo.<br/><br/>
-        Cordial saludo:<br/><br/><br/>A continuación les 
-        entregamos una pequeña explicación de cómo funciona 
+        Cordial saludo:<br/><br/><br/>A continuación les
+        entregamos una pequeña explicación de cómo funciona
         la configuración del predictivo.""", style=STANDARD)
 
     @staticmethod
     def create_second_letter_bullet_point(string, bulletText):
         """
-        return a paragraph flowable 
+        return a paragraph flowable
         editted to have custom a
         bulletpoint number.
         """
@@ -386,35 +408,35 @@ class Flowables(BaseDocTemplate):
 
     def create_second_letter_bullet_one(self):
         """
-        return paragraph containing 
+        return paragraph containing
         1st bullet point in second letter.
         """
 
         return self.create_second_letter_bullet_point(
-            """En cada uno de los diagramas esquemáticos 
-        de los equipos se especifica claramente el lugar 
-        de medición, el número que le corresponde y el tipo 
+            """En cada uno de los diagramas esquemáticos
+        de los equipos se especifica claramente el lugar
+        de medición, el número que le corresponde y el tipo
         de medición a realizar.""", '1.')
 
     def create_second_letter_bullet_two(self):
         """
-        return paragraph containing 
+        return paragraph containing
         2nd bullet point in second letter.
         """
 
         return self.create_second_letter_bullet_point(
             """Orden de la medición por equipo:<br/><br/>
-        El orden de medición por equipo está estandarizado 
-        y se inicia desde la potencia hacia delante, es 
-        decir, el punto 1 siempre será el rodamiento motor 
-        lado libre, el punto dos (2) siempre será el rodamiento 
-        motor lado transmisión y así avanza hacía el equipo 
+        El orden de medición por equipo está estandarizado
+        y se inicia desde la potencia hacia delante, es
+        decir, el punto 1 siempre será el rodamiento motor
+        lado libre, el punto dos (2) siempre será el rodamiento
+        motor lado transmisión y así avanza hacía el equipo
         hasta terminar los puntos de medición.""", '2.')
 
     @staticmethod
     def create_letter_two_diagram_one():
         """
-        create a table containing the 
+        create a table containing the
         diagram image of the letter two.
         """
 
@@ -444,19 +466,19 @@ class Flowables(BaseDocTemplate):
 
     def create_second_letter_bullet_three(self):
         """
-        return paragraph containing 
+        return paragraph containing
         3rd bullet point in second letter.
         """
 
         return self.create_second_letter_bullet_point(
-            """Tipo de medición: La especificación del 
-        tipo de medición está dada por la siguiente 
+            """Tipo de medición: La especificación del
+        tipo de medición está dada por la siguiente
         configuración.""", '3.')
 
     @staticmethod
     def create_letter_two_diagram_two():
         """
-        returns diagram containing 
+        returns diagram containing
         explanation of measured points.
         """
 
@@ -470,40 +492,40 @@ class Flowables(BaseDocTemplate):
 
     def create_second_letter_bullet_four(self):
         """
-        return paragraph containing 
+        return paragraph containing
         4th bullet point in second letter.
         Note: number is 1.
         """
 
         return self.create_second_letter_bullet_point(
-            """Corresponde a la posición de la medición 
-            y puede variar tanto, como puntos de medición 
-            tenga el equipo.<br/>Para el ejemplo, el 1 
+            """Corresponde a la posición de la medición
+            y puede variar tanto, como puntos de medición
+            tenga el equipo.<br/>Para el ejemplo, el 1
             corresponde al rodamiento motor lado libre.
             """, '1.')
 
     def create_second_letter_bullet_five(self):
         """
-        return paragraph containing 
+        return paragraph containing
         4th bullet point in second letter.
         Note: number is 2.
         """
 
         return self.create_second_letter_bullet_point(
-            """El segundo dígito  siempre será una letra, 
-            y corresponde a la posición del  sensor en 
+            """El segundo dígito  siempre será una letra,
+            y corresponde a la posición del  sensor en
             el momento de la medición. Ejemplo.""", '2.')
 
     def create_second_letter_bullet_six(self):
         """
-        return paragraph containing 
+        return paragraph containing
         4th bullet point in second letter.
         Note: number is 2.
         """
 
         return self.create_second_letter_bullet_point(
-            """El tercer dígito también será una letra y 
-            corresponde a la unidad en la cual se 
+            """El tercer dígito también será una letra y
+            corresponde a la unidad en la cual se
             realiza la medición. """, '3.')
 
     @staticmethod
@@ -521,14 +543,14 @@ class Flowables(BaseDocTemplate):
         """
 
         return Paragraph(
-            """En resumen:<br/><br/>1 H V = Rodamiento motor lado libre, medida 
-        horizontal en velocidad.<br/><br/><br/><font name="Arial-Bold">Con respecto a las 
-        unidades de  Vibración:</font> En la tabla de valores se expresa sus 
-        niveles globales de vibración, en mms/s pico, para la variable velocidad, 
-        siendo necesario multiplicar por 0.707 dicho valor, si se requiere 
-        conocer su amplitud en mms/s rms, como lo expresa la Norma ISO 10816-1.<br/> 
-        Medir en unidades pico (P.k) permite identificar con más claridad en el 
-        espectro, condiciones de los componentes de máquina que operan 
+            """En resumen:<br/><br/>1 H V = Rodamiento motor lado libre, medida
+        horizontal en velocidad.<br/><br/><br/><font name="Arial-Bold">Con respecto a las
+        unidades de  Vibración:</font> En la tabla de valores se expresa sus
+        niveles globales de vibración, en mms/s pico, para la variable velocidad,
+        siendo necesario multiplicar por 0.707 dicho valor, si se requiere
+        conocer su amplitud en mms/s rms, como lo expresa la Norma ISO 10816-1.<br/>
+        Medir en unidades pico (P.k) permite identificar con más claridad en el
+        espectro, condiciones de los componentes de máquina que operan
         a baja velocidad.""", style=STANDARD)
 
     @staticmethod
@@ -593,29 +615,25 @@ class Flowables(BaseDocTemplate):
             ('SPAN', (5, 6), (5, 7)),
             ('SPAN', (5, 8), (5, 13)),
             # RED BACKGROUND
-            ('BACKGROUND', (2, 3), (2, 6), Color(red=1, green=0, blue=0)),
-            ('BACKGROUND', (3, 3), (3, 5), Color(red=1, green=0, blue=0)),
-            ('BACKGROUND', (4, 3), (4, 4), Color(red=1, green=0, blue=0)),
-            ('BACKGROUND', (5, 3), (5, 3), Color(red=1, green=0, blue=0)),
+            ('BACKGROUND', (2, 3), (2, 6), RED),
+            ('BACKGROUND', (3, 3), (3, 5), RED),
+            ('BACKGROUND', (4, 3), (4, 4), RED),
+            ('BACKGROUND', (5, 3), (5, 3), RED),
             # YELLOW BACKGROUND
-            ('BACKGROUND', (2, 7), (2, 8), Color(red=1, green=1, blue=0)),
-            ('BACKGROUND', (3, 6), (3, 7), Color(red=1, green=1, blue=0)),
-            ('BACKGROUND', (4, 5), (4, 6), Color(red=1, green=1, blue=0)),
-            ('BACKGROUND', (5, 4), (5, 5), Color(red=1, green=1, blue=0)),
+            ('BACKGROUND', (2, 7), (2, 8), YELLOW),
+            ('BACKGROUND', (3, 6), (3, 7), YELLOW),
+            ('BACKGROUND', (4, 5), (4, 6), YELLOW),
+            ('BACKGROUND', (5, 4), (5, 5), YELLOW),
             # GREEN ONE BACKGROUND
-            ('BACKGROUND', (2, 9), (2, 10), Color(red=0, green=1, blue=0)),
-            ('BACKGROUND', (3, 8), (3, 9), Color(red=0, green=1, blue=0)),
-            ('BACKGROUND', (4, 7), (4, 8), Color(red=0, green=1, blue=0)),
-            ('BACKGROUND', (5, 6), (5, 7), Color(red=0, green=1, blue=0)),
+            ('BACKGROUND', (2, 9), (2, 10), GREEN),
+            ('BACKGROUND', (3, 8), (3, 9), GREEN),
+            ('BACKGROUND', (4, 7), (4, 8), GREEN),
+            ('BACKGROUND', (5, 6), (5, 7), GREEN),
             # GREEN TWO BACKGROUND
-            ('BACKGROUND', (2, 11), (2, 13), Color(
-                red=(153/255), green=1, blue=(153/255))),
-            ('BACKGROUND', (3, 10), (3, 13), Color(
-                red=(153/255), green=1, blue=(153/255))),
-            ('BACKGROUND', (4, 9), (4, 13), Color(
-                red=(153/255), green=1, blue=(153/255))),
-            ('BACKGROUND', (5, 8), (5, 13), Color(
-                red=(153/255), green=1, blue=(153/255))),
+            ('BACKGROUND', (2, 11), (2, 13), FADED_GREEN),
+            ('BACKGROUND', (3, 10), (3, 13), FADED_GREEN),
+            ('BACKGROUND', (4, 9), (4, 13), FADED_GREEN),
+            ('BACKGROUND', (5, 8), (5, 13), FADED_GREEN),
             # FONT GRID AND ALIGNMENT
             ('FONTNAME', (0, 3), (0, 13), 'Arial'),
             ('FONTNAME', (0, 0), (5, 2), 'Arial-Bold'),
@@ -624,7 +642,7 @@ class Flowables(BaseDocTemplate):
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('GRID', (0, 0), (-1, -1), 0.25, black),
             ('BOX', (0, 0), (-1, -1), 2.5, black),
-            ('BOX', (0, 0), (-1, -1), 1.25, Color(red=1, green=1, blue=1)),
+            ('BOX', (0, 0), (-1, -1), 1.25, WHITE),
         ]
         table = Table(
             data,
@@ -634,19 +652,19 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
+    @ staticmethod
     def create_second_letter_title(string):
         """
-        return title paragraph 
-        used in second letter. 
+        return title paragraph
+        used in second letter.
         """
 
         return Paragraph(string, style=BLACK_BOLD_CENTER)
 
-    @staticmethod
+    @ staticmethod
     def _create_especifications_table(data):
         """
-        return basic table populated 
+        return basic table populated
         by the data it is passed.
         """
 
@@ -660,8 +678,7 @@ class Flowables(BaseDocTemplate):
             data,
             colWidths=[2 * cm,
                        2 * cm,
-                       10 * cm],
-            # rowHeights=[0.6 * cm for _ in range(4)]
+                       10 * cm]
         )
         table.setStyle(TableStyle(styles))
         return table
@@ -707,7 +724,7 @@ class Flowables(BaseDocTemplate):
 
     def machine_specifications_table(self):
         """
-        create table detailing especifications 
+        create table detailing especifications
         of each machine and their current severity.
         """
 
@@ -717,10 +734,10 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
+    @ staticmethod
     def pictures_table(diagram_img, machine_img):
         """
-        create a table containing the 
+        create a table containing the
         diagram image and the machine image.
         """
 
@@ -755,7 +772,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
+    @ staticmethod
     def create_table_title():
         """
         create a paragraph flowable to
@@ -765,7 +782,7 @@ class Flowables(BaseDocTemplate):
         return Paragraph(
             'LECTURAS REGISTRADAS (@ptitude - SKF)', style=STANDARD_CENTER)
 
-    @staticmethod
+    @ staticmethod
     def create_analysis_table(analysis, recomendation):
         """
         create table of analysis
@@ -800,7 +817,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
+    @ staticmethod
     def graph_table(title, graph):
         """
         create a table containing
@@ -820,34 +837,34 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @staticmethod
+    @ staticmethod
     def create_tendendy_title():
         """
         create a paragraph flowable to
-        be used as a title for the 
-        tendency graphs. 
+        be used as a title for the
+        tendency graphs.
         """
 
         return Paragraph('GRAFICAS TENDENCIAS (En el tiempo)',
                          style=STANDARD_CENTER)
 
-    @staticmethod
+    @ staticmethod
     def create_espectra_title():
         """
         create a paragraph flowable to
-        be used as a title for the 
-        tendency graphs. 
+        be used as a title for the
+        tendency graphs.
         """
 
         return Paragraph('GRAFICAS ESPECTROS',
                          style=STANDARD_CENTER)
 
-    @staticmethod
+    @ staticmethod
     def create_time_signal_title():
         """
         create a paragraph flowable to
-        be used as a title for the 
-        tendency graphs. 
+        be used as a title for the
+        tendency graphs.
         """
 
         return Paragraph('GRAFICAS SEÑAL EN EL TIEMPO',
