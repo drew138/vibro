@@ -67,7 +67,7 @@ class Segment(Graphs):
         para_two = Paragraph('Ejemplo:', style=STANDARD)
         diagram_one = self.create_letter_two_diagram_one()
         bullets_three = self.create_second_letter_bullet_three()
-        # diagram_two = self.create_letter_two_diagram_two()
+        diagram_two = self.create_letter_two_diagram_two()
         bullets_four = self.create_second_letter_bullet_four()
         bullets_five = self.create_second_letter_bullet_five()
         indent_one = self.create_indented_paragraph('H = Horizontal')
@@ -104,7 +104,7 @@ class Segment(Graphs):
             PageBreak(),
             bullets_three,
             spacer_one,
-            # diagram_two,
+            diagram_two,
             spacer_one,
             bullets_four,
             spacer_one,
@@ -142,11 +142,11 @@ class Segment(Graphs):
         for measurement instance.
         """
 
-        especifications = self.machine_specifications_table()
+        especifications = self.machine_specifications_table(query_instance)
         diagram = self.pictures_table(
             query_instance.machine.images.all().first().diagram,
             query_instance.machine.images.all().first().image)
-        title = self.create_table_title()
+        table_title = self.create_table_title()
 
         # TODO add logic to create measurements tables and graphs
         ###############
@@ -158,11 +158,12 @@ class Segment(Graphs):
             query_instance.recomendation)
 
         self.story += [
-            especifications, Spacer(self.width, 1 * cm),
+            especifications,
+            Spacer(self.width, 1 * cm),
             NextPageTemplate('measurement_two'),
             diagram,
             Spacer(self.width, 0.5 * cm),
-            title,
+            table_title,
             # TODO add remaining flawables
             analysis,
             NextPageTemplate('measurement'),

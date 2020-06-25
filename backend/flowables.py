@@ -19,7 +19,8 @@ registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGO = os.path.join(BASE_DIR, 'static\\images\\logo.jpg')
 SKF = os.path.join(BASE_DIR, 'static\\images\\skf.jpg')
-DIAGRAM = os.path.join(BASE_DIR, 'static\\images\\Numeration.png')
+DIAGRAM = os.path.join(BASE_DIR, 'static\\images\\numeration.png')
+ARROW = os.path.join(BASE_DIR, 'static\\images\\arrow.png')
 # datetime constants
 MONTHS = (
     'enero',
@@ -114,7 +115,7 @@ class Flowables(BaseDocTemplate):
     def __init__(self, filename, queryset, user, **kwargs):
         super().__init__(filename, **kwargs)
         self.filename = filename
-        self.queryset = queryset  # model object that populate pdf
+        self.queryset = queryset
         self.user = user
         self.company = self.user.company
         self.date = self.queryset.first().date
@@ -147,9 +148,12 @@ class Flowables(BaseDocTemplate):
         """
 
         canvas.saveState()
-        page = Paragraph(str(doc.page), style=BLACK_SMALL)
+
+        page = Paragraph(
+            f'Pagina {doc.page}',
+            style=BLACK_SMALL)
         w, h = page.wrap(self.width, 1 * cm)
-        page.drawOn(canvas, self.leftMargin +
+        page.drawOn(canvas, self.leftMargin + 0.5 * cm +
                     ((self.width - w) / 2), (29 * cm) - h)
         table = self._create_header_table()
         _, ht = table.wrap(self.width, 3 * cm)
@@ -164,9 +168,11 @@ class Flowables(BaseDocTemplate):
         """
 
         canvas.saveState()
-        page = Paragraph(str(doc.page), style=BLACK_SMALL)
+        page = Paragraph(
+            f'Pagina {doc.page}',
+            style=BLACK_SMALL)
         w, h = page.wrap(self.width, 1 * cm)
-        page.drawOn(canvas, self.leftMargin +
+        page.drawOn(canvas, self.leftMargin + 0.5 * cm +
                     ((self.width - w) / 2), (29 * cm) - h)
         canvas.restoreState()
 
@@ -413,10 +419,10 @@ class Flowables(BaseDocTemplate):
         """
 
         return self.create_second_letter_bullet_point(
-            """En cada uno de los diagramas esquemáticos
-        de los equipos se especifica claramente el lugar
-        de medición, el número que le corresponde y el tipo
-        de medición a realizar.""", '1.')
+            """En cada uno de los diagramas esquemáticos 
+            de los equipos se especifica claramente el lugar 
+            de medición, el número que le corresponde y el 
+            tipo de medición a realizar.""", '1.')
 
     def create_second_letter_bullet_two(self):
         """
@@ -426,12 +432,12 @@ class Flowables(BaseDocTemplate):
 
         return self.create_second_letter_bullet_point(
             """Orden de la medición por equipo:<br/><br/>
-        El orden de medición por equipo está estandarizado
-        y se inicia desde la potencia hacia delante, es
-        decir, el punto 1 siempre será el rodamiento motor
-        lado libre, el punto dos (2) siempre será el rodamiento
-        motor lado transmisión y así avanza hacía el equipo
-        hasta terminar los puntos de medición.""", '2.')
+            El orden de medición por equipo está estandarizado 
+            y se inicia desde la potencia hacia delante, es 
+            decir, el punto 1 siempre será el rodamiento motor 
+            lado libre, el punto dos (2) siempre será el rodamiento 
+            motor lado transmisión y así avanza hacía el equipo 
+            hasta terminar los puntos de medición.""", '2.')
 
     @staticmethod
     def create_letter_two_diagram_one():
@@ -471,9 +477,9 @@ class Flowables(BaseDocTemplate):
         """
 
         return self.create_second_letter_bullet_point(
-            """Tipo de medición: La especificación del
-        tipo de medición está dada por la siguiente
-        configuración.""", '3.')
+            """Tipo de medición: La especificación del 
+            tipo de medición está dada por la siguiente 
+            configuración.""", '3.')
 
     @staticmethod
     def create_letter_two_diagram_two():
@@ -482,13 +488,22 @@ class Flowables(BaseDocTemplate):
         explanation of measured points.
         """
 
-        # TODO finish method
-        """
-        1 -> 1
-        H -> 2
-        V -> 3
-        """
-        pass
+        arrow = Image(ARROW, width=0.5 * cm, height=0.5 * cm)
+        data = [
+            ['1', 'H', 'V', ''],
+            [arrow, arrow, arrow, ''],
+            ['1', '2', '3', ''],
+        ]
+        styles = [
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ]
+        table = Table(
+            data,
+            colWidths=[1.5 * cm, 1.5 * cm, 1.5 * cm, 4.5 * cm],
+        )
+        table.setStyle(TableStyle(styles))
+        return table
 
     def create_second_letter_bullet_four(self):
         """
@@ -543,15 +558,18 @@ class Flowables(BaseDocTemplate):
         """
 
         return Paragraph(
-            """En resumen:<br/><br/>1 H V = Rodamiento motor lado libre, medida
-        horizontal en velocidad.<br/><br/><br/><font name="Arial-Bold">Con respecto a las
-        unidades de  Vibración:</font> En la tabla de valores se expresa sus
-        niveles globales de vibración, en mms/s pico, para la variable velocidad,
-        siendo necesario multiplicar por 0.707 dicho valor, si se requiere
-        conocer su amplitud en mms/s rms, como lo expresa la Norma ISO 10816-1.<br/>
-        Medir en unidades pico (P.k) permite identificar con más claridad en el
-        espectro, condiciones de los componentes de máquina que operan
-        a baja velocidad.""", style=STANDARD)
+            """En resumen:<br/><br/>1 H V = Rodamiento 
+            motor lado libre, medida horizontal en velocidad.
+            <br/><br/><br/><font name="Arial-Bold">Con respecto 
+            a las unidades de Vibración:</font> En la tabla de 
+            valores se expresa sus niveles globales de vibración, 
+            en mms/s pico, para la variable velocidad, siendo 
+            necesario multiplicar por 0.707 dicho valor, si se 
+            requiere conocer su amplitud en mms/s rms, como lo 
+            expresa la Norma ISO 10816-1.<br/>Medir en unidades 
+            pico (P.k) permite identificar con más claridad en el 
+            espectro, condiciones de los componentes de máquina 
+            que operan a baja velocidad.""", style=STANDARD)
 
     @staticmethod
     def create_letter_two_diagram_three():
@@ -719,23 +737,23 @@ class Flowables(BaseDocTemplate):
 
     # Pred flowables
 
-    # TODO finish machine especifications method
-
-    def machine_specifications_table(self, query_instance):
+    @staticmethod
+    def machine_specifications_table(query_instance):
         """
         create table detailing especifications
         of each machine and their current severity.
         """
 
+        # TODO finish machine especifications method
         title = None
 
         data = [
             [title, '', '', '', ''],
             ['', '', '', '', ''],
             ['FICHA TECNICA', '', '', '', 'SEVERIDAD'],
-            [, , , , ],
-            [, , , , ],
-            [, , , , ],
+            # [, , , , ],
+            # [, , , , ],
+            # [, , , , ],
         ]
         severity_image = None
         styles = [
@@ -866,7 +884,7 @@ class Flowables(BaseDocTemplate):
         tendency graphs.
         """
 
-        return Paragraph('GRAFICAS TENDENCIAS (En el tiempo)',
+        return Paragraph('GRAFICAS TENDENCIAS (En el Tiempo)',
                          style=STANDARD_CENTER)
 
     @staticmethod
