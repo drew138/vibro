@@ -61,6 +61,13 @@ FADED_GREEN = Color(
     red=(153/255),
     green=1,
     blue=(153/255))
+# paragraph styles for TOC entries
+ADMIN_REP = ParagraphStyle(
+    name='INFORME ADMINISTRATIVO', fontName='Arial', fontSize=10)
+TOC = ParagraphStyle(
+    name='Table of contents', fontName='Arial-Bold', fontSize=15, alignment=1)
+BLACK_BOLD_CENTER = ParagraphStyle(
+    name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
@@ -75,10 +82,7 @@ STANDARD_INDENTED = ParagraphStyle(
 )
 BLACK_BOLD = ParagraphStyle(
     name='black_bold', fontName='Arial-Bold', fontSize=10)
-BLACK_BOLD_CENTER = ParagraphStyle(
-    name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
-BLACK_BOLD_BIG_CENTER = ParagraphStyle(
-    name='black_bold_big_center', fontName='Arial-Bold', fontSize=15, alignment=1)
+
 BLUE_HEADER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
                              textColor=COMPANY_HEADER_BLUE, alignment=2)
 BLUE_FOOTER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
@@ -274,17 +278,6 @@ class Flowables(BaseDocTemplate):
         ]
         return flowables
 
-    # flowables used in TOC
-    @staticmethod
-    def create_toc_title():
-        """
-        returns a paragraph flowable 
-        to be used as title in the 
-        table of contents.
-        """
-
-        return Paragraph('Tabla de Contenidos', style=BLACK_BOLD_BIG_CENTER)
-
     # flowables used in first letter
     def create_first_letter_paragraph(self):
         """
@@ -389,6 +382,17 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
+    # flowables used in TOC
+    @staticmethod
+    def create_toc_title():
+        """
+        returns a paragraph flowable 
+        to be used as title in the 
+        table of contents.
+        """
+
+        return Paragraph('Tabla de Contenidos', style=TOC)
+
     # flowables used in second letter
     @staticmethod
     def create_second_letter_paragraph_one():
@@ -482,7 +486,7 @@ class Flowables(BaseDocTemplate):
             configuración.""", '3.')
 
     @staticmethod
-    def create_letter_two_diagram_two():
+    def create_second_letter_diagram_two():
         """
         returns diagram containing
         explanation of measured points.
@@ -571,8 +575,18 @@ class Flowables(BaseDocTemplate):
             espectro, condiciones de los componentes de máquina 
             que operan a baja velocidad.""", style=STANDARD)
 
+    # flowables for ISO
     @staticmethod
-    def create_letter_two_diagram_three():
+    def create_iso_letter_title(string):
+        """
+        return title paragraph
+        used in second letter.
+        """
+
+        return Paragraph(string, style=BLACK_BOLD_CENTER)
+
+    @staticmethod
+    def create_iso_letter_table():
         """
         create a table containing
         an especified graphic.
@@ -671,15 +685,6 @@ class Flowables(BaseDocTemplate):
         return table
 
     @staticmethod
-    def create_second_letter_title(string):
-        """
-        return title paragraph
-        used in second letter.
-        """
-
-        return Paragraph(string, style=BLACK_BOLD_CENTER)
-
-    @staticmethod
     def _create_especifications_table(data):
         """
         return basic table populated
@@ -700,7 +705,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    def create_second_letter_especifications_one(self):
+    def create_iso_letter_especifications_one(self):
         """
         returns first especifications table.
         """
@@ -722,7 +727,7 @@ class Flowables(BaseDocTemplate):
         ]
         return self._create_especifications_table(data)
 
-    def create_second_letter_especifications_two(self):
+    def create_iso_letter_especifications_two(self):
         """
         returns second especificatiosn table.
         """
@@ -736,7 +741,6 @@ class Flowables(BaseDocTemplate):
         return self._create_especifications_table(data)
 
     # Pred flowables
-
     @staticmethod
     def machine_specifications_table(query_instance):
         """
@@ -746,16 +750,15 @@ class Flowables(BaseDocTemplate):
 
         # TODO finish machine especifications method
         title = None
-
+        severity_image = None
         data = [
             [title, '', '', '', ''],
             ['', '', '', '', ''],
             ['FICHA TECNICA', '', '', '', 'SEVERIDAD'],
-            # [, , , , ],
-            # [, , , , ],
-            # [, , , , ],
+            ['CODIGO MÁQUINA:', '', 'POTENCIA MOTOR:', '', severity_image],
+            ['TIPO TRANSMISIÓN:', '', 'RPM MOTOR:', '', ''],
+            ['MARCA MOTOR:', '', 'NORMA:', '', ''],
         ]
-        severity_image = None
         styles = [
             ('BACKGROUND', (0, 0), (4, 2), TABLE_BLUE),
             ('FONTNAME', (4, 2), (4, 2), 'Arial-Bold'),

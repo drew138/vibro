@@ -1,5 +1,5 @@
+from .flowables import STANDARD, BLACK_BOLD_CENTER, LEVEL_ONE, LEVEL_TWO, ADMIN_REP
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
-from .flowables import STANDARD, BLACK_BOLD_CENTER, LEVEL_ONE, LEVEL_TWO
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.units import cm
 from .graph import Graphs
@@ -17,6 +17,8 @@ class Segment(Graphs):
         super().__init__(*args, **kwargs)
         self.toc = TableOfContents()
         self.story = []
+        self.spacer_one = Spacer(self.width, 1 * cm)
+        self.spacer_two = Spacer(self.width, 0.5 * cm)
 
     def create_first_letter(self):
         """
@@ -57,17 +59,14 @@ class Segment(Graphs):
         Note: goes after table of contents (TOC)
         """
 
-        spacer_one = Spacer(self.width, 1 * cm)
-        spacer_two = Spacer(self.width, 0.5 * cm)
-        # add following to story in this exact order
         letter_header = self.create_letter_header()
         para_one = self.create_second_letter_paragraph_one()
         bullets_one = self.create_second_letter_bullet_one()
         bullets_two = self.create_second_letter_bullet_two()
-        para_two = Paragraph('Ejemplo:', style=STANDARD)
+        para_two = Paragraph('Ejemplo:', style=ADMIN_REP)
         diagram_one = self.create_letter_two_diagram_one()
         bullets_three = self.create_second_letter_bullet_three()
-        diagram_two = self.create_letter_two_diagram_two()
+        diagram_two = self.create_second_letter_diagram_two()
         bullets_four = self.create_second_letter_bullet_four()
         bullets_five = self.create_second_letter_bullet_five()
         indent_one = self.create_indented_paragraph('H = Horizontal')
@@ -78,60 +77,69 @@ class Segment(Graphs):
         indent_five = self.create_indented_paragraph('A = Aceleración')
         indent_six = self.create_indented_paragraph('D = Desplazamiento')
         para_three = self.create_second_letter_paragraph_three()
-        title_one = self.create_second_letter_title(
-            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ')
-        diagram_three = self.create_letter_two_diagram_three()
-        title_two = self.create_second_letter_title(
-            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>')
-        especifications_one = self.create_second_letter_especifications_one()
-        title_three = self.create_second_letter_title(
-            '<u>CALIDAD DE LA VIBRACIÓN</u>')
-        especifications_two = self.create_second_letter_especifications_two()
 
         self.story += [
             *letter_header,
             NextPageTemplate('measurement_two'),
-            spacer_one,
+            self.spacer_one,
             para_one,
-            spacer_two,
+            self.spacer_two,
             bullets_one,
-            spacer_two,
+            self.spacer_two,
             bullets_two,
-            spacer_two,
+            self.spacer_two,
             para_two,
-            spacer_one,
+            self.spacer_one,
             diagram_one,
             PageBreak(),
             bullets_three,
-            spacer_one,
+            self.spacer_one,
             diagram_two,
-            spacer_one,
+            self.spacer_one,
             bullets_four,
-            spacer_one,
+            self.spacer_one,
             bullets_five,
-            spacer_two,
+            self.spacer_two,
             indent_one,
             indent_two,
             indent_three,
-            spacer_one,
+            self.spacer_one,
             bullets_six,
-            spacer_one,
+            self.spacer_one,
             indent_four,
             indent_five,
             indent_six,
             para_three,
             NextPageTemplate('measurement'),
-            PageBreak(),
+            PageBreak()
+        ]
+
+    def create_ISO(self):
+        """
+        returns ISO letter.
+        """
+
+        title_one = self.create_iso_letter_title(
+            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ')
+        diagram_three = self.create_iso_letter_table()
+        title_two = self.create_iso_letter_title(
+            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>')
+        especifications_one = self.create_iso_letter_especifications_one()
+        title_three = self.create_iso_letter_title(
+            '<u>CALIDAD DE LA VIBRACIÓN</u>')
+        especifications_two = self.create_iso_letter_especifications_two()
+
+        self.story += [
             title_one,
-            spacer_one,
+            self.spacer_one,
             diagram_three,
-            spacer_one,
+            self.spacer_one,
             title_two,
-            spacer_one,
+            self.spacer_one,
             especifications_one,
-            spacer_one,
+            self.spacer_one,
             title_three,
-            spacer_one,
+            self.spacer_one,
             especifications_two
             # TODO add nextpagetemplate
         ]

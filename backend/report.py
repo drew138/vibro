@@ -33,6 +33,7 @@ class Report(Segment):
         self.create_first_letter()
         self.create_toc()
         self.create_second_letter()
+        self.create_ISO()
         # TODO add remaining methods
 
     def afterFlowable(self, flowable):
@@ -41,10 +42,16 @@ class Report(Segment):
         if flowable.__class__.__name__ == 'Paragraph':
             text = flowable.getPlainText()
             style = flowable.style.name
-            if style == 'Heading1':
-                self.notify('TOCEntry', (0, text, self.page))
-            if style == 'Heading2':
-                self.notify('TOCEntry', (1, text, self.page))
+            if style == 'Table of contents':
+                self.notify('TOCEntry', (0, text.upper(), self.page))
+            elif style == 'INFORME ADMINISTRATIVO':
+                self.notify(
+                    'TOCEntry', (0, style, self.page))
+                self.notify(
+                    'TOCEntry', (1, 'CARTA CONFIGURACION PREDICTIVO', self.page))
+            elif text == 'CALIDAD DE LA VIBRACIÓN' and style == 'black_bold_center':
+                self.notify(
+                    'TOCEntry', (1, 'NORMA ISO 10816-1', self.page))
 
  # moack data used for debugging
 
