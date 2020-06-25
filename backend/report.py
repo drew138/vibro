@@ -34,11 +34,11 @@ class Report(Segment):
         self.create_toc()
         self.create_second_letter()
         self.create_ISO()
-        # TODO add remaining methods
+        # self.write_preds() TODO uncomment
 
     def afterFlowable(self, flowable):
         "Registers TOC entries."
-
+        # TODO add entries for preds
         if flowable.__class__.__name__ == 'Paragraph':
             text = flowable.getPlainText()
             style = flowable.style.name

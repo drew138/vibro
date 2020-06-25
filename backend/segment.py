@@ -140,8 +140,9 @@ class Segment(Graphs):
             self.spacer_one,
             title_three,
             self.spacer_one,
-            especifications_two
-            # TODO add nextpagetemplate
+            especifications_two,
+            NextPageTemplate('measurement'),
+            PageBreak()
         ]
 
     def create_pred(self, query_instance):
@@ -177,3 +178,12 @@ class Segment(Graphs):
             NextPageTemplate('measurement'),
             PageBreak()
         ]
+
+    def write_preds(self):
+        """
+        calls create_pred for all 
+        measurements in query instance.
+        """
+
+        for query_instance in self.queryset:
+            self.create_pred(query_instance)

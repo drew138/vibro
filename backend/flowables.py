@@ -122,6 +122,7 @@ class Flowables(BaseDocTemplate):
         self.queryset = queryset
         self.user = user
         self.company = self.user.company
+        # TODO measurement model may be changed, therefore date property may need reestructuring
         self.date = self.queryset.first().date
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
@@ -386,8 +387,8 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def create_toc_title():
         """
-        returns a paragraph flowable 
-        to be used as title in the 
+        returns a paragraph flowable
+        to be used as title in the
         table of contents.
         """
 
@@ -423,9 +424,9 @@ class Flowables(BaseDocTemplate):
         """
 
         return self.create_second_letter_bullet_point(
-            """En cada uno de los diagramas esquemáticos 
-            de los equipos se especifica claramente el lugar 
-            de medición, el número que le corresponde y el 
+            """En cada uno de los diagramas esquemáticos
+            de los equipos se especifica claramente el lugar
+            de medición, el número que le corresponde y el
             tipo de medición a realizar.""", '1.')
 
     def create_second_letter_bullet_two(self):
@@ -436,11 +437,11 @@ class Flowables(BaseDocTemplate):
 
         return self.create_second_letter_bullet_point(
             """Orden de la medición por equipo:<br/><br/>
-            El orden de medición por equipo está estandarizado 
-            y se inicia desde la potencia hacia delante, es 
-            decir, el punto 1 siempre será el rodamiento motor 
-            lado libre, el punto dos (2) siempre será el rodamiento 
-            motor lado transmisión y así avanza hacía el equipo 
+            El orden de medición por equipo está estandarizado
+            y se inicia desde la potencia hacia delante, es
+            decir, el punto 1 siempre será el rodamiento motor
+            lado libre, el punto dos (2) siempre será el rodamiento
+            motor lado transmisión y así avanza hacía el equipo
             hasta terminar los puntos de medición.""", '2.')
 
     @staticmethod
@@ -481,8 +482,8 @@ class Flowables(BaseDocTemplate):
         """
 
         return self.create_second_letter_bullet_point(
-            """Tipo de medición: La especificación del 
-            tipo de medición está dada por la siguiente 
+            """Tipo de medición: La especificación del
+            tipo de medición está dada por la siguiente
             configuración.""", '3.')
 
     @staticmethod
@@ -562,17 +563,17 @@ class Flowables(BaseDocTemplate):
         """
 
         return Paragraph(
-            """En resumen:<br/><br/>1 H V = Rodamiento 
+            """En resumen:<br/><br/>1 H V = Rodamiento
             motor lado libre, medida horizontal en velocidad.
-            <br/><br/><br/><font name="Arial-Bold">Con respecto 
-            a las unidades de Vibración:</font> En la tabla de 
-            valores se expresa sus niveles globales de vibración, 
-            en mms/s pico, para la variable velocidad, siendo 
-            necesario multiplicar por 0.707 dicho valor, si se 
-            requiere conocer su amplitud en mms/s rms, como lo 
-            expresa la Norma ISO 10816-1.<br/>Medir en unidades 
-            pico (P.k) permite identificar con más claridad en el 
-            espectro, condiciones de los componentes de máquina 
+            <br/><br/><br/><font name="Arial-Bold">Con respecto
+            a las unidades de Vibración:</font> En la tabla de
+            valores se expresa sus niveles globales de vibración,
+            en mms/s pico, para la variable velocidad, siendo
+            necesario multiplicar por 0.707 dicho valor, si se
+            requiere conocer su amplitud en mms/s rms, como lo
+            expresa la Norma ISO 10816-1.<br/>Medir en unidades
+            pico (P.k) permite identificar con más claridad en el
+            espectro, condiciones de los componentes de máquina
             que operan a baja velocidad.""", style=STANDARD)
 
     # flowables for ISO
@@ -748,16 +749,25 @@ class Flowables(BaseDocTemplate):
         of each machine and their current severity.
         """
 
-        # TODO finish machine especifications method
+        # TODO abstract title variable from query_instance and make them uppercase
         title = None
-        severity_image = None
+        image = os.path.join(
+            BASE_DIR, f'static\\images\\{query_instance.severity}.png')
+        severity_image = Image(image, width=1 * cm, height=2 * cm)
+        machine = query_instance.machine.all().first()
+        code = machine.code.upper()
+        transmission = machine.transmission.upper()
+        brand = machine.brand.upper()
+        power = machine.power.upper()
+        rpm = f'{machine.rpm}'.upper()
+
         data = [
             [title, '', '', '', ''],
             ['', '', '', '', ''],
             ['FICHA TECNICA', '', '', '', 'SEVERIDAD'],
-            ['CODIGO MÁQUINA:', '', 'POTENCIA MOTOR:', '', severity_image],
-            ['TIPO TRANSMISIÓN:', '', 'RPM MOTOR:', '', ''],
-            ['MARCA MOTOR:', '', 'NORMA:', '', ''],
+            ['CODIGO MÁQUINA:', code, 'POTENCIA MOTOR:', power, severity_image],
+            ['TIPO TRANSMISIÓN:', transmission, 'RPM MOTOR:', rpm, ''],
+            ['MARCA MOTOR:', brand, 'NORMA:', 'ISO 10816', ''],
         ]
         styles = [
             ('BACKGROUND', (0, 0), (4, 2), TABLE_BLUE),

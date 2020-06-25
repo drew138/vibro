@@ -79,6 +79,11 @@ class Machine(models.Model):
     identifier = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=50)
     machine_type = models.CharField(max_length=50)
+    code = models.TextField(blank=True, null=True)
+    transmission = models.TextField(blank=True, null=True)
+    brand = models.TextField(blank=True, null=True)
+    power = models.TextField(blank=True, null=True)
+    rpm = models.IntegerField(blank=True, null=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -88,7 +93,6 @@ class Machine(models.Model):
 
 class Image(models.Model):
 
-    # TODO make sure ./media/ is the right path
     image = models.ImageField(upload_to="machines/images")
     diagram = models.ImageField(upload_to="machines/diagrams")
     machine = models.OneToOneField(
@@ -128,7 +132,7 @@ class Measurement(models.Model):
     ]
     severity = models.CharField(
         max_length=6, choices=SEVERITY_CHOICES, default=BLACK)
-    date = models.DateTimeField()
+    date = models.DateTimeField()  # TODO requires revising
     analysis = models.TextField()
     recomendation = models.TextField()
     revised = models.BooleanField(default=False)
