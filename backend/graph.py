@@ -77,11 +77,14 @@ class Graphs(Flowables):
         fig.patch.set_visible(False)  # remove graph plot from figure
         fig.tight_layout()  # set tight_layout to adjust objects in figure
         plt.title(engine_name, y=1.1)
+        buff = BytesIO()
         plt.savefig(
-            'tabla',
+            buff,
             bbox_inches="tight",
             transparent=True,
             dpi=300)
+        buff.seek(0)
+        return buff
 
     def create_graph(self, g, title, save):
         """
@@ -114,7 +117,6 @@ class Graphs(Flowables):
                     for v in g.loc[g['name'] == label]['global'].values]
             ax.plot_date(dates, data, linestyle='solid', label=label,
                          color=self.custom_colors[index], marker='.')  # plot label
-            index += 1
 
         # set title accorind to title and last label variables
         ax.set_title(f'Tendencia\n{title}\\{labels[-1]}, Canal X')
@@ -131,8 +133,11 @@ class Graphs(Flowables):
             bbox_to_anchor=(1, 0.5),
             fancybox=True,
             shadow=True, ncol=1)
+        buff = BytesIO()
         plt.savefig(
-            save,
+            buff,
             bbox_inches="tight",
             transparent=True,
             dpi=300)
+        buff.seek(0)
+        return buff

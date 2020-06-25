@@ -15,15 +15,14 @@ class Report(Segment):
         super().__init__(*args, **kwargs)
         self.measurement_types = set()
 
-    def build_doc(self):
+    def write_preds(self):
         """
-        call write_pdf method to 
-        build all segments of the 
-        pdf to then build report.
+        calls create_pred for all 
+        measurements in query instance.
         """
 
-        self.write_pdf()
-        self.multiBuild(self.story)
+        for query_instance in self.queryset:
+            self.create_pred(query_instance)
 
     def write_pdf(self):
         """
@@ -35,6 +34,16 @@ class Report(Segment):
         self.create_second_letter()
         self.create_ISO()
         # self.write_preds() TODO uncomment
+
+    def build_doc(self):
+        """
+        call write_pdf method to 
+        build all segments of the 
+        pdf to then build report.
+        """
+
+        self.write_pdf()
+        self.multiBuild(self.story)
 
     def afterFlowable(self, flowable):
         "Registers TOC entries."
