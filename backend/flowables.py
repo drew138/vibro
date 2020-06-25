@@ -652,7 +652,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @ staticmethod
+    @staticmethod
     def create_second_letter_title(string):
         """
         return title paragraph
@@ -661,7 +661,7 @@ class Flowables(BaseDocTemplate):
 
         return Paragraph(string, style=BLACK_BOLD_CENTER)
 
-    @ staticmethod
+    @staticmethod
     def _create_especifications_table(data):
         """
         return basic table populated
@@ -671,8 +671,7 @@ class Flowables(BaseDocTemplate):
         styles = [
             ('VALIGN', (0, 0), (1, 3), 'MIDDLE'),
             ('ALIGN', (0, 0), (1, 3), 'CENTER'),
-            ('ALIGN', (2, 0), (2, 3), 'LEFT'),
-
+            ('ALIGN', (2, 0), (2, 3), 'LEFT')
         ]
         table = Table(
             data,
@@ -722,19 +721,41 @@ class Flowables(BaseDocTemplate):
 
     # TODO finish machine especifications method
 
-    def machine_specifications_table(self):
+    def machine_specifications_table(self, query_instance):
         """
         create table detailing especifications
         of each machine and their current severity.
         """
 
-        data = None
-        styles = None
-        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
+        title = None
+
+        data = [
+            [title, '', '', '', ''],
+            ['', '', '', '', ''],
+            ['FICHA TECNICA', '', '', '', 'SEVERIDAD'],
+            [, , , , ],
+            [, , , , ],
+            [, , , , ],
+        ]
+        severity_image = None
+        styles = [
+            ('BACKGROUND', (0, 0), (4, 2), TABLE_BLUE),
+            ('FONTNAME', (4, 2), (4, 2), 'Arial-Bold'),
+            ('SPAN', (0, 0), (4, 1)),
+            ('SPAN', (0, 2), (3, 2)),
+            ('SPAN', (4, 3), (-1, -1)),
+            ('ALIGN', (0, 0), (4, 1), 'LEFT'),
+            ('ALIGN', (0, 2), (4, 2), 'CENTER'),
+            ('ALIGN', (0, 3), (-2, -1), 'LEFT'),
+            ('ALIGN', (4, 3), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.25, black)
+        ]
+        table = Table(data, colWidths=[4 * cm, 4 * cm, 4 * cm, 3 * cm, 3 * cm])
         table.setStyle(TableStyle(styles))
         return table
 
-    @ staticmethod
+    @staticmethod
     def pictures_table(diagram_img, machine_img):
         """
         create a table containing the
@@ -772,7 +793,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @ staticmethod
+    @staticmethod
     def create_table_title():
         """
         create a paragraph flowable to
@@ -782,7 +803,7 @@ class Flowables(BaseDocTemplate):
         return Paragraph(
             'LECTURAS REGISTRADAS (@ptitude - SKF)', style=STANDARD_CENTER)
 
-    @ staticmethod
+    @staticmethod
     def create_analysis_table(analysis, recomendation):
         """
         create table of analysis
@@ -817,7 +838,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @ staticmethod
+    @staticmethod
     def graph_table(title, graph):
         """
         create a table containing
@@ -837,7 +858,7 @@ class Flowables(BaseDocTemplate):
         table.setStyle(TableStyle(styles))
         return table
 
-    @ staticmethod
+    @staticmethod
     def create_tendendy_title():
         """
         create a paragraph flowable to
@@ -848,7 +869,7 @@ class Flowables(BaseDocTemplate):
         return Paragraph('GRAFICAS TENDENCIAS (En el tiempo)',
                          style=STANDARD_CENTER)
 
-    @ staticmethod
+    @staticmethod
     def create_espectra_title():
         """
         create a paragraph flowable to
@@ -859,7 +880,7 @@ class Flowables(BaseDocTemplate):
         return Paragraph('GRAFICAS ESPECTROS',
                          style=STANDARD_CENTER)
 
-    @ staticmethod
+    @staticmethod
     def create_time_signal_title():
         """
         create a paragraph flowable to

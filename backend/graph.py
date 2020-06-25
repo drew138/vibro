@@ -34,7 +34,7 @@ class Graphs(Flowables):
         create table graph for word.
         """
 
-        fig, ax = plt.subplots()  # create axes and figure objects
+        fig, ax = plt.subplots()
         columns = [
             '$\\bfNombre$ $\\bfde$ $\\bfPUNTO$',
             '$\\bfUnidades$',
@@ -42,7 +42,7 @@ class Graphs(Flowables):
             f'$\\bfÚlt.$ $\\bfvalor$\n$\\bf{current_date}$',
             '$\\bf\%$ $\\bfcambio$'
         ]
-        fig.patch.set_visible(False)  # remove graph plot from figure
+
         colors = []  # 2d list containing all lists of colors for each row
         # list comprehension to define blue color of first rows
         col_colors = ['#8DB3E2' for _ in range(len(columns))]
@@ -57,20 +57,31 @@ class Graphs(Flowables):
                 else:  # if index is odd set color to blueish
                     row_colors.append('#DCE6F1')
             colors.append(row_colors)  # append list to colors list
+
         ax.axis('off')
         ax.axis('tight')
-        # define table title and place 1.1 above table
-        plt.title(engine_name, y=1.1)
-        table = ax.table(cellText=data, cellColours=colors, colWidths=col_widths, colColours=col_colors,
-                         colLabels=columns, loc='center', cellLoc='center')  # define table object
-        table.set_fontsize(10)  # set font size for table
+        table = ax.table(
+            cellText=data,
+            cellColours=colors,
+            colWidths=col_widths,
+            colColours=col_colors,
+            colLabels=columns,
+            loc='center',
+            cellLoc='center')
+        table.set_fontsize(10)
         table.scale(0.8, 1)  # stretch table horizontally
         cellDict = table.get_celld()  # dict of all cells in table
-        for i in range(0, len(columns)):  # go through all cells in first column
+        for i in range(len(columns)):  # go through all cells in first column
             # change height to be able to adjust text
             cellDict[(0, i)].set_height(.1)
+        fig.patch.set_visible(False)  # remove graph plot from figure
         fig.tight_layout()  # set tight_layout to adjust objects in figure
-    #     plt.savefig('tabla', bbox_inches="tight", transparent=True, dpi=300)  # save figure as tabla.png along with other properties
+        plt.title(engine_name, y=1.1)
+        plt.savefig(
+            'tabla',
+            bbox_inches="tight",
+            transparent=True,
+            dpi=300)
 
     def create_graph(self, g, title, save):
         """
@@ -92,12 +103,9 @@ class Graphs(Flowables):
                 units = 'mm/s - Pico'
             else:
                 units = 'g - RMS'
-        # colors for all 12 possible lines in a plot
 
-        index = 0
-        # create figure and axes objects
         fig, ax = plt.subplots(figsize=(17, 6))
-        for label in labels:  # plot a line for every label
+        for index, label in enumerate(labels):  # plot a line for every label
             # obtain the dates for every label in the dataframe
             dates = [datetime.datetime(int(f[:4]), int(f[4:6]), int(
                 f[6:8])) for f in g.loc[g['name'] == label]['date'].values]
