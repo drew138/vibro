@@ -43,9 +43,9 @@ class CityView(viewsets.ModelViewSet):
         state = self.request.query_params.get('state', None)
         queryset = custom_models.City.objects.all()
         if name is not None:
-            queryset = queryset.filter(name=name).all()
+            queryset = queryset.filter(name=name)
         if state is not None:
-            queryset = queryset.filter(state=state).all()
+            queryset = queryset.filter(state=state)
         return queryset
 
 
@@ -71,6 +71,7 @@ class CompanyView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company
+            return queryset
         else:
             queryset = custom_models.Company.objects.all()
         if name is not None:
@@ -229,13 +230,14 @@ class ProfileView(viewsets.ModelViewSet):
         name = self.request.query_params.get('name', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.profile
+            queryset = self.request.user.profile.all().first()
+            return queryset
         else:
             queryset = custom_models.Profile.objects.all()
         if name is not None:
-            queryset = queryset.filter(name=name).all()
+            queryset = queryset.filter(name=name)
         if profile_id is not None:
-            queryset = queryset.filter(id=profile_id).all()
+            queryset = queryset.filter(id=profile_id)
         return queryset
 
 
@@ -251,26 +253,41 @@ class MachineView(viewsets.ModelViewSet):
         unauthorized data.
         """
 
+        machine_id = self.request.query_params.get('id', None)
         identifier = self.request.query_params.get('identifier', None)
         name = self.request.query_params.get('name', None)
         machine_type = self.request.query_params.get('machine_type', None)
+        code = self.request.query_params.get('code', None)
+        transmission = self.request.query_params.get('transmission', None)
+        brand = self.request.query_params.get('brand', None)
+        power = self.request.query_params.get('power', None)
+        rpm = self.request.query_params.get('rpm', None)
         company = self.request.query_params.get('company', None)
-        q_id = self.request.query_params.get('id', None)  # object id
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             queryset = self.request.user.company.machines.all()
         else:
             queryset = custom_models.Machine.objects.all()
-        if q_id is not None:
-            queryset = queryset.filter(id=q_id)
-        if company is not None:
-            queryset = queryset.filter(company__id=company)
+        if machine_id is not None:
+            queryset = queryset.filter(id=machine_id)
         if identifier is not None:
             queryset = queryset.filter(identifier=identifier)
         if name is not None:
             queryset = queryset.filter(name=identifier)
         if machine_type is not None:
             queryset = queryset.filter(machine_type=identifier)
+        if code is not None:
+            queryset = queryset.filter(code=code)
+        if transmission is not None:
+            queryset = queryset.filter(transmission=transmission)
+        if brand is not None:
+            queryset = queryset.filter(brand=brand)
+        if power is not None:
+            queryset = queryset.filter(power=power)
+        if rpm is not None:
+            queryset = queryset.filter(rpm=rpm)
+        if company is not None:
+            queryset = queryset.filter(company__id=company)
         return queryset
 
 
@@ -291,9 +308,9 @@ class ImageView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
-            queryset = custom_models.Image.objects.filter(q_objects).all()
+            queryset = custom_models.Image.objects.all().filter(q_objects)
         else:
             queryset = custom_models.Image.objects.all()
         if image_id is not None:
@@ -361,8 +378,8 @@ class MeasurementView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
-            queryset = custom_models.Measurement.objects.filter(
-                q_objects).all()
+            queryset = custom_models.Measurement.objects.all().filter(
+                q_objects)
         else:
             queryset = custom_models.Image.objects.all()
         if measurement_id is not None:
@@ -370,8 +387,7 @@ class MeasurementView(viewsets.ModelViewSet):
         if severity is not None:
             queryset = queryset.filter(severity=severity)
         if date is not None:
-            # requires further specification on date
-            queryset = queryset.filter(date=date)
+            queryset = queryset.filter(date__id=date)
         if analysis is not None:
             queryset = queryset.filter(analysis=analysis)
         if recomendation is not None:
@@ -436,12 +452,12 @@ class TermoImageView(viewsets.ModelViewSet):
             for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             measurements = custom_models.Measurement.objects.filter(
-                q_objects).all()
+                q_objects)
             q_objects_t_image = Q()
             for me in measurements:
                 q_objects_t_image |= Q(measurement=me)
-            queryset = custom_models.TermoImage.objects.filter(
-                q_objects_t_image).all()
+            queryset = custom_models.TermoImage.objects.all().filter(
+                q_objects_t_image)
         else:
             queryset = custom_models.Image.objects.all()
         if termo_iamge_id is not None:
@@ -475,15 +491,15 @@ class PointView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             measurements = custom_models.Measurement.objects.filter(
-                q_objects).all()
+                q_objects)
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            queryset = custom_models.Point.objects.filter(
-                q_objects_measurement).all()
+            queryset = custom_models.Point.objects.all().filter(
+                q_objects_measurement)
         else:
             queryset = custom_models.Point.objects.all()
         if point_id is not None:
@@ -517,15 +533,15 @@ class TendencyView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             measurements = custom_models.Measurement.objects.filter(
-                q_objects).all()
+                q_objects)
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
             points = custom_models.Point.objects.filter(
-                q_objects_measurement).all()
+                q_objects_measurement)
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
@@ -561,20 +577,20 @@ class EspectraView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             measurements = custom_models.Measurement.objects.filter(
-                q_objects).all()
+                q_objects)
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
             points = custom_models.Point.objects.filter(
-                q_objects_measurement).all()
+                q_objects_measurement)
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
             queryset = custom_models.Espectra.objects.filter(
-                q_objects_point).all()
+                q_objects_point)
         else:
             queryset = custom_models.Tendency.objects.all()
         if espectra_id is not None:
@@ -607,20 +623,20 @@ class TimeSignalView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             measurements = custom_models.Measurement.objects.filter(
-                q_objects).all()
+                q_objects)
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
             points = custom_models.Point.objects.filter(
-                q_objects_measurement).all()
+                q_objects_measurement)
             q_objects_point = Q()
             for p in points:
                 q_objects_point |= Q(point=p)
             queryset = custom_models.TimeSignal.objects.filter(
-                q_objects_point).all()
+                q_objects_point)
         else:
             queryset = custom_models.Tendency.objects.all()
         if signal_id is not None:

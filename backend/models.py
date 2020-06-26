@@ -236,9 +236,9 @@ class Point(models.Model):
 
 class Tendency(models.Model):
 
+    value = models.DecimalField(decimal_places=2, max_digits=4)
     point = models.OneToOneField(
         Point, on_delete=models.CASCADE, primary_key=True)
-    value = models.DecimalField(decimal_places=2, max_digits=4)
 
 
 class Espectra(models.Model):
