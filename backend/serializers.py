@@ -139,6 +139,15 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DateSerializer(serializers.ModelSerializer):
+
+    company = CompanySerializer()
+
+    class Meta:
+        model = custom_models.Date
+        fields = '__all__'
+
+
 class MeasurementSerializer(serializers.ModelSerializer):
 
     machine = MachineSerializer()

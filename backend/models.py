@@ -49,15 +49,22 @@ class VibroUser(AbstractUser):
         (SUPPORT, 'Support')
     ]
 
-    company = models.ForeignKey(Company, related_name="user",
-                                to_field="name", on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(unique=True)
     phone = models.IntegerField(blank=True, null=True)
     ext = models.IntegerField(blank=True, null=True)
     celphone_one = models.IntegerField(blank=True, null=True)
     celphone_two = models.IntegerField(blank=True, null=True)
+    company = models.ForeignKey(
+        Company,
+        related_name="user",
+        to_field="name",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True)
     user_type = models.CharField(
-        max_length=8, choices=USER_CHOICES, default=CLIENT)
+        max_length=8,
+        choices=USER_CHOICES,
+        default=CLIENT)
 
 
 class Profile(models.Model):

@@ -303,6 +303,35 @@ class ImageView(viewsets.ModelViewSet):
         return queryset
 
 
+class DateView(viewsets.ModelViewSet):
+
+    serializer_class = custom_serializers.DateSerializer
+    permission_classes = [IsStaffOrSuperUser]
+
+    def get_queryset(self):
+        """
+        Optionally filter fields based on url. For non staff/superusers,
+        company is always filtered in order to prevent them from seeing
+        unauthorized data.
+        """
+
+        date_id = self.request.query_params.get('id', None)
+        company = self.request.query_params.get('company', None)
+        date = self.request.query_params.get('date', None)
+
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            queryset = self.request.user.company.dates.all()
+        else:
+            queryset = custom_models.Date.objects.all()
+        if date_id is not None:
+            queryset = queryset.filter(id=date_id)
+        if company is not None:
+            queryset = queryset.filter(company__id=company)
+        if date is not None:
+            queryset = queryset.filter(date=date)
+        return queryset
+
+
 class MeasurementView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.MeasurementSerializer
@@ -330,7 +359,7 @@ class MeasurementView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             queryset = custom_models.Measurement.objects.filter(
                 q_objects).all()
