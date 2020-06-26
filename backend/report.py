@@ -46,7 +46,10 @@ class Report(Segment):
         self.multiBuild(self.story)
 
     def afterFlowable(self, flowable):
-        "Registers TOC entries."
+        """
+        Registers TOC entries.
+        """
+
         # TODO add entries for preds
         if flowable.__class__.__name__ == 'Paragraph':
             text = flowable.getPlainText()

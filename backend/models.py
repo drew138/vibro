@@ -101,6 +101,20 @@ class Image(models.Model):
         on_delete=models.CASCADE)
 
 
+class Date(models.Model):
+
+    class Meta:
+        unique_together = ['company', 'date']
+
+    date = models.DateTimeField()
+    company = models.ForeignKey(
+        Company,
+        related_name="date",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
+
+
 class Measurement(models.Model):
 
     class Meta:
@@ -132,7 +146,12 @@ class Measurement(models.Model):
     ]
     severity = models.CharField(
         max_length=6, choices=SEVERITY_CHOICES, default=BLACK)
-    date = models.DateTimeField()  # TODO requires revising
+    date = models.ForeignKey(
+        Date,
+        related_name="measurements",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
     analysis = models.TextField()
     recomendation = models.TextField()
     revised = models.BooleanField(default=False)
@@ -147,13 +166,13 @@ class Measurement(models.Model):
         on_delete=models.CASCADE)
     engineer_one = models.ForeignKey(
         VibroUser,
-        related_name="eng_one",
+        related_name="measurements",
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
     engineer_two = models.ForeignKey(
         VibroUser,
-        related_name="eng_two",
+        related_name="measurements_two",
         on_delete=models.SET_NULL,
         blank=True,
         null=True)

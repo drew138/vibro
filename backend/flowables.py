@@ -231,7 +231,6 @@ class Flowables(BaseDocTemplate):
         return table
 
     # flowables used in first letter
-
     @staticmethod
     def _create_footer_table():
         """

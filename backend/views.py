@@ -3,7 +3,6 @@ from .permissions import IsStaffOrSuperUser, UpdatePass, ReportPermissions
 from rest_framework import viewsets, generics, permissions
 from django.template.loader import render_to_string
 from . import serializers as custom_serializers
-from v_website.settings import EMAIL_HOST_USER
 from rest_framework.response import Response
 from django.core.mail import EmailMessage
 from . import models as custom_models
@@ -11,8 +10,8 @@ from django.http import FileResponse
 from knox.models import AuthToken
 from django.conf import settings
 from django.db.models import Q
-# from .scripts import Report
-import io
+from .report import Report
+from io import BytesIO
 
 
 def send_email(data):
@@ -376,15 +375,14 @@ class ReportView(viewsets.ModelViewSet):
             queryset = custom_models.Measurement.objects.filter(
                 company=company)
 
-        buffer = io.BytesIO()
-        company = None
-        date = None
-        querysets = None
-
-        pdf = Report(buffer, querysets)
-        pdf.write_pdf().build_doc()
+        buffer = BytesIO()
+        pdf = Report(buffer, queryset)
+        pdf.build_doc()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename=f'PREDICTIVO_{company}_{date}.pdf')
+        return FileResponse(
+            buffer,
+            as_attachment=True,
+            filename=f'INFORME_PREDICTIVO_{company.upper()}.pdf')
 
 
 class TermoImageView(viewsets.ModelViewSet):
@@ -406,7 +404,7 @@ class TermoImageView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
             q_objects = Q()
-            for m in self.request.user.company.machines:
+            for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
             measurements = custom_models.Measurement.objects.filter(
                 q_objects).all()
