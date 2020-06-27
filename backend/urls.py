@@ -20,12 +20,13 @@ router.register('city', views.CityView, 'city')
 router.register('company', views.CompanyView, 'company')
 router.register('machine', views.MachineView, 'machine')
 router.register('image', views.ImageView, 'image')
+router.register('date', views.DateView, 'date')
 router.register('measurement', views.MeasurementView, 'measurement')
 router.register('termal', views.TermoImageView, 'termal')
 router.register('point', views.PointView, 'point')
 router.register('tendency', views.TendencyView, 'tendency')
 router.register('espectra', views.EspectraView, 'espectra')
 router.register('timesignal', views.TimeSignalView, 'timesignal')
-router.register('report', views.ReportView, 'report')
+router.register('report', views.ReportView, 'report')  # TODO needs testing
 
 urlpatterns = auth_views + router.urls

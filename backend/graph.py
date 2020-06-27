@@ -86,40 +86,45 @@ class Graphs(Flowables):
         buff.seek(0)
         return buff
 
-    def create_graph(self, g, title, save):
+    def create_graph(self, query_instance, position):
         """
         create chart graph of tendency
         values for vel or acc.
         """
 
-        labels = g['name'].unique()
-        # obtain the unique values for the 'name' column of the dataframe
-        # if name's 2nd character is not numeric and 3rd character is equal to V unit is mm/s, if A it will b g - RMS
-        if not labels[0][1].isnumeric():
-            if labels[0][2] == 'V':
-                units = 'mm/s - Pico'
-            else:
-                units = 'g - RMS'
+        measurements = custom_models.Measurement.objects.filter(
+            machine=query_instance.machine).order_by('date__date')
+        # TODO check date format
+        points = ((measurement.points.filter(position=position),
+                   measurement.date.date) for measurement in measurements)[:10]
+        data = {}
+        for point_generator, date in points:
+            for point in point_generator:
+                key = f'{point.number}{point.poisition}{point.point_type}'
+                if key in data.keys():
+                    data[key]['values'].append(point.tendency)
+                    data[key]['dates'].append(date)
+                else:
+                    data[key] = {'values': [], 'dates': []}
+
+        _, ax = plt.subplots(figsize=(17, 6))
+        for index, key in enumerate(data.keys()):
+            ax.plot_date(
+                data[key]['dates'],
+                data[key]['values'],
+                linestyle='solid',
+                label=key,
+                color=self.custom_colors[index],
+                marker='.')
+
+        if position == 'V':
+            units = 'mm/s - Pico'
         else:
-            # if name's 2nd character is numeric and 4th character is equal to V unit is mm/s, if A it will b g - RMS
-            if labels[0][3] == 'V':
-                units = 'mm/s - Pico'
-            else:
-                units = 'g - RMS'
-
-        fig, ax = plt.subplots(figsize=(17, 6))
-        for index, label in enumerate(labels):  # plot a line for every label
-            # obtain the dates for every label in the dataframe
-            dates = [datetime.datetime(int(f[:4]), int(f[4:6]), int(
-                f[6:8])) for f in g.loc[g['name'] == label]['date'].values]
-            # obtain the data for every label in the dataframe
-            data = [float(v)
-                    for v in g.loc[g['name'] == label]['global'].values]
-            ax.plot_date(dates, data, linestyle='solid', label=label,
-                         color=self.custom_colors[index], marker='.')  # plot label
-
-        # set title accorind to title and last label variables
-        ax.set_title(f'Tendencia\n{title}\\{labels[-1]}, Canal X')
+            units = 'g - RMS'
+        # TODO title needs review
+        ax.set_title(
+            f"""Tendencia\n{query_instance.machine.machine_type} 
+            {query_instance.machine.name}, Canal X""")
 
         plt.style.use('seaborn-ticks')
         plt.grid(True)

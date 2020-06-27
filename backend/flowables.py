@@ -123,7 +123,7 @@ class Flowables(BaseDocTemplate):
         self.user = user
         self.company = self.user.company
         # TODO measurement model may be changed, therefore date property may need reestructuring
-        self.date = self.queryset.first().date
+        self.date = self.queryset.first().date.date
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
         self.width = 18 * cm

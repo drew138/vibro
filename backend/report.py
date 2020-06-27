@@ -13,7 +13,7 @@ class Report(Segment):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.measurement_types = set()
+        self.machine_types = set()
 
     def write_preds(self):
         """
@@ -33,7 +33,8 @@ class Report(Segment):
         self.create_toc()
         self.create_second_letter()
         self.create_ISO()
-        # self.write_preds() TODO uncomment
+        # self.create_summary()TODO uncomment
+        # self.write_preds()
 
     def build_doc(self):
         """
@@ -73,6 +74,11 @@ class Profile:
         self.certifications = 'Ing. de Servicios de Mantenimiento'
 
 
+class Date:
+    def __init__(self):
+        self.date = 'date'
+
+
 class User:
     def __init__(self):
         self.company = 'some company'
@@ -84,7 +90,7 @@ class User:
 
 class QuerySet:
     def __init__(self):
-        self.date = 'date'
+        self.date = Date()
         self.engineer_one = User()
         self.engineer_two = User()
 

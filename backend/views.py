@@ -310,7 +310,7 @@ class ImageView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
-            queryset = custom_models.Image.objects.all().filter(q_objects)
+            queryset = custom_models.Image.objects.filter(q_objects)
         else:
             queryset = custom_models.Image.objects.all()
         if image_id is not None:
@@ -378,7 +378,7 @@ class MeasurementView(viewsets.ModelViewSet):
             q_objects = Q()
             for m in self.request.user.company.machines.all():
                 q_objects |= Q(machine=m)
-            queryset = custom_models.Measurement.objects.all().filter(
+            queryset = custom_models.Measurement.objects.filter(
                 q_objects)
         else:
             queryset = custom_models.Image.objects.all()
@@ -413,13 +413,24 @@ class ReportView(viewsets.ModelViewSet):
     permission_classes = [ReportPermissions]
 
     def get(self, request, format=None):
+
         company = request.query_params.get('company', None)
-        company = request.query_params.get('company', None)
-        company = request.query_params.get('company', None)
+        date = request.query_params.get('date', None)
+
         if request.user.is_staff or request.user.is_superuser:
             queryset = custom_models.Measurement.objects.filter(
-                company=company)
-
+                company__id=company)
+        else:
+            q_objects = Q()
+            for m in self.request.user.company.machines.all():
+                q_objects |= Q(machine=m)
+            queryset = custom_models.Measurement.objects.filter(
+                q_objects)
+        if date is not None:
+            queryset = queryset.filter(date__id=date)
+        else:
+            raise ValidationError('field date must be provided')
+        queryset = queryset.order_by('machine__machine_type')
         buffer = BytesIO()
         pdf = Report(buffer, queryset)
         pdf.build_doc()
@@ -456,7 +467,7 @@ class TermoImageView(viewsets.ModelViewSet):
             q_objects_t_image = Q()
             for me in measurements:
                 q_objects_t_image |= Q(measurement=me)
-            queryset = custom_models.TermoImage.objects.all().filter(
+            queryset = custom_models.TermoImage.objects.filter(
                 q_objects_t_image)
         else:
             queryset = custom_models.Image.objects.all()
@@ -498,7 +509,7 @@ class PointView(viewsets.ModelViewSet):
             q_objects_measurement = Q()
             for me in measurements:
                 q_objects_measurement |= Q(measurement=me)
-            queryset = custom_models.Point.objects.all().filter(
+            queryset = custom_models.Point.objects.filter(
                 q_objects_measurement)
         else:
             queryset = custom_models.Point.objects.all()
@@ -546,7 +557,7 @@ class TendencyView(viewsets.ModelViewSet):
             for p in points:
                 q_objects_point |= Q(point=p)
             queryset = custom_models.Tendency.objects.filter(
-                q_objects_point).all()
+                q_objects_point)
         else:
             queryset = custom_models.Tendency.objects.all()
         if tendency_id is not None:

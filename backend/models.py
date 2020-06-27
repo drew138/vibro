@@ -230,7 +230,7 @@ class Point(models.Model):
         max_length=1, choices=TYPE_CHOICES, default='undefined')
     measurement = models.ForeignKey(
         Measurement,
-        related_name="point",
+        related_name="points",
         on_delete=models.CASCADE)
 
 
@@ -238,7 +238,7 @@ class Tendency(models.Model):
 
     value = models.DecimalField(decimal_places=2, max_digits=4)
     point = models.OneToOneField(
-        Point, on_delete=models.CASCADE, primary_key=True)
+        Point, related_name='tendency', on_delete=models.CASCADE, primary_key=True)
 
 
 class Espectra(models.Model):

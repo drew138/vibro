@@ -145,6 +145,9 @@ class Segment(Graphs):
             PageBreak()
         ]
 
+    def create_summary(self):
+        pass
+
     def add_graphs(self, query_instance):
         """
         add graphs to preds segment.
@@ -153,7 +156,7 @@ class Segment(Graphs):
         flowables = []
         ##########################################################
         # what create table graph returns may need to be .closed()
-        table = Image(self.create_table_graph(), width=18 * cm)
+        table = Image(self.create_table_graph(args), width=18 * cm)
         tendency_title = self.create_tendendy_title()
         graph_one = self.graph_table(
             'MOTOR (Velocidad)', self.create_graph())
