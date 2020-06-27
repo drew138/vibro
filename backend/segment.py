@@ -153,19 +153,20 @@ class Segment(Graphs):
         add graphs to preds segment.
         """
 
-        flowables = []
         ##########################################################
         # what create table graph returns may need to be .closed()
-        table = Image(self.create_table_graph(args), width=18 * cm)
+        table = Image(self.create_table_graph(query_instance), width=18 * cm)
         tendency_title = self.create_tendendy_title()
         graph_one = self.graph_table(
-            'MOTOR (Velocidad)', self.create_graph())
+            'MOTOR (Velocidad)',
+            self.create_graph(query_instance, 'V'))
         graph_two = self.graph_table(
-            'MOTOR (Aceleracion)', self.create_graph())
+            'MOTOR (Aceleracion)',
+            self.create_graph(query_instance, 'A'))
 
         #########################################################
         ########## TODO NEEDS DEBUGGING ##############
-        flowables += [
+        flowables = [
             table,
             self.spacer_two,
             tendency_title,

@@ -43,12 +43,18 @@ class Graphs(Flowables):
         measurements = custom_models.Measurement.objects.filter(
             machine=query_instance.machine,
             measurement_type='Predictivo').order_by('date__date')
-        # TODO check date format and which date is row 0 and row 1
-        points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
+        # TODO check date format and which date is row 0 and row 1, also check if its only V and A
+
+        try:
+            points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
+                   measurement.date.date) for measurement in measurements)[:2]
+        except expression as identifier:
+            points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
                    measurement.date.date) for measurement in measurements)
+
         data = {'dates': []}
         keys = set()
-        for point_generator, date in points[:2]:
+        for point_generator, date in points:
             data['dates'].append(date)
             for point in point_generator:
                 key = f'{point.number}{point.poisition}{point.point_type}'
@@ -59,7 +65,11 @@ class Graphs(Flowables):
                     keys.add(key)
 
         rows = []
-        previous_date = data['dates'][1]
+        try:
+            previous_date = data['dates'][1]
+        except expression as identifier:
+            previous_date = 'N/A'
+
         current_date = data['dates'][0]
         for key in data.keys():
             if key.endswith('V'):
@@ -154,11 +164,16 @@ class Graphs(Flowables):
             machine=query_instance.machine,
             measurement_type='Predictivo').order_by('date__date')
         # TODO check date format
-        points = ((measurement.points.all().filter(position=position),
+        try:
+            points = ((measurement.points.all().filter(position=position),
+                   measurement.date.date) for measurement in measurements)[:10]
+        except StopIteration:
+            points = ((measurement.points.all().filter(position=position),
                    measurement.date.date) for measurement in measurements)
+
         data = {}
         keys = set()
-        for point_generator, date in points[:10]:
+        for point_generator, date in points:
             for point in point_generator:
                 key = f'{point.number}{point.poisition}{point.point_type}'
                 if key in keys:
