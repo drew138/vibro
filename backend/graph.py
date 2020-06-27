@@ -5,12 +5,6 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import datetime
 
-# CASC
-import pandas as pd
-from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
-from matplotlib import rcParams
-
 
 class Graphs(Flowables):
 
@@ -21,6 +15,7 @@ class Graphs(Flowables):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.custom_colors = [
+            # colors used in graphs
             '#0000FF',
             '#FF0000',
             '#006600',
@@ -35,22 +30,35 @@ class Graphs(Flowables):
             '#0E6251'
         ]
 
-    def create_table_graph(self, query_instance):
+    def retrieve_measurements(self, query_instance):
         """
-        create table graph for word.
+        retrieve queryset of all 'pred' 
+        measurements for a given machiine 
+        ordered by date. 
         """
 
-        measurements = custom_models.Measurement.objects.filter(
+        return custom_models.Measurement.objects.filter(
             machine=query_instance.machine,
             measurement_type='Predictivo').order_by('date__date')
-        # TODO check date format and which date is row 0 and row 1, also check if its only V and A
 
+    def format_table_data(self, measurements):
+        """
+        abstract data from measurements models 
+        generators and format it to be consumed 
+        by create_table_graph method.
+
+        Returns two list. A 2d lists containing 
+        all the rows used in the table and a row 
+        containing the headers of the rows.
+        """
+
+        # TODO check date format and which date is row 0 and row 1, also check if its only V and A
         try:
             points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
-                   measurement.date.date) for measurement in measurements)[:2]
-        except expression as identifier:
+                       measurement.date.date) for measurement in measurements)[:2]
+        except StopIteration:
             points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
-                   measurement.date.date) for measurement in measurements)
+                       measurement.date.date) for measurement in measurements)
 
         data = {'dates': []}
         keys = set()
@@ -67,7 +75,7 @@ class Graphs(Flowables):
         rows = []
         try:
             previous_date = data['dates'][1]
-        except expression as identifier:
+        except IndexError:
             previous_date = 'N/A'
 
         current_date = data['dates'][0]
@@ -78,20 +86,20 @@ class Graphs(Flowables):
                 units = 'g'
             try:
                 previous_value = data[key][previous_date]
-            except Exception:
+            except KeyError:
                 previous_value = '--'
             try:
                 current_value = data[key][current_date]
-            except Exception:
+            except KeyError:
                 current_value = '--'
             if not (previous_value == '--') or (current_value == '--'):
-                percentage = (current_value - previous_value) / \
-                              (previous_value * 100)
+                percentage = (current_value - previous_value) * \
+                    100 / previous_value
                 change = round(percentage, 2)
             else:
                 change = 'N/A'
             row = [
-                f'$\\bf{key}$',
+                f'$\\bf{key}$',  # make text in first column bold
                 units,
                 previous_value,
                 current_value,
@@ -100,31 +108,55 @@ class Graphs(Flowables):
             rows.append(row)
 
         columns = [
+            # strings are formatted this way to make font bold
             '$\\bfNombre$ $\\bfde$ $\\bfPUNTO$',
             '$\\bfUnidades$',
             f'$\\bfValor$ $\\bfanterior$\n$\\bf{previous_date}$',
             f'$\\bfÚlt.$ $\\bfvalor$\n$\\bf{current_date}$',
-            '$\\bf\%$ $\\bfcambio$'
+            '$\\bf\%$ $\\bfCambio$'
         ]
+        return (rows, columns)
 
-        number_of_columns = len(columns)
-        col_colors = ['#8DB3E2' for _ in range(number_of_columns)]
-        col_widths = [0.3, 0.2, 0.25, 0.2, 0.2]
+    def create_row_colors(self, rows, number_of_columns):
+        """
+        create 2d list containing 
+        colors for each row in table.
+        """
 
         colors = []
-
-        for index, row in enumerate(rows):
+        for index, _ in enumerate(rows):
             if index % 2 == 0:
-                row_colors = ['#FFFFFF' for _ in number_of_columns]
+                row_colors = ['#FFFFFF' for _ in range(number_of_columns)]
                 colors.append(row_colors)
             else:
-                row_colors = ['#DCE6F1' for _ in number_of_columns]
+                row_colors = ['#DCE6F1' for _ in range(number_of_columns)]
                 colors.append(row_colors)
+        return colors
+
+    def create_table_graph(self, query_instance):
+        """
+        create table graph for used 
+        in add_graphs method.
+
+        Returns an image in bytes format.
+        """
+
+        measurements = self.retrieve_measurements(query_instance)
+
+        rows, columns = self.format_table_data(measurements)
+
+        number_of_columns = len(columns)
+
+        col_colors = ['#8DB3E2' for _ in range(number_of_columns)]
+
+        col_widths = [0.3, 0.2, 0.25, 0.2, 0.2]
+
+        colors = self.create_row_colors(rows, number_of_columns)
 
         fig, ax = plt.subplots()
 
         table = ax.table(
-            cellText=data,
+            cellText=rows,
             cellColours=colors,
             colWidths=col_widths,
             colColours=col_colors,
@@ -142,7 +174,8 @@ class Graphs(Flowables):
         fig.patch.set_visible(False)  # remove graph plot from figure
         fig.tight_layout()  # set tight_layout to adjust objects in figure
         # TODO
-        plt.title(engine_name, y=1.1)
+        plt.title(
+            f'{query_instance.machine.machine_type} {query_instance.machine.name}', y=1.1)
         ax.axis('off')
         ax.axis('tight')
         buff = BytesIO()
@@ -154,22 +187,25 @@ class Graphs(Flowables):
         buff.seek(0)
         return buff
 
-    def create_graph(self, query_instance, position):
+    def format_tendency_data(self, measurements, position):
         """
-        create chart graph of tendency
-        values for vel or acc.
+        abstract data from measurements models 
+        generators and format it to be consumed 
+        by create_tendency_graph method.
+
+        Returns a dictionary populated with data 
+        in the format:
+
+        {key: {values: [v1..vn], dates: [d1..dn]}}
         """
 
-        measurements = custom_models.Measurement.objects.filter(
-            machine=query_instance.machine,
-            measurement_type='Predictivo').order_by('date__date')
         # TODO check date format
         try:
             points = ((measurement.points.all().filter(position=position),
-                   measurement.date.date) for measurement in measurements)[:10]
+                       measurement.date.date) for measurement in measurements)[:10]
         except StopIteration:
             points = ((measurement.points.all().filter(position=position),
-                   measurement.date.date) for measurement in measurements)
+                       measurement.date.date) for measurement in measurements)
 
         data = {}
         keys = set()
@@ -183,8 +219,20 @@ class Graphs(Flowables):
                     data[key] = {
                         'values': [point.tendency.first().value],
                         'dates': [date]
-                        }
+                    }
                     keys.add(key)
+        return data
+
+    def create_tendency_graph(self, query_instance, position):
+        """
+        create chart graph of tendency
+        values for vel or acc.
+
+        Returns an image in bytes format.
+        """
+
+        measurements = self.retrieve_measurements(query_instance)
+        data = self.format_tendency_data(measurements, position)
 
         _, ax = plt.subplots(figsize=(17, 6))
         for index, key in enumerate(data.keys()):
@@ -206,7 +254,7 @@ class Graphs(Flowables):
         ax.set_title(
             f"""Tendencia\n{query_instance.machine.machine_type}
             {query_instance.machine.name}, Canal X""")
-        ax.xaxis.set_major_formatter(date_format)  # set format to axis
+        ax.xaxis.set_major_formatter(date_format)  # set format to x  axis
         ax.set_xlabel('Fecha', labelpad=5)
         ax.set_ylabel(units)
         ax.legend(
@@ -227,31 +275,39 @@ class Graphs(Flowables):
         return buff
 
     # TODO
-    def create_casc(self, title, meas_date, point, save):
-            """plot 3d figure of all spectra specified"""
-            import datetime
+    def create_casc_graph(self, query_instance):
+        """
+        plot 3d figure of all spectra specified.
+
+        Returns an image in bytes format.
+        """
+
+        import pandas as pd
+        from mpl_toolkits.mplot3d import Axes3D
+        import numpy as np
+        from matplotlib import rcParams
 
         df_spec = pd.read_csv('Export_Spectra.csv', delimiter=';',
-                            encoding='ISO-8859-1')  # open csv to create a dataframe
+                              encoding='ISO-8859-1')  # open csv to create a dataframe
         fig = plt.figure(figsize=(10, 5))
         ax = fig.add_subplot(111, projection='3d')
         z_ticks = []
         if point.upper().startswith(('AC', 'VE', 'EN')):
-                _rows = []
-                if point.upper().startswith('A'):
-                    df_spec = df_spec.loc[df_spec['Ruta de punto'].str.contains(
-                        f'({title}).\d\d?[AVH][A]', regex=True)]
-                elif point.upper().startswith('V'):
-                    df_spec = df_spec.loc[df_spec['Ruta de punto'].str.contains(
-                        f'({title}).\d\d?[AVH][V]', regex=True)]
-                elif point.upper().startswith('E'):
-                    df_spec = df_spec.loc[df_spec['Ruta de punto'].str.contains(
-                        f'({title}).\d\d?[AVH][E]', regex=True)]
-                for index, df_row in df_spec.iterrows():
-                    _date = datetime.datetime.strptime(
-                        df_row['DTS'], '%d/%m/%Y %I:%M')
-                    if abs((_date - meas_date).days) < 7:
-                        _rows.append(df_row)
+            _rows = []
+            if point.upper().startswith('A'):
+                df_spec = df_spec.loc[df_spec['Ruta de punto'].str.contains(
+                    f'({title}).\d\d?[AVH][A]', regex=True)]
+            elif point.upper().startswith('V'):
+                df_spec = df_spec.loc[df_spec['Ruta de punto'].str.contains(
+                    f'({title}).\d\d?[AVH][V]', regex=True)]
+            elif point.upper().startswith('E'):
+                df_spec = df_spec.loc[df_spec['Ruta de punto'].str.contains(
+                    f'({title}).\d\d?[AVH][E]', regex=True)]
+            for index, df_row in df_spec.iterrows():
+                _date = datetime.datetime.strptime(
+                    df_row['DTS'], '%d/%m/%Y %I:%M')
+                if abs((_date - meas_date).days) < 7:
+                    _rows.append(df_row)
 
         #         if len(_rows) > 10:
         #             _rows = _rows[:11]
@@ -260,7 +316,7 @@ class Graphs(Flowables):
                 label = _row['Ruta de punto'].split('\\')[-1]
                 # obtain data of the y axis for the figure
                 y = (_row[f'Unnamed: {12 + x}']
-                    for x in range(1, int(_row['Líneas'])))
+                     for x in range(1, int(_row['Líneas'])))
                 # replace commas for dots in the string
                 y = (x.replace(',', '.') for x in y)
                 y = [float(x) for x in y]  # convert strings to floats
@@ -273,8 +329,8 @@ class Graphs(Flowables):
                 ax.plot(x, y, zs=float(index), zdir='y',
                         label=label, linewidth=0.6)
                 index += 2
-    #             if index == 18:
-    #                 break
+                if index == 18:
+                    break
 
             units = df_spec['Unidad'].values[0] + ' - ' + \
                 df_spec['Detección'].values[0].rstrip('\t')
@@ -286,9 +342,9 @@ class Graphs(Flowables):
         # separate ticks labels from axis
         ax.tick_params(width=8, labelsize=8, pad=13)
         ax.set_xlabel('Frecuencia - Hz', labelpad=30,
-                    rotation=90)  # set x axis label
+                      rotation=90)  # set x axis label
         ax.set_ylabel('Fecha/Hora', labelpad=30,
-                    rotation=90)  # set y axis label
+                      rotation=90)  # set y axis label
         ax.set_zlabel(units, labelpad=30, rotation=90)  # set z axis label
         ax.set_title(f'Cascada\n{title}, Canal X')  # set title
         date_format = mpl_dates.DateFormatter(
@@ -297,10 +353,10 @@ class Graphs(Flowables):
         ax.yaxis.set_major_formatter(date_format)
         rcParams['axes.labelpad'] = 25  # distance of labels from ticks
         ax.legend(loc="upper left", bbox_to_anchor=(0.08, 1),
-                fancybox=True, shadow=True, ncol=1)  # specify params for legend
+                  fancybox=True, shadow=True, ncol=1)  # specify params for legend
         plt.tight_layout()
         ax.set_yticks(z_ticks)
         ax.margins(0, 0, 0)
         ax.view_init(elev=70, azim=-90)
 
-#     plt.savefig('cascada', bbox_inches="tight", transparent=True, dpi=300)
+        plt.savefig('cascada', bbox_inches="tight", transparent=True, dpi=300)

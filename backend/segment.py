@@ -159,10 +159,10 @@ class Segment(Graphs):
         tendency_title = self.create_tendendy_title()
         graph_one = self.graph_table(
             'MOTOR (Velocidad)',
-            self.create_graph(query_instance, 'V'))
+            self.create_tendency_graph(query_instance, 'V'))
         graph_two = self.graph_table(
             'MOTOR (Aceleracion)',
-            self.create_graph(query_instance, 'A'))
+            self.create_tendency_graph(query_instance, 'A'))
 
         #########################################################
         ########## TODO NEEDS DEBUGGING ##############
