@@ -129,6 +129,10 @@ class Flowables(BaseDocTemplate):
         self.leftMargin = 1.6 * cm
         self.bottomMargin = 2 * cm
         self.templates = [
+            PageTemplate(id='letter',
+                         frames=[MACHINE_FRAME],
+                         onPage=self._header_three,
+                         onPageEnd=self._footer),
             PageTemplate(id='measurement',
                          frames=[MACHINE_FRAME],
                          onPage=self._header_one,
@@ -159,7 +163,8 @@ class Flowables(BaseDocTemplate):
         w, h = page.wrap(self.width, 1 * cm)
         page.drawOn(canvas, self.leftMargin + 0.5 * cm +
                     ((self.width - w) / 2), (29 * cm) - h)
-        table = self._create_header_table()
+        report_date = Paragraph(self.date.upper(), style=STANDARD_HEADER)
+        table = self._create_header_table(report_date)
         _, ht = table.wrap(self.width, 3 * cm)
         table.drawOn(canvas, self.leftMargin, 28 * cm - ht)
         canvas.restoreState()
@@ -180,6 +185,19 @@ class Flowables(BaseDocTemplate):
                     ((self.width - w) / 2), (29 * cm) - h)
         canvas.restoreState()
 
+    def _header_three(self, canvas, doc):
+        canvas.saveState()
+        page = Paragraph(
+            f'Pagina {doc.page}',
+            style=BLACK_SMALL)
+        w, h = page.wrap(self.width, 1 * cm)
+        page.drawOn(canvas, self.leftMargin + 0.5 * cm +
+                    ((self.width - w) / 2), (29 * cm) - h)
+        table = self._create_header_table('')
+        _, ht = table.wrap(self.width, 3 * cm)
+        table.drawOn(canvas, self.leftMargin, 28 * cm - ht)
+        canvas.restoreState()
+
     def _footer(self, canvas, doc):
         """
         method to be passed to PageTemplate
@@ -194,7 +212,7 @@ class Flowables(BaseDocTemplate):
         canvas.restoreState()
 
     # flowables used in footers/headers
-    def _create_header_table(self):
+    def _create_header_table(self, report_date):
         """
         create table to manage
         elements in custom header.
@@ -203,7 +221,6 @@ class Flowables(BaseDocTemplate):
         logo = Image(LOGO, width=8.65 * cm, height=2.51 * cm)
         skf = Image(SKF, width=1.76 * cm, height=0.47 * cm)
         skf_text = Paragraph('Con tecnología', style=GREEN_SMALL)
-        report_date = Paragraph(self.date.upper(), style=STANDARD_HEADER)
         company = Paragraph(self.company.upper(), style=BLUE_HEADER)
         data = [[logo, skf_text, report_date], ['', skf, company]]
         styles = [
@@ -319,10 +336,18 @@ class Flowables(BaseDocTemplate):
 
     @staticmethod
     def create_signature_line(string):
+        """
+        return a paragraph flowable 
+        with STANDARD style.
+        """
         return Paragraph(string, style=STANDARD)
 
     @staticmethod
     def create_signature_name(string):
+        """
+        return a paragraph flowable 
+        with BLACK_BOLD style.
+        """
         return Paragraph(string, style=BLACK_BOLD)
 
     def create_signatures_table(self):

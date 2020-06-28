@@ -32,9 +32,9 @@ class Graphs(Flowables):
 
     def retrieve_measurements(self, query_instance):
         """
-        retrieve queryset of all 'pred' 
-        measurements for a given machiine 
-        ordered by date. 
+        retrieve queryset of all 'pred'
+        measurements for a given machiine
+        ordered by date.
         """
 
         return custom_models.Measurement.objects.filter(
@@ -43,19 +43,19 @@ class Graphs(Flowables):
 
     def format_table_data(self, measurements):
         """
-        abstract data from measurements models 
-        generators and format it to be consumed 
+        abstract data from measurements models
+        generators and format it to be consumed
         by create_table_graph method.
 
-        Returns two list. A 2d lists containing 
-        all the rows used in the table and a row 
+        Returns two list. A 2d lists containing
+        all the rows used in the table and a row
         containing the headers of the rows.
         """
 
-        # TODO check date format and which date is row 0 and row 1, also check if its only V and A
+        # TODO check if its only V and A
 
         points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
-                   measurement.date.date) for measurement in measurements[:2])
+                   measurement.date.date.strftime('%d/%m/%Y')) for measurement in measurements[:2])
         data = {'dates': []}
         keys = set()
         for point_generator, date in points:
@@ -68,13 +68,14 @@ class Graphs(Flowables):
                     data[key] = {date: point.tendency.first().value}
                     keys.add(key)
 
-        rows = []
         try:
             previous_date = data['dates'][1]
         except IndexError:
             previous_date = 'N/A'
 
         current_date = data['dates'][0]
+
+        rows = []  # format data dictionary to 2d list rows
         for key in data.keys():
             if key.endswith('V'):
                 units = 'mm/s'
@@ -95,7 +96,7 @@ class Graphs(Flowables):
             else:
                 change = 'N/A'
             row = [
-                f'$\\bf{key}$',  # make text in first column bold
+                f'$\\bf{key}$',  # make text bold in first column
                 units,
                 previous_value,
                 current_value,
@@ -115,7 +116,7 @@ class Graphs(Flowables):
 
     def create_row_colors(self, rows, number_of_columns):
         """
-        create 2d list containing 
+        create 2d list containing
         colors for each row in table.
         """
 
@@ -131,7 +132,7 @@ class Graphs(Flowables):
 
     def create_table_graph(self, query_instance):
         """
-        create table graph for used 
+        create table graph for used
         in add_graphs method.
 
         Returns an image in bytes format.
@@ -185,11 +186,11 @@ class Graphs(Flowables):
 
     def format_tendency_data(self, measurements, position):
         """
-        abstract data from measurements models 
-        generators and format it to be consumed 
+        abstract data from measurements models
+        generators and format it to be consumed
         by create_tendency_graph method.
 
-        Returns a dictionary populated with data 
+        Returns a dictionary populated with data
         in the format:
 
         {key: {values: [v1..vn], dates: [d1..dn]}}
@@ -268,8 +269,8 @@ class Graphs(Flowables):
 
     def create_time_signal_graph(self, query_instance, position):
         """
-        create graph containing time signal 
-        of a point for an specific measurement 
+        create graph containing time signal
+        of a point for an specific measurement
         and point.
 
         Returns an image in bytes format.

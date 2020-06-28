@@ -49,7 +49,7 @@ class Segment(Graphs):
             title,
             Spacer(self.width, 1 * cm),
             self.toc,
-            NextPageTemplate('measurement'),
+            NextPageTemplate('letter'),
             PageBreak()
         ]
 
@@ -110,7 +110,7 @@ class Segment(Graphs):
             indent_five,
             indent_six,
             para_three,
-            NextPageTemplate('measurement'),
+            NextPageTemplate('letter'),
             PageBreak()
         ]
 
