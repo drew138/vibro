@@ -264,7 +264,60 @@ class Graphs(Flowables):
             shadow=True, ncol=1)
         plt.style.use('seaborn-ticks')
         plt.grid(True)
-        plt.tight_layout()  # adjust plot params
+        plt.tight_layout()
+        buff = BytesIO()
+        plt.savefig(
+            buff,
+            bbox_inches="tight",
+            transparent=True,
+            dpi=300)
+        buff.seek(0)
+        return buff
+
+    def create_time_signal_graph(self, query_instance, position):
+        """
+        create graph containing time signal 
+        of a point for an specific measurement 
+        and point.
+
+        Returns an image in bytes format.
+        """
+
+        label = None
+        time = None
+        values = None
+        if position == 'V':
+            units = 'mm/s - Pico'
+        else:
+            units = 'g - RMS'
+
+        _, ax = plt.subplots(figsize=(17, 6))
+        ax.plot_date(
+            time,
+            values,
+            linestyle='solid',
+            label=label,
+            color=self.custom_colors[0],
+            linewidth=0.6
+        )
+
+        date_format = mpl_dates.DateFormatter('%d/%m/%Y')
+        # TODO review title
+        ax.set_title(
+            f"""Señal en el Tiempo\n{query_instance.machine.machine_type}
+            {query_instance.machine.name}, Canal X""")
+        ax.xaxis.set_major_formatter(date_format)  # set format to x  axis
+        ax.set_xlabel('Fecha', labelpad=5)
+        ax.set_ylabel(units)
+        ax.legend(
+            loc='center left',
+            bbox_to_anchor=(1, 0.5),
+            fancybox=True,
+            shadow=True, ncol=1)
+
+        plt.style.use('seaborn-ticks')
+        plt.grid(True)
+        plt.tight_layout()
         buff = BytesIO()
         plt.savefig(
             buff,
