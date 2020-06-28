@@ -11,6 +11,9 @@ class City(models.Model):
     name = models.CharField(max_length=30, unique=True)
     state = models.CharField(max_length=30, blank=True, null=True)
 
+    def __str__(self):
+        return f'city {self.name} of state {self.state}'
+
 
 class Company(models.Model):
 
@@ -33,6 +36,9 @@ class Company(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class VibroUser(AbstractUser):
@@ -66,6 +72,9 @@ class VibroUser(AbstractUser):
         choices=USER_CHOICES,
         default=CLIENT)
 
+    def __str__(self):
+        return f'{self.username}/{self.first_name} {self.last_naame}'
+
 
 class Profile(models.Model):
 
@@ -76,6 +85,9 @@ class Profile(models.Model):
         VibroUser,
         related_name='profile',
         on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
 
 
 class Machine(models.Model):
@@ -97,6 +109,9 @@ class Machine(models.Model):
         to_field="name",
         on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.name} - {self.company.name}'
+
 
 class Image(models.Model):
 
@@ -106,6 +121,9 @@ class Image(models.Model):
         Machine,
         related_name="images",
         on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.machine.name
 
 
 class Date(models.Model):
@@ -120,6 +138,9 @@ class Date(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
+
+    def __str__(self):
+        return f'{self.company} {self.date}'
 
 
 class Measurement(models.Model):
@@ -184,6 +205,9 @@ class Measurement(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return f'{self.date} - {self.machine.name} - {self.machine.company.name}'
+
 
 class TermoImage(models.Model):
 
@@ -232,6 +256,9 @@ class Point(models.Model):
         Measurement,
         related_name="points",
         on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.number}{self.position}{self.point_type}'
 
 
 class Tendency(models.Model):

@@ -53,13 +53,9 @@ class Graphs(Flowables):
         """
 
         # TODO check date format and which date is row 0 and row 1, also check if its only V and A
-        try:
-            points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
-                       measurement.date.date) for measurement in measurements)[:2]
-        except StopIteration:
-            points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
-                       measurement.date.date) for measurement in measurements)
 
+        points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
+                   measurement.date.date) for measurement in measurements[:2])
         data = {'dates': []}
         keys = set()
         for point_generator, date in points:
@@ -200,13 +196,9 @@ class Graphs(Flowables):
         """
 
         # TODO check date format
-        try:
-            points = ((measurement.points.all().filter(position=position),
-                       measurement.date.date) for measurement in measurements)[:10]
-        except StopIteration:
-            points = ((measurement.points.all().filter(position=position),
-                       measurement.date.date) for measurement in measurements)
 
+        points = ((measurement.points.all().filter(position=position),
+                   measurement.date.date) for measurement in measurements[:10])
         data = {}
         keys = set()
         for point_generator, date in points:
@@ -335,7 +327,6 @@ class Graphs(Flowables):
         Returns an image in bytes format.
         """
 
-        import pandas as pd
         from mpl_toolkits.mplot3d import Axes3D
         import numpy as np
         from matplotlib import rcParams

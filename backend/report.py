@@ -33,7 +33,7 @@ class Report(Segment):
         self.create_toc()
         self.create_second_letter()
         self.create_ISO()
-        # self.create_summary()TODO uncomment
+        # self.create_summary() TODO uncomment
         # self.write_preds()
 
     def build_doc(self):
