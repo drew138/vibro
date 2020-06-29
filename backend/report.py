@@ -65,10 +65,13 @@ class Report(Segment):
             elif text == 'CALIDAD DE LA VIBRACIÓN' and style == 'black_bold_center':
                 self.notify(
                     'TOCEntry', (1, 'NORMA ISO 10816-1', self.page))
+            elif style == 'summary':
+                self.notify(
+                    'TOCEntry', (1, 'INFORME RESUMEN', self.page)
+                )
 
- # moack data used for debugging
 
-
+# moack data used for debugging
 class Profile:
     def __init__(self):
         self.certifications = 'Ing. de Servicios de Mantenimiento'

@@ -146,7 +146,18 @@ class Segment(Graphs):
         ]
 
     def create_summary(self):
-        pass
+        """
+        adds summary segment to story.
+        """
+
+        summary_title = self.create_summary_title()
+        self.story.append(summary_title)
+        for query_instance in self.queryset:
+            table = self.create_summary_table(query_instance)
+            self.story += [table, self.spacer_two]
+        title_two = self.create_second_summary_title()
+        self.story += [PageBreak(), title_two]
+        # TODO pending to create graphs and extra tables
 
     def add_graphs(self, query_instance):
         """

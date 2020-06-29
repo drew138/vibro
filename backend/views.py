@@ -432,7 +432,7 @@ class ReportView(viewsets.ModelViewSet):
             raise ValidationError('field date must be provided')
         queryset = queryset.order_by('machine__machine_type')
         buffer = BytesIO()
-        pdf = Report(buffer, queryset)
+        pdf = Report(buffer, queryset, self.request.user)
         pdf.build_doc()
         buffer.seek(0)
         return FileResponse(

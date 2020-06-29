@@ -68,6 +68,8 @@ TOC = ParagraphStyle(
     name='Table of contents', fontName='Arial-Bold', fontSize=15, alignment=1)
 BLACK_BOLD_CENTER = ParagraphStyle(
     name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
+SUMMARY = ParagraphStyle(
+    name='summary', fontName='Arial-Bold', fontSize=10, alignment=1)
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
@@ -763,6 +765,71 @@ class Flowables(BaseDocTemplate):
             ['D', ':', 'Inaceptable'],
         ]
         return self._create_especifications_table(data)
+
+    # summary flowables
+    @staticmethod
+    def create_summary_title():
+        """
+        return first title in the 
+        summmary segment.
+        """
+
+        return Paragraph(
+            'CUADRO RESUMEN DEL MANTENIMIENTO PREDICTIVO REALIZADO',
+            style=SUMMARY)
+
+    def extend_sumary_table_data(self, data, styles, query_instance):
+        """
+        extend data and style lists of the 
+        create_summary_table method according 
+        to the query instance.
+        """
+
+        return (data, styles)
+
+    def create_summary_table(self, query_instance):
+        """
+        create information table of a set 
+        of machines in the summary segment.
+        """
+
+        # TODO abstract title variable from query_instance and make them uppercase
+        title = None
+        data = [
+            [title, '', '', '', '', '', '', '', '',
+                '', '', '', '', '', '', '', ''],
+            ['SAP', 'NUMERO', 'NOMBRE EQUIPO', 'CORRECTIVOS', '',
+                '', '', '', '', '', '', '', '', '', '', '', ''],
+            ['', '', '', 'BIEN', 'BAL', 'ALIN', 'TENS', 'LUB', 'ROD', 'HOLG', 'EXC', 'SOLT',
+                'FRACT', 'VACÍO', 'ELECT.', 'OTROS', 'NM']
+        ]
+        styles = [
+            ('SPAN', (0, 0), (0, 16)),
+            ('SPAN', (3, 1), (3, 16)),
+            # alignment of first 3 rows
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (2, 16), 'CENTER'),
+            # horizontal alignment of first and second column
+            ('ALIGN', (0, 3), (0, -1), 'RIGHT'),
+            ('ALIGN', (1, 3), (2, -1), 'RIGHT'),
+            # grid
+            ('GRID', (0, 0), (-1, -1), 0.25, black)
+        ]
+        data, styles = self.extend_sumary_table_data(
+            data, styles, query_instance)
+        table = Table(data)
+        table.setStyle(TableStyle(styles))
+        return table
+
+    @staticmethod
+    def create_second_summary_title():
+        """
+        return second title in 
+        summary segment.
+        """
+
+        return Paragraph(
+            'INFORME RESUMEN Y COMPARATIVO DE CORRECTIVOS AL MANTENIMIENTO', style=)
 
     # Pred flowables
     @staticmethod
