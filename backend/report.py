@@ -113,4 +113,4 @@ user = VibroUser.objects.filter(username='drew').first()
 
 queryset = Measurement.objects.filter(severity='green')
 
-Report('test.pdf', queryset, user).build_doc()
+# Report('test.pdf', queryset, user).build_doc()

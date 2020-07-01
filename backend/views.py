@@ -381,7 +381,7 @@ class MeasurementView(viewsets.ModelViewSet):
             queryset = custom_models.Measurement.objects.filter(
                 q_objects)
         else:
-            queryset = custom_models.Image.objects.all()
+            queryset = custom_models.Measurement.objects.all()
         if measurement_id is not None:
             queryset = queryset.filter(id=measurement_id)
         if severity is not None:
@@ -470,7 +470,7 @@ class TermoImageView(viewsets.ModelViewSet):
             queryset = custom_models.TermoImage.objects.filter(
                 q_objects_t_image)
         else:
-            queryset = custom_models.Image.objects.all()
+            queryset = custom_models.TermoImage.objects.all()
         if termo_iamge_id is not None:
             queryset = queryset.filter(id=termo_iamge_id)
         if image_type is not None:
@@ -603,7 +603,7 @@ class EspectraView(viewsets.ModelViewSet):
             queryset = custom_models.Espectra.objects.filter(
                 q_objects_point)
         else:
-            queryset = custom_models.Tendency.objects.all()
+            queryset = custom_models.Espectra.objects.all()
         if espectra_id is not None:
             queryset = queryset.filter(id=espectra_id)
         if identifier is not None:
@@ -649,7 +649,7 @@ class TimeSignalView(viewsets.ModelViewSet):
             queryset = custom_models.TimeSignal.objects.filter(
                 q_objects_point)
         else:
-            queryset = custom_models.Tendency.objects.all()
+            queryset = custom_models.TimeSignal.objects.all()
         if signal_id is not None:
             queryset = queryset.filter(id=signal_id)
         if identifier is not None:

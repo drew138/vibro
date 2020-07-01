@@ -169,6 +169,7 @@ class Segment(Graphs):
         table = self.create_table_graph(query_instance)
         tendency_title = self.create_tendendy_title()
         tendency_title.keepWithNext = True
+        # TODO check if queryset contains V
         graph_one = self.create_tendency_graph(query_instance, 'V')
         table_one = self.graph_table('MOTOR (Velocidad)', graph_one)
         # graph_two = self.create_tendency_graph(query_instance, 'A')

@@ -58,7 +58,6 @@ class Graphs(Flowables):
         """
 
         # TODO check if its only V and A
-
         points = ((measurement.points.filter(point_type__in=['A', 'V']),
                    measurement.date.date.strftime('%d/%m/%Y')) for measurement in measurements[:2])
         data = {'dates': []}
