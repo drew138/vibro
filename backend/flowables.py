@@ -16,11 +16,11 @@ registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 
 
 # file location
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGO = os.path.join(BASE_DIR, 'static\\images\\logo.jpg')
-SKF = os.path.join(BASE_DIR, 'static\\images\\skf.jpg')
-DIAGRAM = os.path.join(BASE_DIR, 'static\\images\\numeration.png')
-ARROW = os.path.join(BASE_DIR, 'static\\images\\arrow.png')
+B_DIR = os.path.dirname(os.path.abspath(__file__))
+LOGO = os.path.join(B_DIR, 'static\\images\\logo.jpg')
+SKF = os.path.join(B_DIR, 'static\\images\\skf.jpg')
+DIAGRAM = os.path.join(B_DIR, 'static\\images\\numeration.png')
+ARROW = os.path.join(B_DIR, 'static\\images\\arrow.png')
 # datetime constants
 MONTHS = (
     'enero',
@@ -70,6 +70,10 @@ BLACK_BOLD_CENTER = ParagraphStyle(
     name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
 SUMMARY = ParagraphStyle(
     name='summary', fontName='Arial-Bold', fontSize=10, alignment=1)
+SUMMARY_TWO = ParagraphStyle(
+    name='summary_two', fontName='Arial-Bold', fontSize=10, alignment=1)
+MACHINE_PARAGRAPH = ParagraphStyle(
+    name='machine_entry', fontName='Arial-Bold', fontSize=10, alignment=1)
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
@@ -123,8 +127,8 @@ class Flowables(BaseDocTemplate):
         self.filename = filename
         self.queryset = queryset
         self.user = user
-        self.company = self.user.company
-        self.date = self.queryset.first().date.date
+        self.company = self.user.company.name
+        self.date = self.queryset.first().date.date.strftime('%d/%m/%Y')
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
         self.width = 18 * cm
@@ -364,7 +368,7 @@ class Flowables(BaseDocTemplate):
         first_engineer_full_name = f"""{self.engineer_one.first_name}
          {self.engineer_one.last_name}""".upper()  # space inbetween string
 
-        if self.engineer_two.first_name:
+        if self.engineer_two:
             second_engineer_name = f"""{self.engineer_two.first_name}
              {self.engineer_two.last_name}""".upper()
             data = [
@@ -482,13 +486,13 @@ class Flowables(BaseDocTemplate):
             DIAGRAM,
             width=img_width,
             height=img_height)
-        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD_CENTER)
+        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=BLACK_BOLD_CENTER)
         data = [[diagram], [img]]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('GRID', (0, 0), (-1, -1), 0.25, black),
-            ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE)
+            ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE),
         ]
         table = Table(
             data,
@@ -759,7 +763,7 @@ class Flowables(BaseDocTemplate):
         """
 
         data = [
-            ['A ', ':', 'Buena'],
+            ['A', ':', 'Buena'],
             ['B', ':', 'Satisfactoria'],
             ['C', ':', 'Insatisfactoria'],
             ['D', ':', 'Inaceptable'],
@@ -813,7 +817,10 @@ class Flowables(BaseDocTemplate):
             ('ALIGN', (0, 3), (0, -1), 'RIGHT'),
             ('ALIGN', (1, 3), (2, -1), 'RIGHT'),
             # grid
-            ('GRID', (0, 0), (-1, -1), 0.25, black)
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            # font
+            ('FONTNAME', (0, 0), (1, 16), 'Arial-Bold'),
+            ('NOSPLIT', (0, 0), (-1, -1))
         ]
         data, styles = self.extend_sumary_table_data(
             data, styles, query_instance)
@@ -829,22 +836,31 @@ class Flowables(BaseDocTemplate):
         """
 
         return Paragraph(
-            'INFORME RESUMEN Y COMPARATIVO DE CORRECTIVOS AL MANTENIMIENTO', style=)
+            'INFORME RESUMEN Y COMPARATIVO DE CORRECTIVOS AL MANTENIMIENTO',
+            style=SUMMARY_TWO)
 
     # Pred flowables
+
     @staticmethod
-    def machine_specifications_table(query_instance):
+    def create_measurement_title_entry(string):
+        """
+        returns a Paragraph flowable
+        """
+
+        return Paragraph(string, style=MACHINE_PARAGRAPH)
+
+    def machine_specifications_table(self, query_instance):
         """
         create table detailing especifications
         of each machine and their current severity.
         """
 
         # TODO abstract title variable from query_instance and make them uppercase
-        title = None
+        title = query_instance.machine.name.upper()
         image = os.path.join(
-            BASE_DIR, f'static\\images\\{query_instance.severity}.png')
-        severity_image = Image(image, width=1 * cm, height=2 * cm)
-        machine = query_instance.machine.all().first()
+            B_DIR, f'static\\images\\{query_instance.severity}.png')
+        severity_image = Image(image, width=1.8 * cm, height=2 * cm)
+        machine = query_instance.machine
         code = machine.code.upper()
         transmission = machine.transmission.upper()
         brand = machine.brand.upper()
@@ -861,12 +877,15 @@ class Flowables(BaseDocTemplate):
         ]
         styles = [
             ('BACKGROUND', (0, 0), (4, 2), TABLE_BLUE),
-            ('FONTNAME', (4, 2), (4, 2), 'Arial-Bold'),
+            ('FONTNAME', (0, 0), (4, 2), 'Arial-Bold'),
+            ('FONTNAME', (0, 3), (0, -1), 'Arial-Bold'),
+            ('FONTNAME', (2, 3), (2, -1), 'Arial-Bold'),
             ('SPAN', (0, 0), (4, 1)),
             ('SPAN', (0, 2), (3, 2)),
             ('SPAN', (4, 3), (-1, -1)),
             ('ALIGN', (0, 0), (4, 1), 'LEFT'),
             ('ALIGN', (0, 2), (4, 2), 'CENTER'),
+            ('ALIGN', (0, 0), (1, 4), 'CENTER'),
             ('ALIGN', (0, 3), (-2, -1), 'LEFT'),
             ('ALIGN', (4, 3), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -893,14 +912,15 @@ class Flowables(BaseDocTemplate):
             machine_img,
             width=img_width,
             height=img_height)
-        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=STANDARD)
-        machine = Paragraph('IMAGEN MAQUINA', style=STANDARD)
+        diagram = Paragraph('DIAGRAMA ESQUEMATICO', style=BLACK_BOLD_CENTER)
+        machine = Paragraph('IMAGEN MAQUINA', style=BLACK_BOLD_CENTER)
         data = [[diagram, machine], [diagram_img, machine_img]]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('GRID', (0, 0), (-1, -1), 0.25, black),
-            ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE)
+            ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE),
+            ('FONTNAME', (0, 0), (0, 1), 'Arial-Bold'),
         ]
         table = Table(
             data,
@@ -933,10 +953,10 @@ class Flowables(BaseDocTemplate):
 
         header_one = Paragraph(
             'ANÁLISIS DE VIBRACIÓN',
-            style=STANDARD_CENTER)
+            style=BLACK_BOLD_CENTER)
         header_two = Paragraph(
             'CORRECTIVOS Y/O RECOMENDACIONES',
-            style=STANDARD_CENTER)
+            style=BLACK_BOLD_CENTER)
         analysis = Paragraph(
             analysis,
             style=STANDARD)
@@ -960,22 +980,32 @@ class Flowables(BaseDocTemplate):
         return table
 
     @staticmethod
+    def create_graph_table_title(string):
+        """
+        returns Paragraph flowable for the text in the 
+        """
+
+        return Paragraph(string, style=BLACK_BOLD_CENTER)
+
+    @staticmethod
     def graph_table(title, graph):
         """
         create a table containing
         an especified graphic.
         """
 
-        title = Paragraph(title.upper(), style=STANDARD_CENTER)
-        graph = Image(graph, width=17 * cm, height=6 * cm)
+        title = Paragraph(title.upper(), style=BLACK_BOLD_CENTER)
+        graph = Image(graph, width=17 * cm, height=5.5 * cm)
         data = [[title], [graph]]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
-            ('GRID', (0, 0), (-1, -1), 0.25, black)
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('FONTNAME', (0, 0), (0, 0), 'Arial-Bold'),
+            ('NOSPLIT', (0, 0), (-1, -1))
         ]
-        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 7 * cm])
+        table = Table(data, colWidths=[18 * cm], rowHeights=[0.5 * cm, 6 * cm])
         table.setStyle(TableStyle(styles))
         return table
 

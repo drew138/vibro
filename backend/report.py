@@ -1,6 +1,7 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
 from .flowables import STANDARD_CENTER
 from .segment import Segment
+from .models import VibroUser, Measurement
 
 
 class Report(Segment):
@@ -14,6 +15,10 @@ class Report(Segment):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.machine_types = set()
+
+    def closer_buffers(self):
+        for buffer in self.buffers:
+            buffer.close()
 
     def write_preds(self):
         """
@@ -34,7 +39,7 @@ class Report(Segment):
         self.create_second_letter()
         self.create_ISO()
         # self.create_summary() TODO uncomment
-        # self.write_preds()
+        self.write_preds()
 
     def build_doc(self):
         """
@@ -45,6 +50,7 @@ class Report(Segment):
 
         self.write_pdf()
         self.multiBuild(self.story)
+        self.closer_buffers()
 
     def afterFlowable(self, flowable):
         """
@@ -67,8 +73,10 @@ class Report(Segment):
                     'TOCEntry', (1, 'NORMA ISO 10816-1', self.page))
             elif style == 'summary':
                 self.notify(
-                    'TOCEntry', (1, 'INFORME RESUMEN', self.page)
-                )
+                    'TOCEntry', (1, 'INFORME RESUMEN', self.page))
+            elif style == 'machine_entry':
+                self.notify(
+                    'TOCEntry', (1, text, self.page))
 
 
 # moack data used for debugging
@@ -101,8 +109,8 @@ class QuerySet:
         return self
 
 
-user = User()
+user = VibroUser.objects.filter(username='drew').first()
 
-queryset = QuerySet()
+queryset = Measurement.objects.filter(severity='green')
 
 Report('test.pdf', queryset, user).build_doc()

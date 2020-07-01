@@ -3,7 +3,6 @@ from . import models as custom_models
 from .admin_forms import MyUserAdmin
 from django.contrib import admin
 
-
 admin.site.register(custom_models.City)
 admin.site.register(custom_models.Company)
 admin.site.register(custom_models.VibroUser, MyUserAdmin)

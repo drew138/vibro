@@ -19,9 +19,9 @@ class Company(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     nit = models.CharField(max_length=15, unique=True)
-    address = models.CharField(max_length=50, blank=True)
-    rut_address = models.CharField(max_length=50, blank=True)
-    pbx = models.IntegerField(blank=True)
+    address = models.CharField(max_length=50, blank=True, null=True)
+    rut_address = models.CharField(max_length=50, blank=True, null=True)
+    pbx = models.IntegerField(blank=True, null=True)
     city = models.ForeignKey(
         City,
         related_name='company',
@@ -73,7 +73,7 @@ class VibroUser(AbstractUser):
         default=CLIENT)
 
     def __str__(self):
-        return f'{self.username}/{self.first_name} {self.last_naame}'
+        return f'{self.username}/{self.first_name} {self.last_name}'
 
 
 class Profile(models.Model):
@@ -97,7 +97,7 @@ class Machine(models.Model):
 
     identifier = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=50)
-    machine_type = models.CharField(max_length=50)
+    machine_type = models.CharField(max_length=50)  # TODO add machine types
     code = models.TextField(blank=True, null=True)
     transmission = models.TextField(blank=True, null=True)
     brand = models.TextField(blank=True, null=True)
@@ -131,7 +131,7 @@ class Date(models.Model):
     class Meta:
         unique_together = ['company', 'date']
 
-    date = models.DateTimeField()
+    date = models.DateField()
     company = models.ForeignKey(
         Company,
         related_name="date",

@@ -1,6 +1,10 @@
+from reportlab.lib.colors import black, Color
+from .flowables import Flowables, TABLE_BLUE
+from reportlab.platypus.tables import Table
+from reportlab.platypus import TableStyle
 from .import models as custom_models
 import matplotlib.dates as mpl_dates
-from .flowables import Flowables
+from reportlab.lib.units import cm
 import matplotlib.pyplot as plt
 from io import BytesIO
 import datetime
@@ -14,6 +18,7 @@ class Graphs(Flowables):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.buffers = []
         self.custom_colors = [
             # colors used in graphs
             '#0000FF',
@@ -39,9 +44,9 @@ class Graphs(Flowables):
 
         return custom_models.Measurement.objects.filter(
             machine=query_instance.machine,
-            measurement_type='Predictivo').order_by('date__date')
+            measurement_type='pred').order_by('date__date')
 
-    def format_table_data(self, measurements):
+    def format_table_data(self, measurements, title):
         """
         abstract data from measurements models
         generators and format it to be consumed
@@ -54,67 +59,66 @@ class Graphs(Flowables):
 
         # TODO check if its only V and A
 
-        points = ((measurement.points.all().filter(point_type__in=['A', 'V']),
+        points = ((measurement.points.filter(point_type__in=['A', 'V']),
                    measurement.date.date.strftime('%d/%m/%Y')) for measurement in measurements[:2])
         data = {'dates': []}
         keys = set()
         for point_generator, date in points:
             data['dates'].append(date)
             for point in point_generator:
-                key = f'{point.number}{point.poisition}{point.point_type}'
+                key = f'{point.number}{point.position}{point.point_type}'
                 if key in keys:
-                    data[key][date] = point.tendency.first().value
+                    data[key][date] = point.tendency.value
                 else:
-                    data[key] = {date: point.tendency.first().value}
+                    data[key] = {date: point.tendency.value}
                     keys.add(key)
 
         try:
             previous_date = data['dates'][1]
         except IndexError:
             previous_date = 'N/A'
-
         current_date = data['dates'][0]
-
-        rows = []  # format data dictionary to 2d list rows
+        rows = [[title, '', '', '', ''],
+                [
+            self.create_graph_table_title('Nombre de<br/>PUNTO'),
+            self.create_graph_table_title('Unidades'),
+            self.create_graph_table_title(
+                f'Valor Anterior<br/>{previous_date}'),
+            self.create_graph_table_title(f'Últ. Valor<br/>{current_date}'),
+            self.create_graph_table_title('% de Cambio')
+        ]]
+        # format data dictionary to 2d list rows
         for key in data.keys():
-            if key.endswith('V'):
-                units = 'mm/s'
-            else:
-                units = 'g'
-            try:
-                previous_value = data[key][previous_date]
-            except KeyError:
-                previous_value = '--'
-            try:
-                current_value = data[key][current_date]
-            except KeyError:
-                current_value = '--'
-            if not (previous_value == '--') or (current_value == '--'):
-                percentage = (current_value - previous_value) * \
-                    100 / previous_value
-                change = round(percentage, 2)
-            else:
-                change = 'N/A'
-            row = [
-                f'$\\bf{key}$',  # make text bold in first column
-                units,
-                previous_value,
-                current_value,
-                change
-            ]
-            rows.append(row)
+            if key != 'dates':
+                if key.endswith('V'):
+                    units = 'mm/s'
+                else:
+                    units = 'g'
+                try:
+                    previous_value = data[key][previous_date]
+                except KeyError:
+                    previous_value = '--'
+                try:
+                    current_value = data[key][current_date]
+                except KeyError:
+                    current_value = '--'
+                if (previous_value == '--') or (current_value == '--'):
+                    change = 'N/A'
+                else:
+                    percentage = (current_value - previous_value) * \
+                        100 / previous_value
+                    change = round(percentage, 2)
+                row = [
+                    key,
+                    units,
+                    previous_value,
+                    current_value,
+                    change
+                ]
+                rows.append(row)
+        return rows
 
-        columns = [
-            # strings are formatted this way to make font bold
-            '$\\bfNombre$ $\\bfde$ $\\bfPUNTO$',
-            '$\\bfUnidades$',
-            f'$\\bfValor$ $\\bfanterior$\n$\\bf{previous_date}$',
-            f'$\\bfÚlt.$ $\\bfvalor$\n$\\bf{current_date}$',
-            '$\\bf\%$ $\\bfCambio$'
-        ]
-        return (rows, columns)
-
-    def create_row_colors(self, rows, number_of_columns):
+    def create_row_colors(self, rows):
         """
         create 2d list containing
         colors for each row in table.
@@ -122,12 +126,19 @@ class Graphs(Flowables):
 
         colors = []
         for index, _ in enumerate(rows):
-            if index % 2 == 0:
-                row_colors = ['#FFFFFF' for _ in range(number_of_columns)]
-                colors.append(row_colors)
-            else:
-                row_colors = ['#DCE6F1' for _ in range(number_of_columns)]
-                colors.append(row_colors)
+            if index < 2:
+                continue
+            elif index % 2:
+                colors.append(
+                    ('BACKGROUND',
+                     (0, index),
+                     (4, index),
+                     Color(
+                         red=220/255,
+                         green=230/255,
+                         blue=241)
+                     )
+                )
         return colors
 
     def create_table_graph(self, query_instance):
@@ -139,50 +150,25 @@ class Graphs(Flowables):
         """
 
         measurements = self.retrieve_measurements(query_instance)
+        # TODO confirm title
+        title = f'{query_instance.machine.machine_type} {query_instance.machine.name}'.upper()
+        rows = self.format_table_data(measurements, title)
 
-        rows, columns = self.format_table_data(measurements)
-
-        number_of_columns = len(columns)
-
-        col_colors = ['#8DB3E2' for _ in range(number_of_columns)]
-
-        col_widths = [0.3, 0.2, 0.25, 0.2, 0.2]
-
-        colors = self.create_row_colors(rows, number_of_columns)
-
-        fig, ax = plt.subplots()
-
-        table = ax.table(
-            cellText=rows,
-            cellColours=colors,
-            colWidths=col_widths,
-            colColours=col_colors,
-            colLabels=columns,
-            loc='center',
-            cellLoc='center')
-
-        table.set_fontsize(10)
-        table.scale(0.8, 1)  # stretch table horizontally
-        cellDict = table.get_celld()  # dict of all cells in table
-        for i in range(number_of_columns):  # go through all cells in first column
-            # change height to be able to adjust text
-            cellDict[(0, i)].set_height(.1)
-
-        fig.patch.set_visible(False)  # remove graph plot from figure
-        fig.tight_layout()  # set tight_layout to adjust objects in figure
-        # TODO
-        plt.title(
-            f'{query_instance.machine.machine_type} {query_instance.machine.name}', y=1.1)
-        ax.axis('off')
-        ax.axis('tight')
-        buff = BytesIO()
-        plt.savefig(
-            buff,
-            bbox_inches="tight",
-            transparent=True,
-            dpi=300)
-        buff.seek(0)
-        return buff
+        styles = [
+            ('SPAN', (0, 0), (-1, 0)),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('BACKGROUND', (0, 0), (4, 1), TABLE_BLUE),
+            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('FONTNAME', (0, 0), (0, -1), 'Arial-Bold'),
+            ('FONTNAME', (0, 0), (4, 1), 'Arial-Bold'),
+            ('FONTNAME', (1, 0), (-1, -1), 'Arial'),
+        ]
+        colors = self.create_row_colors(rows)
+        styles += colors
+        table = Table(rows, colWidths=[3 * cm])
+        table.setStyle(TableStyle(styles))
+        return table
 
     def format_tendency_data(self, measurements, position):
         """
@@ -196,21 +182,19 @@ class Graphs(Flowables):
         {key: {values: [v1..vn], dates: [d1..dn]}}
         """
 
-        # TODO check date format
-
-        points = ((measurement.points.all().filter(position=position),
+        points = ((measurement.points.filter(position=position),
                    measurement.date.date) for measurement in measurements[:10])
         data = {}
         keys = set()
         for point_generator, date in points:
             for point in point_generator:
-                key = f'{point.number}{point.poisition}{point.point_type}'
+                key = f'{point.number}{point.position}{point.point_type}'
                 if key in keys:
-                    data[key]['values'].append(point.tendency.first().value)
+                    data[key]['values'].append(point.tendency.value)
                     data[key]['dates'].append(date)
                 else:
                     data[key] = {
-                        'values': [point.tendency.first().value],
+                        'values': [point.tendency.value],
                         'dates': [date]
                     }
                     keys.add(key)
@@ -227,7 +211,7 @@ class Graphs(Flowables):
         measurements = self.retrieve_measurements(query_instance)
         data = self.format_tendency_data(measurements, position)
 
-        _, ax = plt.subplots(figsize=(17, 6))
+        _, ax = plt.subplots(figsize=(10, 3.5))
         for index, key in enumerate(data.keys()):
             ax.plot_date(
                 data[key]['dates'],
@@ -248,6 +232,7 @@ class Graphs(Flowables):
             f"""Tendencia\n{query_instance.machine.machine_type}
             {query_instance.machine.name}, Canal X""")
         ax.xaxis.set_major_formatter(date_format)  # set format to x  axis
+        ax.xaxis_date()
         ax.set_xlabel('Fecha', labelpad=5)
         ax.set_ylabel(units)
         ax.legend(
@@ -255,6 +240,7 @@ class Graphs(Flowables):
             bbox_to_anchor=(1, 0.5),
             fancybox=True,
             shadow=True, ncol=1)
+        ax.set_ylim(bottom=0)
         plt.style.use('seaborn-ticks')
         plt.grid(True)
         plt.tight_layout()
@@ -263,8 +249,11 @@ class Graphs(Flowables):
             buff,
             bbox_inches="tight",
             transparent=True,
-            dpi=300)
+            dpi=300,
+            format='jpg'
+        )
         buff.seek(0)
+        self.buffers.append(buff)
         return buff
 
     def create_time_signal_graph(self, query_instance, position):
@@ -279,12 +268,13 @@ class Graphs(Flowables):
         label = None
         time = None
         values = None
+
         if position == 'V':
             units = 'mm/s - Pico'
         else:
             units = 'g - RMS'
 
-        _, ax = plt.subplots(figsize=(17, 6))
+        _, ax = plt.subplots(figsize=(10, 3.5))
         ax.plot_date(
             time,
             values,
@@ -318,6 +308,7 @@ class Graphs(Flowables):
             transparent=True,
             dpi=300)
         buff.seek(0)
+        self.buffers.append(buff)
         return buff
 
     # TODO

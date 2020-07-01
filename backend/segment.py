@@ -1,5 +1,5 @@
 from .flowables import STANDARD, BLACK_BOLD_CENTER, LEVEL_ONE, LEVEL_TWO, ADMIN_REP
-from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak, Image
+from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak, Image, KeepTogether
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.units import cm
 from .graph import Graphs
@@ -164,26 +164,27 @@ class Segment(Graphs):
         add graphs to preds segment.
         """
 
-        ##########################################################
-        # what create table graph returns may need to be .closed()
-        table = Image(self.create_table_graph(query_instance), width=18 * cm)
+        table_title = self.create_table_title()
+        table_title.keepWithNext = True
+        table = self.create_table_graph(query_instance)
         tendency_title = self.create_tendendy_title()
-        graph_one = self.graph_table(
-            'MOTOR (Velocidad)',
-            self.create_tendency_graph(query_instance, 'V'))
-        graph_two = self.graph_table(
-            'MOTOR (Aceleracion)',
-            self.create_tendency_graph(query_instance, 'A'))
+        tendency_title.keepWithNext = True
+        graph_one = self.create_tendency_graph(query_instance, 'V')
+        table_one = self.graph_table('MOTOR (Velocidad)', graph_one)
+        # graph_two = self.create_tendency_graph(query_instance, 'A')
+        # table_two = self.graph_table('MOTOR (Aceleracion)', graph_two)
 
-        #########################################################
         ########## TODO NEEDS DEBUGGING ##############
         flowables = [
-            table,
+            KeepTogether(
+                [table_title,
+                 table]),
             self.spacer_two,
-            tendency_title,
-            graph_one,
+            KeepTogether(
+                [tendency_title,
+                 table_one]),
             self.spacer_one,
-            graph_two
+            # graph_two
         ]
         #############################################
         # TODO add logic to create measurements tables and graphs
@@ -197,10 +198,12 @@ class Segment(Graphs):
         """
 
         especifications = self.machine_specifications_table(query_instance)
+        # TODO check title
+        title = self.create_measurement_title_entry(
+            query_instance.machine.name.upper())
         diagram = self.pictures_table(
-            query_instance.machine.images.all().first().diagram,
-            query_instance.machine.images.all().first().image)
-        table_title = self.create_table_title()
+            query_instance.machine.images.diagram,
+            query_instance.machine.images.image)
         graphs = self.add_graphs(query_instance)
         analysis = self.create_analysis_table(
             query_instance.analysis,
@@ -208,11 +211,10 @@ class Segment(Graphs):
 
         self.story += [
             especifications,
-            self.spacer_one,
             NextPageTemplate('measurement_two'),
-            diagram,
             self.spacer_two,
-            table_title,
+            title,
+            diagram,
             self.spacer_two,
             *graphs,
             self.spacer_one,
