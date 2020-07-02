@@ -61,22 +61,24 @@ class Report(Segment):
         if flowable.__class__.__name__ == 'Paragraph':
             text = flowable.getPlainText()
             style = flowable.style.name
+            page = str(self.page)
             if style == 'Table of contents':
-                self.notify('TOCEntry', (0, text.upper(), self.page))
+                self.notify('TOCEntry', (0, text.upper(),
+                                         self.page, page))
             elif style == 'INFORME ADMINISTRATIVO':
                 self.notify(
-                    'TOCEntry', (0, style, self.page))
+                    'TOCEntry', (0, style, self.page, page))
                 self.notify(
-                    'TOCEntry', (1, 'CARTA CONFIGURACION PREDICTIVO', self.page))
+                    'TOCEntry', (1, 'CARTA CONFIGURACION PREDICTIVO', self.page, page))
             elif text == 'CALIDAD DE LA VIBRACIÓN' and style == 'black_bold_center':
                 self.notify(
-                    'TOCEntry', (1, 'NORMA ISO 10816-1', self.page))
+                    'TOCEntry', (1, 'NORMA ISO 10816-1', self.page, page))
             elif style == 'summary':
                 self.notify(
-                    'TOCEntry', (1, 'INFORME RESUMEN', self.page))
+                    'TOCEntry', (1, 'INFORME RESUMEN', self.page, page))
             elif style == 'machine_entry':
                 self.notify(
-                    'TOCEntry', (1, text, self.page))
+                    'TOCEntry', (1, text, self.page, page))
 
 
 # moack data used for debugging

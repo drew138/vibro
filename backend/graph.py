@@ -280,9 +280,7 @@ class Graphs(Flowables):
             linestyle='solid',
             label=label,
             color=self.custom_colors[0],
-            linewidth=0.6
-        )
-
+            linewidth=0.6)
         date_format = mpl_dates.DateFormatter('%d/%m/%Y')
         # TODO review title
         ax.set_title(
@@ -305,6 +303,7 @@ class Graphs(Flowables):
             buff,
             bbox_inches="tight",
             transparent=True,
+            format='jpg',
             dpi=300)
         buff.seek(0)
         self.buffers.append(buff)
@@ -394,4 +393,13 @@ class Graphs(Flowables):
         ax.margins(0, 0, 0)
         ax.view_init(elev=70, azim=-90)
 
-        plt.savefig('cascada', bbox_inches="tight", transparent=True, dpi=300)
+        buff = BytesIO()
+        plt.savefig(
+            buff,
+            bbox_inches="tight",
+            format='jpg',
+            transparent=True,
+            dpi=300)
+        buff.seek(0)
+        self.buffers.append(buff)
+        return buff

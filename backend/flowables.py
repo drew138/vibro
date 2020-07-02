@@ -73,7 +73,7 @@ SUMMARY = ParagraphStyle(
 SUMMARY_TWO = ParagraphStyle(
     name='summary_two', fontName='Arial-Bold', fontSize=10, alignment=1)
 MACHINE_PARAGRAPH = ParagraphStyle(
-    name='machine_entry', fontName='Arial-Bold', fontSize=10, alignment=1)
+    name='machine_entry', fontName='Arial', fontSize=10, alignment=1)
 # constants for paragraph styles
 STANDARD = ParagraphStyle(
     name='standard', fontName='Arial', fontSize=10)
@@ -162,7 +162,7 @@ class Flowables(BaseDocTemplate):
         """
 
         canvas.saveState()
-
+        canvas.bookmarkPage(str(doc.page))
         page = Paragraph(
             f'Pagina {doc.page}',
             style=BLACK_SMALL)
@@ -183,6 +183,7 @@ class Flowables(BaseDocTemplate):
         """
 
         canvas.saveState()
+        canvas.bookmarkPage(str(doc.page))
         page = Paragraph(
             f'Pagina {doc.page}',
             style=BLACK_SMALL)
@@ -192,7 +193,14 @@ class Flowables(BaseDocTemplate):
         canvas.restoreState()
 
     def _header_three(self, canvas, doc):
+        """
+        method to be passed to PageTemplate
+        objects on onPage keyword argument
+        to generate basic headers.
+        """
+
         canvas.saveState()
+        canvas.bookmarkPage(str(doc.page))
         page = Paragraph(
             f'Pagina {doc.page}',
             style=BLACK_SMALL)

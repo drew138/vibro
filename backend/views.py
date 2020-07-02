@@ -418,6 +418,8 @@ class ReportView(viewsets.ModelViewSet):
         date = request.query_params.get('date', None)
 
         if request.user.is_staff or request.user.is_superuser:
+            if company is None:
+                raise ValidationError('field company must be provided')
             queryset = custom_models.Measurement.objects.filter(
                 company__id=company)
         else:
