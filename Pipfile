@@ -26,6 +26,8 @@ zipp = "==3.1.0"
 xhtml2pdf = "*"
 reportlab = "*"
 numpy = "*"
+djangorestframework-simplejwt = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.8"

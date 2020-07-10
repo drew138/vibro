@@ -1,30 +1,17 @@
 from rest_framework.exceptions import ValidationError, NotAuthenticated, NotFound
 from .permissions import IsStaffOrSuperUser, UpdatePass, ReportPermissions
 from rest_framework import viewsets, generics, permissions
-from django.template.loader import render_to_string
+from rest_framework_simplejwt.tokens import RefreshToken
 from . import serializers as custom_serializers
 from rest_framework.response import Response
-from django.core.mail import EmailMessage
 from . import models as custom_models
 from django.http import FileResponse
-from knox.models import AuthToken
-from django.conf import settings
 from django.db.models import Q
+from .email import send_email
 from .report import Report
 from io import BytesIO
 
 
-def send_email(data):
-    """
-    function to be used in a view to send emails.
-    """
-
-    template = render_to_string(data['template'], data['variables'])
-    sender = settings.EMAIL_HOST_USER
-    email = EmailMessage(data['subject'], template, sender, data['receiver'])
-    email.content_subtype = "html"
-    email.fail_silently = False
-    email.send()
 
 
 class CityView(viewsets.ModelViewSet):
@@ -130,27 +117,14 @@ class RegisterAPI(generics.GenericAPIView):
             'receiver': staff_users
         }
         send_email(staff_email)  # send email to staff
+        refresh = RefreshToken.for_user(self.request.user)  # JWT token
         return Response({
             "user": custom_serializers.RegisterVibroUserSerializer(user,
                                                                    context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
         })
 
-
-# Login API
-class LoginAPI(generics.GenericAPIView):
-
-    serializer_class = custom_serializers.LoginVibroUserSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
-        return Response({
-            "user": custom_serializers.VibroUserSerializer(user,
-                                                           context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
-        })
 
 
 # Reset API
@@ -164,7 +138,7 @@ class ResetAPI(generics.GenericAPIView):
         user = custom_models.VibroUser.objects.filter(
             email=request.data['email']).first()
         if user.exists():
-            token = AuthToken.objects.create(user)[1]
+            refresh = RefreshToken.for_user(user)
             email_data = {
                 'subject': 'Cambio de Contraseña - Vibromontajes',
                 'template': 'email/password_reset.html',
@@ -172,7 +146,7 @@ class ResetAPI(generics.GenericAPIView):
                     'user': user.first_name,
                     'host': request.get_host(),
                     'username': user.username,
-                    'token': token
+                    'token': str(refresh.access_token)
                 },
                 'receiver': [user.email]
             }
@@ -204,10 +178,12 @@ class ChangePassAPI(generics.UpdateAPIView):
             'receiver': [user.email]
         }
         send_email(email_data)
+        refresh = RefreshToken.for_user(user)
         return Response({
             "user": custom_serializers.ChangePassSerializer(user,
                                                             context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
+            "refresh": str(refresh),
+            'access': str(refresh.access_token)
         })
 
     def get_object(self):

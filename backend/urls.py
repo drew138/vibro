@@ -1,18 +1,19 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from knox import views as knox_views
+# from knox import views as knox_views
 from rest_framework import routers
 from . import views
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 
 # TODO test endpoints
 auth_views = [
-    path('auth', include('knox.urls')),
     path('auth/register', views.RegisterAPI.as_view()),
-    path('auth/login', views.LoginAPI.as_view()),
     path('auth/user', views.UserAPI.as_view()),
     path('auth/reset', views.ResetAPI.as_view()),
     path('auth/change', views.ChangePassAPI.as_view()),
-    path('auth/logout', knox_views.LogoutView.as_view(), name='knox_logout')
+    path('api/token/', TokenObtainPairView.as_view()),
+    path('api/token/refresh', TokenRefreshView.as_view())
 ]
 
 router = routers.DefaultRouter()

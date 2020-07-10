@@ -41,22 +41,19 @@ INSTALLED_APPS = [
     'rest_framework',
     'frontend',
     'backend',
-    'knox',
 ]
 
 AUTH_USER_MODEL = 'backend.VibroUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
-    ('knox.auth.TokenAuthentication',)
+    ('rest_framework_simplejwt.authentication.JWTAuthentication',)
 }
 
-REST_KNOX = {
-    'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
-    'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-    'TOKEN_TTL': timedelta(hours=10),
-    'TOKEN_LIMIT_PER_USER': None,
-    'AUTO_REFRESH': False,
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 MIDDLEWARE = [
