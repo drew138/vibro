@@ -8,10 +8,8 @@ from . import models as custom_models
 from django.http import FileResponse
 from django.db.models import Q
 from .email import send_email
-from .report import Report
+# from .report import Report
 from io import BytesIO
-
-
 
 
 class CityView(viewsets.ModelViewSet):
@@ -124,7 +122,6 @@ class RegisterAPI(generics.GenericAPIView):
             "refresh": str(refresh),
             "access": str(refresh.access_token)
         })
-
 
 
 # Reset API

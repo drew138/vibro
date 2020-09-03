@@ -11,8 +11,8 @@ import datetime
 import os
 
 
-registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
-registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
+registerFont(TTFont('Arial', 'Arial.ttf'))  # register arial fonts
+registerFont(TTFont('Arial-Bold', 'Arial.ttf'))
 
 
 # file location
