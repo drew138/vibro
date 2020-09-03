@@ -14,7 +14,7 @@ import os
 if sys.platform == 'linux':
     registerFont(TTFont('Arial', 'Arial.ttf'))  # register arial fonts
     registerFont(TTFont('Arial-Bold', 'Arial.ttf'))
-elif sys.platform == 'windows':
+elif sys.platform == 'win32':
     registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
     registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 
