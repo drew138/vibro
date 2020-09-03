@@ -8,11 +8,15 @@ from reportlab.platypus.frames import Frame
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
 import datetime
+import sys
 import os
 
-
-registerFont(TTFont('Arial', 'Arial.ttf'))  # register arial fonts
-registerFont(TTFont('Arial-Bold', 'Arial.ttf'))
+if sys.platform == 'linux':
+    registerFont(TTFont('Arial', 'Arial.ttf'))  # register arial fonts
+    registerFont(TTFont('Arial-Bold', 'Arial.ttf'))
+elif sys.platform == 'windows':
+    registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
+    registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 
 
 # file location
