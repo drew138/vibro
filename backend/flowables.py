@@ -11,7 +11,7 @@ import datetime
 import sys
 import os
 
-if sys.platform == 'linux':
+if (sys.platform == 'linux') or (sys.platform == 'linux2'):
     registerFont(TTFont('Arial', 'Arial.ttf'))  # register arial fonts
     registerFont(TTFont('Arial-Bold', 'Arial.ttf'))
 elif sys.platform == 'win32':
