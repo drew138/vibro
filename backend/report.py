@@ -111,8 +111,8 @@ class QuerySet:
         return self
 
 
-# user = VibroUser.objects.filter(username='drew').first()
+user = VibroUser.objects.filter(username='juliana').first()
 
-# queryset = Measurement.objects.filter(severity='green')
+queryset = Measurement.objects.filter(severity='green')
 
-# Report('test.pdf', queryset, user).build_doc()
+Report('test.pdf', queryset, user).build_doc()

@@ -8,7 +8,7 @@ from . import models as custom_models
 from django.http import FileResponse
 from django.db.models import Q
 from .email import send_email
-# from .report import Report
+from .report import Report
 from io import BytesIO
 
 

@@ -181,7 +181,7 @@ class Graphs(Flowables):
         {key: {values: [v1..vn], dates: [d1..dn]}}
         """
 
-        points = ((measurement.points.filter(position=position),
+        points = ((measurement.points.filter(point_type=position),
                    measurement.date.date) for measurement in measurements[:10])
         data = {}
         keys = set()

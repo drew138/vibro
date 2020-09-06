@@ -172,8 +172,8 @@ class Segment(Graphs):
         # TODO check if queryset contains V
         graph_one = self.create_tendency_graph(query_instance, 'V')
         table_one = self.graph_table('MOTOR (Velocidad)', graph_one)
-        # graph_two = self.create_tendency_graph(query_instance, 'A')
-        # table_two = self.graph_table('MOTOR (Aceleracion)', graph_two)
+        graph_two = self.create_tendency_graph(query_instance, 'A')
+        table_two = self.graph_table('MOTOR (Aceleracion)', graph_two)
 
         ########## TODO NEEDS DEBUGGING ##############
         flowables = [
@@ -185,7 +185,8 @@ class Segment(Graphs):
                 [tendency_title,
                  table_one]),
             self.spacer_one,
-            # graph_two
+            KeepTogether(
+                [table_two]),
         ]
         #############################################
         # TODO add logic to create measurements tables and graphs
