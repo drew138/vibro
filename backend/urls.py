@@ -12,8 +12,9 @@ auth_views = [
     path('auth/user', views.UserAPI.as_view()),
     path('auth/reset', views.ResetAPI.as_view()),
     path('auth/change', views.ChangePassAPI.as_view()),
-    path('api/token/', TokenObtainPairView.as_view()),
-    path('api/token/refresh', TokenRefreshView.as_view())
+    path('auth/token/', TokenObtainPairView.as_view()),
+    path('auth/token/refresh', TokenRefreshView.as_view()),
+    path('rep', views.MockReport.as_view())
 ]
 
 router = routers.DefaultRouter()
@@ -29,5 +30,6 @@ router.register('tendency', views.TendencyView, 'tendency')
 router.register('espectra', views.EspectraView, 'espectra')
 router.register('timesignal', views.TimeSignalView, 'timesignal')
 router.register('report', views.ReportView, 'report')  # TODO needs testing
+
 
 urlpatterns = auth_views + router.urls

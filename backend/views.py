@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from . import models as custom_models
 from django.http import FileResponse
 from django.db.models import Q
-from .email import send_email
 from .report import Report
 from io import BytesIO
 
@@ -103,7 +102,7 @@ class RegisterAPI(generics.GenericAPIView):
             },
             'receiver': [user.email]
         }
-        send_email(email_data)  # send welcome email
+        user.send_email(email_data)  # send welcome email
         staff_users = [vibrouser.email for vibrouser in custom_models.VibroUser.objects.filter(
             is_staff=True).all()]
         staff_email = {
@@ -114,7 +113,7 @@ class RegisterAPI(generics.GenericAPIView):
             },
             'receiver': staff_users
         }
-        send_email(staff_email)  # send email to staff
+        user.send_email(staff_email)  # send email to staff
         refresh = RefreshToken.for_user(self.request.user)  # JWT token
         return Response({
             "user": custom_serializers.RegisterVibroUserSerializer(user,
@@ -147,7 +146,7 @@ class ResetAPI(generics.GenericAPIView):
                 },
                 'receiver': [user.email]
             }
-            send_email(email_data)
+            user.send_email(email_data)
         else:
             raise NotFound('user not found')
         return Response({"detail": f"an email has been sent to {user.email}"})
@@ -174,7 +173,7 @@ class ChangePassAPI(generics.UpdateAPIView):
             },
             'receiver': [user.email]
         }
-        send_email(email_data)
+        user.send_email(email_data)
         refresh = RefreshToken.for_user(user)
         return Response({
             "user": custom_serializers.ChangePassSerializer(user,
@@ -414,6 +413,24 @@ class ReportView(viewsets.ModelViewSet):
             buffer,
             as_attachment=True,
             filename=f'INFORME_PREDICTIVO_{company.upper()}.pdf')
+
+
+class MockReport(generics.GenericAPIView):
+
+    permission_classes = [ReportPermissions]
+
+    def get(self, request, format=None):
+        user = custom_models.VibroUser.objects.filter(
+            username='juliana').first()
+
+        queryset = custom_models.Measurement.objects.filter(severity='green')
+        buffer = BytesIO()
+        pdf = Report(buffer, queryset, user).build_doc()
+        buffer.seek(0)
+        print('hola')
+        return FileResponse(buffer, as_attachment=True,
+                            filename=f'INFORME_PREDICTIVO_empresa.pdf'
+                            )
 
 
 class TermoImageView(viewsets.ModelViewSet):

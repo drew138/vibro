@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 from django.contrib import admin
+from django.conf import settings
 from django.db import models
 
 
@@ -74,6 +77,19 @@ class VibroUser(AbstractUser):
 
     def __str__(self):
         return f'{self.username}/{self.first_name} {self.last_name}'
+
+    def send_email(self, data):
+        """
+        function to be used in a view to send emails.
+        """
+
+        template = render_to_string(data['template'], data['variables'])
+        sender = settings.EMAIL_HOST_USER
+        email = EmailMessage(data['subject'], template,
+                             sender, data['receiver'])
+        email.content_subtype = "html"
+        email.fail_silently = False
+        email.send()
 
 
 class Profile(models.Model):
