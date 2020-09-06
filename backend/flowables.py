@@ -11,6 +11,13 @@ import datetime
 import sys
 import os
 
+if (sys.platform == 'linux') or (sys.platform == 'linux2'):
+    registerFont(TTFont('Arial', 'Arial.ttf'))  # register arial fonts
+    registerFont(TTFont('Arial-Bold', 'Arial.ttf'))
+elif sys.platform == 'win32':
+    registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
+    registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
+
 
 # file location
 B_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,15 +25,6 @@ LOGO = os.path.join(B_DIR, 'static\\images\\logo.jpg')
 SKF = os.path.join(B_DIR, 'static\\images\\skf.jpg')
 DIAGRAM = os.path.join(B_DIR, 'static\\images\\numeration.png')
 ARROW = os.path.join(B_DIR, 'static\\images\\arrow.png')
-# register fonts
-if (sys.platform == 'linux') or (sys.platform == 'linux2'):
-    # register arial fonts
-    registerFont(TTFont('Arial', os.path.join(B_DIR, 'static', 'arial.ttf')))
-    registerFont(
-        TTFont('Arial-Bold', os.path.join(B_DIR, 'static', 'Arial.ttf')))
-elif sys.platform == 'win32':
-    registerFont(TTFont('Arial', 'ARIAL.ttf'))
-    registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 # datetime constants
 MONTHS = (
     'enero',
