@@ -422,14 +422,27 @@ class MockReport(generics.GenericAPIView):
     def get(self, request, format=None):
         user = custom_models.VibroUser.objects.filter(
             username='juliana').first()
+        admin = custom_models.VibroUser.objects.filter(
+            username='drew').first()
 
         queryset = custom_models.Measurement.objects.filter(severity='green')
         buffer = BytesIO()
         pdf = Report(buffer, queryset, user).build_doc()
         buffer.seek(0)
-        print('hola')
+        filename = f'INFORME_PREDICTIVO_empresa.pdf'
+        pred_mail = {
+            'subject': 'SOLICITUD INFORME PREDICTIVO',
+            'template': 'email/pred.html',
+            'variables': {
+                'user': user.username,
+            },
+            'receiver': [admin.email],  # cambiar a user
+            'file': buffer,
+            'filename': filename
+        }
+        admin.send_email(pred_mail)  # cambiar a user
         return FileResponse(buffer, as_attachment=True,
-                            filename=f'INFORME_PREDICTIVO_empresa.pdf'
+                            filename=filename
                             )
 
 

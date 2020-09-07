@@ -82,33 +82,33 @@ class Report(Segment):
 
 
 # moack data used for debugging
-class Profile:
-    def __init__(self):
-        self.certifications = 'Ing. de Servicios de Mantenimiento'
+# class Profile:
+#     def __init__(self):
+#         self.certifications = 'Ing. de Servicios de Mantenimiento'
 
 
-class Date:
-    def __init__(self):
-        self.date = 'date'
+# class Date:
+#     def __init__(self):
+#         self.date = 'date'
 
 
-class User:
-    def __init__(self):
-        self.company = 'some company'
-        self.email = 'person@email.com'
-        self.first_name = 'andres'
-        self.last_name = "asdasdasd"
-        self.profile = Profile()
+# class User:
+#     def __init__(self):
+#         self.company = 'some company'
+#         self.email = 'person@email.com'
+#         self.first_name = 'andres'
+#         self.last_name = "asdasdasd"
+#         self.profile = Profile()
 
 
-class QuerySet:
-    def __init__(self):
-        self.date = Date()
-        self.engineer_one = User()
-        self.engineer_two = User()
+# class QuerySet:
+#     def __init__(self):
+#         self.date = Date()
+#         self.engineer_one = User()
+#         self.engineer_two = User()
 
-    def first(self):
-        return self
+#     def first(self):
+#         return self
 
 
 # user = VibroUser.objects.filter(username='juliana').first()

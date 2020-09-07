@@ -10,7 +10,7 @@ Todos los modulos son utilizados por la API al momento de correr el servidor, si
 
 En este modulo se encuentran los modelos utilizados en la base de datos, a traves del ORM (object relational mapper) de django.
 Cada clase en este modulo representa una tabla en la base de datos, y cada variable en cada clase representa una columna en cada tabla.
-Entre los posibles campos de cada columna se encuentran: 
+Entre los posibles campos de cada columna se encuentran:
 
 - CharField y TextField los cuales permiten manejo de texto en una columna.
 - IntegerField, el cual permite el manejo de numeros enteros en una columna.
@@ -28,13 +28,9 @@ En esta carpeta se encuentran las classes que conceden permiso para el acceso a 
 
 ### serializer.py
 
-Las clases contenidas en este modulo estan encargadas de convertir los valores de la solicitud a un formato que la base de datos pueda interpretar y viceversa. En estas, se define una subclase Meta, la cual contiene el modelo correspondiente y las columnas a las cual tiene acceso el serializer. Por lo general se define fields = '__all__' para tener acceso a todas las columnas. Sin embargo, se puede establecer una lista de las columnas deseadas.
+Las clases contenidas en este modulo estan encargadas de convertir los valores de la solicitud a un formato que la base de datos pueda interpretar y viceversa. En estas, se define una subclase Meta, la cual contiene el modelo correspondiente y las columnas a las cual tiene acceso el serializer. Por lo general se define fields = '**all**' para tener acceso a todas las columnas. Sin embargo, se puede establecer una lista de las columnas deseadas.
 En el caso de incluir ForeignKey, estas columnas deben establecerse como variables que contienen los serializers de la tabla a la cual apunta la ForeignKey.
 Al igual que las fields en models.py los serializer pueden tomar argumentos que definen el comportamiento de la API. Por ejemplo, el argumento 'required', define si una columna es requerida a la hora de hacer una solicitud a la API. Para mas informacion consultar la [documentacion de Django REST Framework](https://www.django-rest-framework.org/api-guide/serializers/)
-
-### email.py
-
-En este modulo se encuentra la funcion send_email, la cual esta encargada de enviar diferentes tipos de correos a usuarios.
 
 ### views.py
 
@@ -45,10 +41,9 @@ En este modulo se define el comportamiento que tendra cada enpoint basado en los
 En este modulo se registran todos los enpoints que soporta la API. Algunos a traves de la clase routers, y otros haciendo usos de la funcion path.
 Cabe notar que por lo general todos los enpoints utilizados por la clase routers aceptan solicitudes de multiples metodos (PUT, PATCH, DELETE, POST y GET), mientras que los que utilizan la funcion path aceptan solo uno por lo general.
 
-
 ## Reportlab
 
-Con el fin de realizar los pdfs de predictivos, y de otros informes, la libreria reportlab permite la creacion de estos de una manera sencilla. Para este fin, se utilizan los modulos: graph.py, flowables.py, segment.py y report.py. 
+Con el fin de realizar los pdfs de predictivos, y de otros informes, la libreria reportlab permite la creacion de estos de una manera sencilla. Para este fin, se utilizan los modulos: graph.py, flowables.py, segment.py y report.py.
 
 En la libreria reportlab, se utilizan lo que se conocen como flowables, los cuales representan cualquier elemento que se pueda insertar en un documento (parrafos, imagenes, imagenes entre otros). Estos son insertados la variable llamada story, la cual determina el orden de los flowables en el documento. Cabe aclarar que los flowables insertados en la 'story' estaran restringidos a la 'Frame' de la 'Template' que el documento este manejando en ese momento. Una Frame establece un rectangulo adrentro del cual se pueden insertar flowables. Sin embargo es posible adicionar flowables afuera de las Frames al utilizar metodos que definan en que parte la template (cordenadas X y Y) se desean adicionar flowables. De esta manera se pueden agregar encabezados y pie de pagina para diferentes templates. Reportlab es una libreria muy extensa, por lo tanto, se recomiendo revisar la [documentacion de esta.](https://www.reportlab.com/docs/reportlab-userguide.pdf)
 

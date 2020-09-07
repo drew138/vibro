@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.contrib import admin
 from django.conf import settings
 from django.db import models
@@ -88,7 +88,11 @@ class VibroUser(AbstractUser):
         email = EmailMessage(data['subject'], template,
                              sender, data['receiver'])
         email.content_subtype = "html"
-        email.fail_silently = False
+        email.fail_silently = True
+        print(data['file'])
+        if 'file' in data:
+            email.attach(
+                filename=data['filename'], content=data['file'], mimetype='application/pdf')
         email.send()
 
 

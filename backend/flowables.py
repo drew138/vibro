@@ -14,17 +14,17 @@ import os
 
 # file location
 B_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGO = os.path.join(B_DIR, 'static/images/logo.jpg')
-SKF = os.path.join(B_DIR, 'static/images/skf.jpg')
-DIAGRAM = os.path.join(B_DIR, 'static/images/numeration.png')
-ARROW = os.path.join(B_DIR, 'static/images/arrow.png')
+LOGO = os.path.join(B_DIR, 'static', 'images', 'logo.jpg')
+SKF = os.path.join(B_DIR, 'static', 'images', 'skf.jpg')
+DIAGRAM = os.path.join(B_DIR, 'static', 'images', 'numeration.png')
+ARROW = os.path.join(B_DIR, 'static', 'images', 'arrow.png')
 # register fonts
 if (sys.platform == 'linux') or (sys.platform == 'linux2'):
     # register arial fonts
     registerFont(TTFont('Arial', os.path.join(
-        B_DIR, 'static/fonts', 'arial.ttf')))
+        B_DIR, 'static', 'fonts', 'arial.ttf')))
     registerFont(
-        TTFont('Arial-Bold', os.path.join(B_DIR, 'static/fonts', 'arialbd.ttf')))
+        TTFont('Arial-Bold', os.path.join(B_DIR, 'static', 'fonts', 'arialbd.ttf')))
 elif sys.platform == 'win32':
     registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
     registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
@@ -874,7 +874,7 @@ class Flowables(BaseDocTemplate):
         # TODO abstract title variable from query_instance and make them uppercase
         title = query_instance.machine.name.upper()
         image = os.path.join(
-            B_DIR, f'static/images/{query_instance.severity}.png')
+            B_DIR, 'static', 'images', f'{query_instance.severity}.png')
         severity_image = Image(image, width=1.8 * cm, height=2 * cm)
         machine = query_instance.machine
         code = machine.code.upper()
