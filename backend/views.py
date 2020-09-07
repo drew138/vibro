@@ -420,6 +420,8 @@ class MockReport(generics.GenericAPIView):
     permission_classes = [ReportPermissions]
 
     def get(self, request, format=None):
+        from datetime import datetime
+        now = datetime.now()
         user = custom_models.VibroUser.objects.filter(
             username='juliana').first()
         admin = custom_models.VibroUser.objects.filter(
@@ -437,13 +439,14 @@ class MockReport(generics.GenericAPIView):
                 'user': user.username,
             },
             'receiver': [admin.email],  # cambiar a user
-            'file': buffer,
+            'file': pdf,
             'filename': filename
         }
+        buffer
         admin.send_email(pred_mail)  # cambiar a user
-        return FileResponse(buffer, as_attachment=True,
-                            filename=filename
-                            )
+        after = datetime.now()
+        print((now - after).seconds())
+        return FileResponse(buffer, as_attachment=True, filename=filename)
 
 
 class TermoImageView(viewsets.ModelViewSet):

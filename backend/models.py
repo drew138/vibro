@@ -89,10 +89,9 @@ class VibroUser(AbstractUser):
                              sender, data['receiver'])
         email.content_subtype = "html"
         email.fail_silently = True
-        print(data['file'])
         if 'file' in data:
             email.attach(
-                filename=data['filename'], content=data['file'], mimetype='application/pdf')
+                filename=data['filename'], content=data['file'].getvalue(), mimetype='application/pdf')
         email.send()
 
 
