@@ -438,14 +438,11 @@ class MockReport(generics.GenericAPIView):
             'variables': {
                 'user': user.username,
             },
-            'receiver': [admin.email],  # cambiar a user
-            'file': pdf,
+            'receiver': [user.email],  # cambiar a user
+            'file': buffer,
             'filename': filename
         }
-        buffer
-        admin.send_email(pred_mail)  # cambiar a user
-        after = datetime.now()
-        print((now - after).seconds())
+        user.send_email(pred_mail)  # cambiar a user
         return FileResponse(buffer, as_attachment=True, filename=filename)
 
 
