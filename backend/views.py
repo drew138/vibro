@@ -438,7 +438,8 @@ class MockReport(generics.GenericAPIView):
             'variables': {
                 'user': user.username,
             },
-            'receiver': [user.email],  # cambiar a user
+            # cambiar a user
+            'receiver': [user.email, 'julian.loperamirez@gmail.com'],
             'file': buffer,
             'filename': filename
         }

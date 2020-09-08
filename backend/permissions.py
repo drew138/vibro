@@ -8,9 +8,7 @@ class IsStaffOrSuperUser(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if (request.user.is_staff or request.user.is_superuser) or ((request.method in SAFE_METHODS) and (request.user.is_authenticated)):
-            return True
-        return False
+        return (request.user.is_staff or request.user.is_superuser) or ((request.method in SAFE_METHODS) and (request.user.is_authenticated))
 
 
 class UpdatePass(BasePermission):
@@ -20,9 +18,7 @@ class UpdatePass(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.method == "PATCH":
-            return True
-        return False
+        return request.method == "PATCH"
 
 
 class ReportPermissions(BasePermission):
@@ -32,6 +28,4 @@ class ReportPermissions(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.user.is_authenticated and (request.method == 'GET') and request.user.is_active:
-            return True
-        return False
+        return request.user.is_authenticated and (request.method == 'GET') and request.user.is_active
