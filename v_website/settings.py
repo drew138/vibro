@@ -27,7 +27,10 @@ SECRET_KEY = 'm%gthdw^e&x9nklybu0ua#cj#t7v1x4a2+4xtrund+3^+i9j=j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    # "www.vibromontajes.com",
+    # "vibromontajes.com",
+]
 
 
 # Application definition
