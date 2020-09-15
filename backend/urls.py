@@ -1,6 +1,5 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-# from knox import views as knox_views
 from rest_framework import routers
 from . import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
