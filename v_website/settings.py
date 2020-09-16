@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 import os
 from datetime import timedelta
 
+load_dotenv()  # load environment variables
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,12 +23,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'm%gthdw^e&x9nklybu0ua#cj#t7v1x4a2+4xtrund+3^+i9j=j'
+
+SECRET_KEY = os.getenv('SECRET_KEY')  # TODO change .env key before production
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    # !Remove comments on production
     # "www.vibromontajes.com",
     # "vibromontajes.com",
 ]
@@ -112,10 +115,10 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'DATABASE NAME',
-#         'PASSWORD': 'PASSWORD',
-#         'HOST': 'localhost',
-#         'PORT': '5432'
+#         'NAME': os.getenv('DATABASE_NAME'),
+#         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+#         'HOST': os.getenv('DATABASE_HOST'),
+#         'PORT': os.getenv('DATABASE_PORT'),
 #     }
 # }
 
@@ -163,7 +166,7 @@ MEDIA_URL = '/media/'
 
 
 # SMTP configuration
-load_dotenv()
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
