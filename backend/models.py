@@ -75,24 +75,42 @@ class VibroUser(AbstractUser):
         choices=USER_CHOICES,
         default=CLIENT)
 
-    def __str__(self):
-        return f'{self.username}/{self.first_name} {self.last_name}'
+    def blur_email(self):
+        import math
+        email_string = self.email
+        indexat = self.email.index("@")
+        total_stars = math.floor(indexat * 0.4)
+        character_list = list()
+        for index, character in enumerate(email_string):
+            if total_stars < index < indexat:
+                character_list.append("*")
+            else:
+                character_list.append(character)
+        new_email = "".join(character_list)
+        return new_email
 
-    def send_email(self, data):
+    @staticmethod
+    def send_email(data):
         """
         function to be used in a view to send emails.
         """
 
         template = render_to_string(data['template'], data['variables'])
         sender = settings.EMAIL_HOST_USER
-        email = EmailMessage(data['subject'], template,
-                             sender, data['receiver'])
+        email = EmailMessage(
+            data['subject'],
+            template,
+            sender,
+            data['receiver'])
         email.content_subtype = "html"
         email.fail_silently = True
         if 'file' in data:
             email.attach(
                 filename=data['filename'], content=data['file'].getvalue(), mimetype='application/pdf')
         email.send()
+
+    def __str__(self):
+        return f'{self.username}/{self.first_name} {self.last_name}'
 
 
 class Profile(models.Model):
@@ -105,9 +123,6 @@ class Profile(models.Model):
         related_name='profile',
         on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.user.username
-
 
 class Machine(models.Model):
 
@@ -119,8 +134,8 @@ class Machine(models.Model):
     machine_type = models.CharField(max_length=50)  # TODO add machine types
     code = models.TextField(blank=True, null=True)
     transmission = models.TextField(blank=True, null=True)
-    brand = models.TextField(blank=True, null=True)
-    power = models.TextField(blank=True, null=True)
+    brand = models.IntegerField()
+    power = models.IntegerField()
     rpm = models.IntegerField(blank=True, null=True)
     company = models.ForeignKey(
         Company,
@@ -128,8 +143,14 @@ class Machine(models.Model):
         to_field="name",
         on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f'{self.name} - {self.company.name}'
+
+class Sensor(models.Model):
+    sensor_type = models.CharField(max_length=10)
+    sensitivity = models.IntegerField()
+    channel = models.IntegerField()
+    arduino = models.IntegerField()
+    machine = models.ForeignKey(
+        Machine, related_name="sensors", on_delete=models.SET_NULL)
 
 
 class Image(models.Model):
@@ -172,27 +193,106 @@ class Measurement(models.Model):
     GREEN = 'green'
     YELLOW = 'yellow'
     BLACK = 'black'
-    # measurement type
+    UNDEFINED = 'undefined'
+    # service type
     PRED = 'pred'
-    ESP = 'esp'
-    TER = 'ter'
+    CORR = 'corr'
+    ENG = 'eng'
+    MON = 'mon'
+    # measurement type
+    VIB = 'vib'
     ULT = 'ult'
-    AIR = 'air'
+    TER = 'ter'
+    POL = 'pol'
+    ACP = 'acp'
+    CRD = 'crd'
+    EGR = 'egr'
+    BAL = 'bal'
+    AYC = 'ayc'
+    ADC = 'adc'
+    TDB = 'tdb'
+    CMP = 'cmp'
+    ADR = 'adr'
+    CME = 'cme'
+    MES = 'mes'
+    SUM = 'sum'
+    # flaw types
+    BN = 'bn'
+    BAL = 'bal'
+    ALI = 'ali'
+    TEN = 'ten'
+    LUB = 'lub'
+    ROD = 'rod'
+    HOL = 'hol'
+    EXC = 'exc'
+    SOL = 'sol'
+    FRA = 'fra'
+    VAC = 'vac'
+    ELE = 'ele'
+    INS = 'ins'
+    OTR = 'otr'
+    EST = 'est'
+    RES = 'res'
+    NOM = 'nom'
+
+    FLAW_CHOICES = [
+        (BN, 'Bien'),
+        (BAL, 'Balanceo'),
+        (ALI, 'Alineacion'),
+        (TEN, 'Tension'),
+        (LUB, 'Lubricacion'),
+        (ROD, 'Rodamientos'),
+        (HOL, 'Holgura'),
+        (EXC, 'Excentricidad'),
+        (SOL, 'Soltura'),
+        (FRA, 'Fractura'),
+        (VAC, 'Vacio'),
+        (ELE, 'Electrico'),
+        (INS, 'Inspeccion'),
+        (OTR, 'Otro'),
+        (EST, 'Estructural'),
+        (RES, 'Resonancia'),
+        (NOM, 'No medido'),
+    ]
+
     SEVERITY_CHOICES = [
         (RED, 'Red'),
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
-        (BLACK, 'Black')
+        (BLACK, 'Black'),
+        (UNDEFINED, 'Undefined')
+    ]
+    SERVICE_CHOICES = [
+        (PRED, 'Predictivo'),
+        (CORR, 'Correctivo'),
+        (ENG, 'Ingenieria'),
+        (MON, 'Monitoreo en Linea'),
     ]
     MEASUREMENT_CHOICES = [
-        (PRED, 'Predictivo'),
-        (ESP, 'Especial'),
-        (TER, 'Termografía'),
         (ULT, 'Ultrasonido'),
-        (AIR, 'Aire y Cauldal')
+        (TER, 'Termografia'),
+        (VIB, 'Vibracion'),
+        (ADC, 'Analisis de Aceite'),
+        (POL, 'Alineacion Laser Polea'),
+        (TDB, 'Tencion de Bandas'),
+        (CMP, 'Correccion Montajes Poleas'),
+        (ACP, 'Alineacion Laser Acople'),
+        (CRD, 'Alineacion Laser Cardan'),
+        (EGR, 'Alineacion Engranes'),
+        (ADR, 'Alineacion Rodamientos'),
+        (BAL, 'Balanceo'),
+        (CME, 'Chequeo Mecanico'),
+        (MES, 'Medicion Especial'),
+        (AYC, 'Aire y Caudal'),
+        (SUM, 'Suministro')
     ]
+    flaw = models.CharField(
+        max_length=3, choices=FLAW_CHOICES, default=OTR
+    )
     severity = models.CharField(
-        max_length=6, choices=SEVERITY_CHOICES, default=BLACK)
+        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
+    severity_flaw = models.CharField(
+        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
     date = models.ForeignKey(
         Date,
         related_name="measurements",
@@ -204,8 +304,12 @@ class Measurement(models.Model):
     revised = models.BooleanField(default=False)
     resolved = models.BooleanField(default=False)
     measurement_type = models.CharField(
-        max_length=10,
+        max_length=3,
         choices=MEASUREMENT_CHOICES,
+        default=VIB)
+    service = models.CharField(
+        max_length=4,
+        choices=SERVICE_CHOICES,
         default=PRED)
     machine = models.ForeignKey(
         Machine,
@@ -218,6 +322,12 @@ class Measurement(models.Model):
         blank=True,
         null=True)
     engineer_two = models.ForeignKey(
+        VibroUser,
+        related_name="measurements_two",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
+    analyst = models.ForeignKey(
         VibroUser,
         related_name="measurements_two",
         on_delete=models.SET_NULL,
@@ -256,6 +366,7 @@ class Point(models.Model):
     DEZ = 'D'  # Desplazamiento
     ENV = 'E'  # Envolvente
     HFD = 'H'  # HFD
+    TEMP = 'T'
 
     POSITION_CHOICES = [(VER, 'Vertical'), (HOR, 'Horizontal'), (AX, 'Axial')]
     TYPE_CHOICES = [
@@ -263,7 +374,8 @@ class Point(models.Model):
         (ACC, 'Acceleration'),
         (DEZ, 'Displacement'),
         (ENV, 'Envol'),
-        (HFD, 'HFD')
+        (HFD, 'HFD'),
+        (TEMP, 'Temperature')
     ]
 
     number = models.IntegerField()

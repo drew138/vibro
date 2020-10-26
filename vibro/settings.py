@@ -10,14 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-from dotenv import load_dotenv
+
 import os
 from datetime import timedelta
 
-load_dotenv()  # load environment variables
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
+if DEBUG:
+    from dotenv import load_dotenv
+    load_dotenv()  # load environment variables
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -26,8 +30,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY')  # TODO change .env key before production
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = [
     # !Remove comments on production
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
     'frontend',
     'backend',
     'corsheaders',
+    'storages',
 ]
 
 AUTH_USER_MODEL = 'backend.VibroUser'
@@ -80,7 +83,7 @@ MIDDLEWARE = [
 #     "http://localhost:8080",
 # ]
 
-ROOT_URLCONF = 'v_website.urls'
+ROOT_URLCONF = 'vibro.urls'
 
 TEMPLATES = [
     {
@@ -98,7 +101,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'v_website.wsgi.application'
+WSGI_APPLICATION = 'vibro.wsgi.application'
 
 
 # Database
@@ -121,7 +124,7 @@ DATABASES = {
 #         'PORT': os.getenv('DATABASE_PORT'),
 #     }
 # }
-
+# https://stackoverflow.com/questions/11618898/pg-config-executable-not-found
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -158,6 +161,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+
+# AWS_ACCESS_KEY_ID = os.getenv()  # 'your-spaces-access-key'
+# AWS_SECRET_ACCESS_KEY = os.getenv()  # 'your-spaces-secret-access-key'
+# AWS_STORAGE_BUCKET_NAME = os.getenv()  # 'your-storage-bucket-name'
+# AWS_S3_ENDPOINT_URL = os.getenv()  # 'https://nyc3.digitaloceanspaces.com'
+# AWS_S3_OBJECT_PARAMETERS = {
+#     'CacheControl': 'max-age=86400',
+# }
+# AWS_LOCATION = os.getenv()  # 'your-spaces-files-folder'
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'backend/static'),
+# ]
+# STATIC_URL = os.getenv()  # 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+# STATICFILES_STORAGE = os.getenv()  # 'storages.backends.s3boto3.S3Boto3Storage'
+
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -170,6 +189,16 @@ MEDIA_URL = '/media/'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
 EMAIL_HOST_USER = os.getenv('EMAIL_USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
+
+
+# Celery Configuration
+
+CELERY_BROKER_URL = ''
+
+CELERY_ACCEPT_CONTENT = ''
+CELERY_TASK_SERIALIZER = ''
+# https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html

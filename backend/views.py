@@ -6,9 +6,9 @@ from . import serializers as custom_serializers
 from rest_framework.response import Response
 from . import models as custom_models
 from django.http import FileResponse
-from django.db.models import Q
 from .report import Report
 from io import BytesIO
+import jwt
 
 
 class CityView(viewsets.ModelViewSet):
@@ -116,8 +116,9 @@ class RegisterAPI(generics.GenericAPIView):
         user.send_email(staff_email)  # send email to staff
         refresh = RefreshToken.for_user(self.request.user)  # JWT token
         return Response({
-            "user": custom_serializers.RegisterVibroUserSerializer(user,
-                                                                   context=self.get_serializer_context()).data,
+            "user": custom_serializers.RegisterVibroUserSerializer(
+                user,
+                context=self.get_serializer_context()).data,
             "refresh": str(refresh),
             "access": str(refresh.access_token)
         })
@@ -148,8 +149,8 @@ class ResetAPI(generics.GenericAPIView):
             }
             user.send_email(email_data)
         else:
-            raise NotFound('user not found')
-        return Response({"detail": f"an email has been sent to {user.email}"})
+            raise NotFound('usuario no encontrado')
+        return Response({"detail": f"un correo de recuperacion ha sido enviado a la cuenta {user.blur_email()}"})
 
 
 # Change Password API
@@ -161,6 +162,7 @@ class ChangePassAPI(generics.UpdateAPIView):
 
     serializer_class = custom_serializers.ChangePassSerializer
 
+    # TODO
     def patch(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -176,8 +178,9 @@ class ChangePassAPI(generics.UpdateAPIView):
         user.send_email(email_data)
         refresh = RefreshToken.for_user(user)
         return Response({
-            "user": custom_serializers.ChangePassSerializer(user,
-                                                            context=self.get_serializer_context()).data,
+            "user": custom_serializers.ChangePassSerializer(
+                user,
+                context=self.get_serializer_context()).data,
             "refresh": str(refresh),
             'access': str(refresh.access_token)
         })
@@ -202,7 +205,7 @@ class ProfileView(viewsets.ModelViewSet):
         name = self.request.query_params.get('name', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.profile.all().first()
+            queryset = self.request.user.profile.first()
             return queryset
         else:
             queryset = custom_models.Profile.objects.all()
@@ -237,7 +240,8 @@ class MachineView(viewsets.ModelViewSet):
         company = self.request.query_params.get('company', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company.machines.all()
+            queryset = custom_models.Machine.filter(
+                company__user=self.request.user)
         else:
             queryset = custom_models.Machine.objects.all()
         if machine_id is not None:
@@ -279,10 +283,8 @@ class ImageView(viewsets.ModelViewSet):
         machine = self.request.query_params.get('machine', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            queryset = custom_models.Image.objects.filter(q_objects)
+            queryset = custom_models.Image.objects.filter(
+                machine__company__user=self.request.user)
         else:
             queryset = custom_models.Image.objects.all()
         if image_id is not None:
@@ -309,7 +311,8 @@ class DateView(viewsets.ModelViewSet):
         date = self.request.query_params.get('date', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company.dates.all()
+            queryset = custom_models.Date.filter(
+                company__user=self.request.user)
         else:
             queryset = custom_models.Date.objects.all()
         if date_id is not None:
@@ -345,13 +348,9 @@ class MeasurementView(viewsets.ModelViewSet):
         machine = self.request.query_params.get('machine', None)
         engineer_one = self.request.query_params.get('engineer_one', None)
         engineer_two = self.request.query_params.get('engineer_two', None)
-
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            queryset = custom_models.Measurement.objects.filter(
-                q_objects)
+            queryset = custom_models.Measurement.filter(
+                machine__company__user=self.request.user)
         else:
             queryset = custom_models.Measurement.objects.all()
         if measurement_id is not None:
@@ -392,14 +391,11 @@ class ReportView(viewsets.ModelViewSet):
         if request.user.is_staff or request.user.is_superuser:
             if company is None:
                 raise ValidationError('field company must be provided')
-            queryset = custom_models.Measurement.objects.filter(
+            queryset = custom_models.Measurement.filter(
                 company__id=company)
         else:
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            queryset = custom_models.Measurement.objects.filter(
-                q_objects)
+            queryset = custom_models.Measurement.filter(
+                machine__company__user=self.request.user)
         if date is not None:
             queryset = queryset.filter(date__id=date)
         else:
@@ -409,6 +405,19 @@ class ReportView(viewsets.ModelViewSet):
         pdf = Report(buffer, queryset, self.request.user)
         pdf.build_doc()
         buffer.seek(0)
+        filename = f'INFORME_PREDICTIVO_{company.upper()}_{date}.pdf'
+        pred_mail = {
+            'subject': 'SOLICITUD INFORME PREDICTIVO',
+            'template': 'email/pred.html',
+            'variables': {
+                'user': self.request.user.username,
+            },
+            # cambiar a user
+            'receiver': [self.request.user.email],
+            'file': buffer,
+            'filename': filename
+        }
+        self.request.user.send_email(pred_mail)  # cambiar a user
         return FileResponse(
             buffer,
             as_attachment=True,
@@ -465,16 +474,8 @@ class TermoImageView(viewsets.ModelViewSet):
         measurement = self.request.query_params.get('measurement', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(
-                q_objects)
-            q_objects_t_image = Q()
-            for me in measurements:
-                q_objects_t_image |= Q(measurement=me)
             queryset = custom_models.TermoImage.objects.filter(
-                q_objects_t_image)
+                measurement__machine__company__user=self.request.user)
         else:
             queryset = custom_models.TermoImage.objects.all()
         if termo_iamge_id is not None:
@@ -507,16 +508,8 @@ class PointView(viewsets.ModelViewSet):
         measurement = self.request.query_params.get('measurement', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(
-                q_objects)
-            q_objects_measurement = Q()
-            for me in measurements:
-                q_objects_measurement |= Q(measurement=me)
             queryset = custom_models.Point.objects.filter(
-                q_objects_measurement)
+                measurement__machine__company__user=self.request.user)
         else:
             queryset = custom_models.Point.objects.all()
         if point_id is not None:
@@ -547,23 +540,9 @@ class TendencyView(viewsets.ModelViewSet):
         tendency_id = self.request.query_params.get('id', None)
         point = self.request.query_params.get('point', None)
         value = self.request.query_params.get('value', None)
-
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(
-                q_objects)
-            q_objects_measurement = Q()
-            for me in measurements:
-                q_objects_measurement |= Q(measurement=me)
-            points = custom_models.Point.objects.filter(
-                q_objects_measurement)
-            q_objects_point = Q()
-            for p in points:
-                q_objects_point |= Q(point=p)
             queryset = custom_models.Tendency.objects.filter(
-                q_objects_point)
+                point__measurement__machines__company__user=self.request.user)
         else:
             queryset = custom_models.Tendency.objects.all()
         if tendency_id is not None:
@@ -593,21 +572,8 @@ class EspectraView(viewsets.ModelViewSet):
         value = self.request.query_params.get('value', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(
-                q_objects)
-            q_objects_measurement = Q()
-            for me in measurements:
-                q_objects_measurement |= Q(measurement=me)
-            points = custom_models.Point.objects.filter(
-                q_objects_measurement)
-            q_objects_point = Q()
-            for p in points:
-                q_objects_point |= Q(point=p)
             queryset = custom_models.Espectra.objects.filter(
-                q_objects_point)
+                point__measurement__machine__company__user=self.request.user)
         else:
             queryset = custom_models.Espectra.objects.all()
         if espectra_id is not None:
@@ -639,21 +605,8 @@ class TimeSignalView(viewsets.ModelViewSet):
         value = self.request.query_params.get('value', None)
 
         if not (self.request.user.is_staff or self.request.user.is_superuser):
-            q_objects = Q()
-            for m in self.request.user.company.machines.all():
-                q_objects |= Q(machine=m)
-            measurements = custom_models.Measurement.objects.filter(
-                q_objects)
-            q_objects_measurement = Q()
-            for me in measurements:
-                q_objects_measurement |= Q(measurement=me)
-            points = custom_models.Point.objects.filter(
-                q_objects_measurement)
-            q_objects_point = Q()
-            for p in points:
-                q_objects_point |= Q(point=p)
             queryset = custom_models.TimeSignal.objects.filter(
-                q_objects_point)
+                point__measurement__machine__company__user=self.request.user)
         else:
             queryset = custom_models.TimeSignal.objects.all()
         if signal_id is not None:

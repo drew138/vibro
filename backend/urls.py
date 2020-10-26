@@ -13,7 +13,7 @@ auth_views = [
     path('auth/change', views.ChangePassAPI.as_view()),
     path('auth/token/', TokenObtainPairView.as_view()),
     path('auth/token/refresh', TokenRefreshView.as_view()),
-    path('rep', views.MockReport.as_view())
+    # path('rep', views.MockReport.as_view())
 ]
 
 router = routers.DefaultRouter()
