@@ -1,8 +1,8 @@
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.admin import UserAdmin
 from .models import VibroUser
 from django import forms
 
+# !Delete file
 
 ADDTIONAL_USER_FIELDS = (
     (None, {'fields': ('company', 'phone', 'ext',

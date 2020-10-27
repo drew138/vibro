@@ -1,7 +1,7 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
 from .flowables import STANDARD_CENTER
 from .segment import Segment
-from .models import VibroUser, Measurement
+from backend.models import VibroUser, Measurement
 
 
 class Report(Segment):

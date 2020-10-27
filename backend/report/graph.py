@@ -2,7 +2,7 @@ from reportlab.lib.colors import black, Color
 from .flowables import Flowables, TABLE_BLUE
 from reportlab.platypus.tables import Table
 from reportlab.platypus import TableStyle
-from .import models as custom_models
+from backend import models as custom_models
 import matplotlib.dates as mpl_dates
 from reportlab.lib.units import cm
 import matplotlib.pyplot as plt

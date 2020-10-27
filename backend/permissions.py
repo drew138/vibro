@@ -19,7 +19,7 @@ class UpdatePass(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.method == "PATCH"
+        return request.method == "PUT"
 
 
 class ReportPermissions(BasePermission):

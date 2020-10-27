@@ -150,7 +150,7 @@ class Sensor(models.Model):
     channel = models.IntegerField()
     arduino = models.IntegerField()
     machine = models.ForeignKey(
-        Machine, related_name="sensors", on_delete=models.SET_NULL)
+        Machine, related_name="sensors", on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class Image(models.Model):
@@ -329,13 +329,10 @@ class Measurement(models.Model):
         null=True)
     analyst = models.ForeignKey(
         VibroUser,
-        related_name="measurements_two",
+        related_name="measurements_three",
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
-
-    def __str__(self):
-        return f'{self.date} - {self.machine.name} - {self.machine.company.name}'
 
 
 class TermoImage(models.Model):

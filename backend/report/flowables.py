@@ -10,24 +10,20 @@ from reportlab.lib.units import cm
 import datetime
 import sys
 import os
-
+# from django.config.settings import STATIC_URL
 
 # file location
-B_DIR = os.path.dirname(os.path.abspath(__file__))
+B_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGO = os.path.join(B_DIR, 'static', 'images', 'logo.jpg')
 SKF = os.path.join(B_DIR, 'static', 'images', 'skf.jpg')
 DIAGRAM = os.path.join(B_DIR, 'static', 'images', 'numeration.png')
 ARROW = os.path.join(B_DIR, 'static', 'images', 'arrow.png')
 # register fonts
-if (sys.platform == 'linux') or (sys.platform == 'linux2'):
-    # register arial fonts
-    registerFont(TTFont('Arial', os.path.join(
-        B_DIR, 'static', 'fonts', 'arial.ttf')))
-    registerFont(
-        TTFont('Arial-Bold', os.path.join(B_DIR, 'static', 'fonts', 'arialbd.ttf')))
-elif sys.platform == 'win32':
-    registerFont(TTFont('Arial', 'ARIAL.ttf'))  # register arial fonts
-    registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
+registerFont(TTFont('Arial', os.path.join(
+    B_DIR, 'static', 'fonts', 'arial.ttf')))
+registerFont(
+    TTFont('Arial-Bold', os.path.join(B_DIR, 'static', 'fonts', 'arialbd.ttf')))
+
 
 # datetime constants
 MONTHS = (

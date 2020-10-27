@@ -1,8 +1,8 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path, include
-from rest_framework import routers
-from . import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.contrib.auth import views as auth_views
+from rest_framework import routers
+from django.urls import path
+from . import views
 
 
 # TODO test endpoints
@@ -11,8 +11,8 @@ auth_views = [
     path('auth/user', views.UserAPI.as_view()),
     path('auth/reset', views.ResetAPI.as_view()),
     path('auth/change', views.ChangePassAPI.as_view()),
-    path('auth/token/', TokenObtainPairView.as_view()),
-    path('auth/token/refresh', TokenRefreshView.as_view()),
+    path('auth/login/', TokenObtainPairView.as_view()),
+    path('auth/token/refresh/', TokenRefreshView.as_view()),
     # path('rep', views.MockReport.as_view())
 ]
 

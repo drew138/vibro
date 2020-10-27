@@ -31,6 +31,9 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'company',
+            'user_type',
+            'is_staff',
+            'is_superuser'
         ]
 
 
@@ -79,24 +82,15 @@ class ResetSerializer(serializers.Serializer):
 # Change Password Serializer
 class ChangePassSerializer(serializers.Serializer):
 
-    username = serializers.CharField(required=False)
+    model = custom_models.VibroUser
+    password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
 
-    class Meta:
-        model = custom_models.VibroUser
-        fields = ['username', 'password']
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
-    def update(self, instance, password):
+class ForgotPassSeriazliaer(serializers.Serializer):
 
-        if password == None:
-            raise serializers.ValidationError(
-                'argument password must be provided')
-        elif len(password) < 7:
-            raise serializers.ValidationError(
-                'password must be 8 characters minimum')
-        instance.set_password(password)
-        instance.save()
-        return instance
+    model = custom_models.VibroUser
+    password = serializers.CharField(required=True)
 
 
 class ProfileSerializer(serializers.ModelSerializer):

@@ -165,17 +165,41 @@ USE_TZ = True
 # AWS_ACCESS_KEY_ID = os.getenv()  # 'your-spaces-access-key'
 # AWS_SECRET_ACCESS_KEY = os.getenv()  # 'your-spaces-secret-access-key'
 # AWS_STORAGE_BUCKET_NAME = os.getenv()  # 'your-storage-bucket-name'
-# AWS_S3_ENDPOINT_URL = os.getenv()  # 'https://nyc3.digitaloceanspaces.com'
+# AWS_S3_ENDPOINT_URL = os.getenv() 'https://nyc3.digitaloceanspaces.com'
 # AWS_S3_OBJECT_PARAMETERS = {
 #     'CacheControl': 'max-age=86400',
 # }
 # AWS_LOCATION = os.getenv()  # 'your-spaces-files-folder'
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'backend/static'),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'backend/static'),
+]
 # STATIC_URL = os.getenv()  # 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
 # STATICFILES_STORAGE = os.getenv()  # 'storages.backends.s3boto3.S3Boto3Storage'
+
+#################################
+# AWS_ACCESS_KEY_ID = '<your_key>'
+# AWS_SECRET_ACCESS_KEY = '<your_secret_key>'
+
+# AWS_STORAGE_BUCKET_NAME = '<your_space_name>'
+# AWS_S3_ENDPOINT_URL = '<your_endpoint_url>'
+# # I enabled the CDN, so you get a custom domain. Use the end point in the AWS_S3_CUSTOM_DOMAIN setting.
+# AWS_S3_CUSTOM_DOMAIN = '<your_custom_domain_url>'
+# AWS_S3_OBJECT_PARAMETERS = {
+#     'CacheControl': 'max-age=86400',
+# }
+
+# AWS_DEFAULT_ACL = 'public-read'
+
+# STATICFILES_STORAGE = 'custom_storages.StaticStorage'
+# DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
+
+# # Use AWS_S3_ENDPOINT_URL here if you haven't enabled the CDN and got a custom domain.
+# STATIC_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, 'static')
+# STATIC_ROOT = 'static/'
+
+# MEDIA_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, 'media')
+# MEDIA_ROOT = 'media/'
 
 STATIC_URL = '/static/'
 
@@ -189,8 +213,8 @@ MEDIA_URL = '/media/'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.getenv('EMAIL_USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
@@ -199,6 +223,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 CELERY_BROKER_URL = ''
 
-CELERY_ACCEPT_CONTENT = ''
-CELERY_TASK_SERIALIZER = ''
+CELERY_ACCEPT_CONTENT = ['json']
+
+CELERY_TASK_SERIALIZER = 'json'
 # https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
