@@ -12,7 +12,7 @@ class City(models.Model):
     class Meta:
         unique_together = ["name", "state"]
 
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=30)
     state = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
@@ -29,14 +29,12 @@ class Company(models.Model):
     city = models.ForeignKey(
         City,
         related_name='company',
-        to_field="name",
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
     rut_city = models.ForeignKey(
         City,
         related_name='ruts',
-        to_field="name",
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
@@ -127,7 +125,8 @@ class Profile(models.Model):
 
 class Hierarchy(models.Model):
     name = models.CharField(max_length=30, default='Nombre')
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL)
+    parent = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(
         Company,
         related_name="hierarchies",
@@ -176,7 +175,7 @@ class Machine(models.Model):
         max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
     norm = models.TextField()
     hierarchy = models.ForeignKey(
-        Hierarchy, related_name="machines", on_delete=models.SET_NULL)
+        Hierarchy, related_name="machines", on_delete=models.SET_NULL, blank=True, null=True)
 
     machine_type = models.CharField(max_length=50)  # TODO add machine types
     transmission = models.TextField(blank=True, null=True)
@@ -192,7 +191,7 @@ class Sensor(models.Model):
     )
 
     sensor_type = models.CharField(
-        max_length=9, chocies=SENSOR_CHOICES, default=VIBRACION)
+        max_length=9, choices=SENSOR_CHOICES, default=VIBRACION)
     sensitivity = models.IntegerField()
     channel = models.IntegerField()
     arduino = models.IntegerField()
@@ -201,7 +200,74 @@ class Sensor(models.Model):
 
 
 class Gear(models.Model):
-    pass
+    # gear type
+    MOTOR_ELECTRICO = 'Motor Eléctrico'
+    MOTOR_DIESEL = 'Motor Diesel'
+    VENTILADOR = 'Ventilador'
+    BOMBA = 'Bombda'
+    COMPRESOR = 'Compresor'
+    GENERADOR_SOPLADOR = 'Generador Soplador'
+    MOLINO = 'Molino'
+    PELET = 'Pelet'
+    ZARANDA = 'Zaranda'
+    ESTRUCTURA = 'Estructura'
+    EXTRUSORA = 'Extrusora'
+    REDUCTORA = 'Reductora'
+
+    GEAR_TYPE_CHOICES = (
+        (MOTOR_ELECTRICO, 'Motor Eléctrico'),
+        (MOTOR_DIESEL, 'Motor Diesel'),
+        (VENTILADOR,  'Ventilador'),
+        (BOMBA, 'Bombda'),
+        (COMPRESOR, 'Compresor'),
+        (GENERADOR_SOPLADOR, 'Generador Soplador'),
+        (MOLINO, 'Molino'),
+        (PELET, 'Pelet'),
+        (ZARANDA, 'Zaranda'),
+        (ESTRUCTURA, 'Estructura'),
+        (EXTRUSORA, 'Extrusora'),
+        (REDUCTORA, 'Reductora'),
+    )
+
+    # support types
+    RIGIDO = 'Rigido'
+    FLEXIBLE = 'Flexible'
+    SUPPORT_CHOICES = (
+        (RIGIDO, 'Rigido'),
+        (FLEXIBLE, 'Flexible'),
+    )
+
+    # transmission types
+    FLEXIBLES = 'Flexibles'
+    ENGRANAJE = 'Engranaje'
+    CADENA = 'Cadena'
+    REJILLA = 'Rejilla'
+    MORFLEX = 'Morflex'
+    PARAFLEX = 'Paraflex'
+    ARAÑA = 'Araña'
+    PASADOR = 'Pasador'
+    LAMINILLA = 'Laminilla'
+    RIGIDO = 'Rigido'
+    TRANSMISSION_CHOICES = (
+        (FLEXIBLES, 'Flexibles'),
+        (ENGRANAJE, 'Engranaje'),
+        (CADENA, 'Cadena'),
+        (REJILLA, 'Rejilla'),
+        (MORFLEX, 'Morflex'),
+        (PARAFLEX, 'Paraflex'),
+        (ARAÑA, 'Araña'),
+        (PASADOR, 'Pasador'),
+        (LAMINILLA, 'Laminilla'),
+        (RIGIDO, 'Rigido'),
+    )
+
+    gear_type = models.CharField(
+        max_length=20, choices=GEAR_TYPE_CHOICES, default="N/A")
+    num_axis = models.IntegerField()  # ! required? or can count on request?
+    support = models.CharField(
+        max_length=10, choices=SUPPORT_CHOICES, default='N/A')
+    transmission = models.CharField(
+        max_length=12, choices=TRANSMISSION_CHOICES, default="N/A")
 
 
 class Axis(models.Model):  # eje
@@ -345,10 +411,18 @@ class Measurement(models.Model):
         (SUM, 'Suministro')
     ]
 
-    severity = models.CharField(
-        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
-    severity_flaw = models.CharField(
-        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
+    service = models.CharField(
+        max_length=4,
+        choices=SERVICE_CHOICES,
+        default=PRED)
+    measurement_type = models.CharField(
+        max_length=3,
+        choices=MEASUREMENT_CHOICES,
+        default=VIB)
+    machine = models.ForeignKey(
+        Machine,
+        related_name="measurements",
+        on_delete=models.CASCADE)
     date = models.ForeignKey(
         Date,
         related_name="measurements",
@@ -356,21 +430,9 @@ class Measurement(models.Model):
         blank=True,
         null=True)
     analysis = models.TextField()
-    recomendation = models.TextField()
-    revised = models.BooleanField(default=False)
-    resolved = models.BooleanField(default=False)
-    measurement_type = models.CharField(
-        max_length=3,
-        choices=MEASUREMENT_CHOICES,
-        default=VIB)
-    service = models.CharField(
-        max_length=4,
-        choices=SERVICE_CHOICES,
-        default=PRED)
-    machine = models.ForeignKey(
-        Machine,
-        related_name="measurements",
-        on_delete=models.CASCADE)
+    diagnostic = models.TextField()
+    severity = models.CharField(
+        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
     engineer_one = models.ForeignKey(
         VibroUser,
         related_name="measurements",
@@ -389,6 +451,10 @@ class Measurement(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
+    revised = models.BooleanField(default=False)
+    resolved = models.BooleanField(default=False)
+    prev_changes = models.TextField()
+    prev_changs_date = models.DateField(null=True, blank=True)
 
 
 class Flaw(models.Model):
