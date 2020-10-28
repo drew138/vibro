@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.db.models.fields import related
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage, send_mail
 from django.contrib import admin
@@ -124,33 +125,126 @@ class Profile(models.Model):
         on_delete=models.CASCADE)
 
 
+class Hierarchy(models.Model):
+    name = models.CharField(max_length=30, default='Nombre')
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL)
+    company = models.ForeignKey(
+        Company,
+        related_name="hierarchies",
+        on_delete=models.CASCADE)
+
+
 class Machine(models.Model):
 
     class Meta:
         unique_together = ["name", "machine_type", "company"]
 
+    SAP = 'sap'
+    INTERNO = 'int'
+    CODE_CHOICES = (
+        (SAP, 'Sap'),
+        (INTERNO, 'Interno'),
+    )
+
+    DIRECTA = 'dir'
+    VARIADOR = 'var'
+    ELECTRIC_FEED_CHOICES = (
+        (DIRECTA, 'Directa'),
+        (VARIADOR, 'Variador'),
+    )
+
+    KW = 'kW'
+    HP = 'HP'
+    POWER_UNIT_CHOICES = (
+        (KW, 'KiloWatts'),
+        (HP, 'HorsePower'),
+    )
+
     identifier = models.IntegerField(blank=True, null=True)
-    name = models.CharField(max_length=50)
-    machine_type = models.CharField(max_length=50)  # TODO add machine types
-    code = models.TextField(blank=True, null=True)
-    transmission = models.TextField(blank=True, null=True)
-    brand = models.IntegerField()
-    power = models.IntegerField()
-    rpm = models.IntegerField(blank=True, null=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
-        to_field="name",
         on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    code = models.CharField(
+        max_length=3, choices=CODE_CHOICES, blank=True, null=True)
+    electric_feed = models.CharField(
+        max_length=3, choices=CODE_CHOICES, blank=True, null=True)
+    brand = models.IntegerField()
+    power = models.IntegerField()
+    power_units = models.CharField(
+        max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
+    norm = models.TextField()
+    hierarchy = models.ForeignKey(
+        Hierarchy, related_name="machines", on_delete=models.SET_NULL)
+
+    machine_type = models.CharField(max_length=50)  # TODO add machine types
+    transmission = models.TextField(blank=True, null=True)
+    rpm = models.IntegerField(blank=True, null=True)
 
 
 class Sensor(models.Model):
-    sensor_type = models.CharField(max_length=10)
+    VIBRACION = 'Vibración'
+    DUAL = 'Dual'
+    SENSOR_CHOICES = (
+        (VIBRACION, 'Vibración'),
+        (DUAL, 'Dual'),
+    )
+
+    sensor_type = models.CharField(
+        max_length=9, chocies=SENSOR_CHOICES, default=VIBRACION)
     sensitivity = models.IntegerField()
     channel = models.IntegerField()
     arduino = models.IntegerField()
     machine = models.ForeignKey(
-        Machine, related_name="sensors", on_delete=models.SET_NULL, null=True, blank=True)
+        Machine, related_name="sensor", on_delete=models.SET_NULL, null=True, blank=True)
+
+
+class Gear(models.Model):
+    pass
+
+
+class Axis(models.Model):  # eje
+
+    DESLIZAMIENTO = 'Dezlizamiento'
+    RODAMIENTO = 'Rodamiento'
+    TYPE_CHOICES = (
+        (DESLIZAMIENTO, 'Dezlizamiento'),
+        (RODAMIENTO, 'Rodamiento'),
+    )
+
+    RPM = 'rpm'
+    HZ = 'Hz'
+    UNITS_CHOICES = (
+        (RPM, 'rpm'),
+        (HZ, 'Hz'),
+    )
+
+    type_axis = models.CharField(
+        max_length=13, choices=TYPE_CHOICES, default='Undefined')
+    units = models.CharField(max_length=3, choices=UNITS_CHOICES, default=RPM)
+
+
+class Bearing(models.Model):  # cojinetes
+
+    NA = 'N/A'
+    BPFI = 'BPFI'
+    BPFO = 'BPFO'
+    BSF = 'BSF'
+    FTF = 'FTF'
+    FREQUENCY_CHOICES = (
+        (NA, 'N/A'),
+        (BPFI, 'BPFI'),
+        (BPFO, 'BPFO'),
+        (BSF, 'BSF'),
+        (FTF, 'FTF'),
+    )
+
+    reference = models.CharField(max_length=30, default='N/A')
+    frequency = models.CharField(
+        max_length=4, choices=FREQUENCY_CHOICES, default='N/A')
+    axis = models.ForeignKey(
+        Axis, related_name='bearing', on_delete=models.CASCADE)
 
 
 class Image(models.Model):
@@ -194,11 +288,13 @@ class Measurement(models.Model):
     YELLOW = 'yellow'
     BLACK = 'black'
     UNDEFINED = 'undefined'
+
     # service type
     PRED = 'pred'
     CORR = 'corr'
     ENG = 'eng'
     MON = 'mon'
+
     # measurement type
     VIB = 'vib'
     ULT = 'ult'
@@ -216,44 +312,6 @@ class Measurement(models.Model):
     CME = 'cme'
     MES = 'mes'
     SUM = 'sum'
-    # flaw types
-    BN = 'bn'
-    BAL = 'bal'
-    ALI = 'ali'
-    TEN = 'ten'
-    LUB = 'lub'
-    ROD = 'rod'
-    HOL = 'hol'
-    EXC = 'exc'
-    SOL = 'sol'
-    FRA = 'fra'
-    VAC = 'vac'
-    ELE = 'ele'
-    INS = 'ins'
-    OTR = 'otr'
-    EST = 'est'
-    RES = 'res'
-    NOM = 'nom'
-
-    FLAW_CHOICES = [
-        (BN, 'Bien'),
-        (BAL, 'Balanceo'),
-        (ALI, 'Alineacion'),
-        (TEN, 'Tension'),
-        (LUB, 'Lubricacion'),
-        (ROD, 'Rodamientos'),
-        (HOL, 'Holgura'),
-        (EXC, 'Excentricidad'),
-        (SOL, 'Soltura'),
-        (FRA, 'Fractura'),
-        (VAC, 'Vacio'),
-        (ELE, 'Electrico'),
-        (INS, 'Inspeccion'),
-        (OTR, 'Otro'),
-        (EST, 'Estructural'),
-        (RES, 'Resonancia'),
-        (NOM, 'No medido'),
-    ]
 
     SEVERITY_CHOICES = [
         (RED, 'Red'),
@@ -286,9 +344,7 @@ class Measurement(models.Model):
         (AYC, 'Aire y Caudal'),
         (SUM, 'Suministro')
     ]
-    flaw = models.CharField(
-        max_length=3, choices=FLAW_CHOICES, default=OTR
-    )
+
     severity = models.CharField(
         max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
     severity_flaw = models.CharField(
@@ -333,6 +389,70 @@ class Measurement(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
+
+
+class Flaw(models.Model):
+    # severity
+    RED = "red"
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    BLACK = 'black'
+    UNDEFINED = 'undefined'
+
+    # severity
+    SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+        (UNDEFINED, 'Undefined')
+    ]
+
+    # flaw types
+    BN = 'bn'
+    BAL = 'bal'
+    ALI = 'ali'
+    TEN = 'ten'
+    LUB = 'lub'
+    ROD = 'rod'
+    HOL = 'hol'
+    EXC = 'exc'
+    SOL = 'sol'
+    FRA = 'fra'
+    VAC = 'vac'
+    ELE = 'ele'
+    INS = 'ins'
+    OTR = 'otr'
+    EST = 'est'
+    RES = 'res'
+    NOM = 'nom'
+
+    FLAW_CHOICES = [
+        (BN, 'Bien'),
+        (BAL, 'Balanceo'),
+        (ALI, 'Alineacion'),
+        (TEN, 'Tension'),
+        (LUB, 'Lubricacion'),
+        (ROD, 'Rodamientos'),
+        (HOL, 'Holgura'),
+        (EXC, 'Excentricidad'),
+        (SOL, 'Soltura'),
+        (FRA, 'Fractura'),
+        (VAC, 'Vacio'),
+        (ELE, 'Electrico'),
+        (INS, 'Inspeccion'),
+        (OTR, 'Otro'),
+        (EST, 'Estructural'),
+        (RES, 'Resonancia'),
+        (NOM, 'No medido'),
+    ]
+
+    measurement = models.ForeignKey(
+        Measurement, related_name="flaw", on_delete=models.CASCADE)
+    flaw_type = models.CharField(
+        max_length=3, choices=FLAW_CHOICES, default=OTR)
+    severity = models.CharField(
+        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
 
 
 class TermoImage(models.Model):
