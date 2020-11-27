@@ -1,5 +1,4 @@
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.contrib.auth import views as auth_views
 from rest_framework import routers
 from django.urls import path
 from . import views
@@ -25,9 +24,6 @@ router.register('date', views.DateView, 'date')
 router.register('measurement', views.MeasurementView, 'measurement')
 router.register('termal', views.TermoImageView, 'termal')
 router.register('point', views.PointView, 'point')
-router.register('tendency', views.TendencyView, 'tendency')
-router.register('espectra', views.EspectraView, 'espectra')
-router.register('timesignal', views.TimeSignalView, 'timesignal')
 router.register('report', views.ReportView, 'report')  # TODO needs testing
 
 
