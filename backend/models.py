@@ -1,8 +1,7 @@
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractUser
-from django.db.models.fields import related
 from django.template.loader import render_to_string
-from django.core.mail import EmailMessage, send_mail
-from django.contrib import admin
+from django.core.mail import EmailMessage
 from django.conf import settings
 from django.db import models
 
@@ -14,9 +13,6 @@ class City(models.Model):
 
     name = models.CharField(max_length=30)
     state = models.CharField(max_length=30, blank=True, null=True)
-
-    def __str__(self):
-        return f'city {self.name} of state {self.state}'
 
 
 class Company(models.Model):
@@ -38,9 +34,6 @@ class Company(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class VibroUser(AbstractUser):
@@ -76,12 +69,11 @@ class VibroUser(AbstractUser):
 
     def blur_email(self):
         import math
-        email_string = self.email
         indexat = self.email.index("@")
         total_stars = math.floor(indexat * 0.4)
         character_list = list()
-        for index, character in enumerate(email_string):
-            if total_stars < index < indexat:
+        for index, character in enumerate(self.email):
+            if total_stars < index:
                 character_list.append("*")
             else:
                 character_list.append(character)
@@ -169,11 +161,11 @@ class Machine(models.Model):
         max_length=3, choices=CODE_CHOICES, blank=True, null=True)
     electric_feed = models.CharField(
         max_length=3, choices=CODE_CHOICES, blank=True, null=True)
-    brand = models.IntegerField()
-    power = models.IntegerField()
+    brand = models.TextField(blank=True, null=True)
+    power = models.IntegerField(default=0)
     power_units = models.CharField(
         max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
-    norm = models.TextField()
+    norm = models.TextField(null=True, blank=True)
     hierarchy = models.ForeignKey(
         Hierarchy, related_name="machines", on_delete=models.SET_NULL, blank=True, null=True)
 
@@ -199,7 +191,7 @@ class Sensor(models.Model):
         Machine, related_name="sensor", on_delete=models.SET_NULL, null=True, blank=True)
 
 
-class Gear(models.Model):
+class Gear(models.Model):  # equipo
     # gear type
     MOTOR_ELECTRICO = 'Motor Eléctrico'
     MOTOR_DIESEL = 'Motor Diesel'
@@ -453,11 +445,11 @@ class Measurement(models.Model):
         null=True)
     revised = models.BooleanField(default=False)
     resolved = models.BooleanField(default=False)
-    prev_changes = models.TextField()
+    prev_changes = models.TextField(null=True, blank=True)
     prev_changs_date = models.DateField(null=True, blank=True)
 
 
-class Flaw(models.Model):
+class Flaw(models.Model):  # falla
     # severity
     RED = "red"
     GREEN = 'green'
@@ -570,27 +562,11 @@ class Point(models.Model):
         Measurement,
         related_name="points",
         on_delete=models.CASCADE)
+    tendency = models.DecimalField(decimal_places=2, max_digits=4, default=0)
+    espectra = ArrayField(models.DecimalField(
+        decimal_places=2, max_digits=4), default=list)
+    time_signal = ArrayField(models.DecimalField(
+        decimal_places=2, max_digits=4), default=list)
 
     def __str__(self):
         return f'{self.number}{self.position}{self.point_type}'
-
-
-class Tendency(models.Model):
-
-    value = models.DecimalField(decimal_places=2, max_digits=4)
-    point = models.OneToOneField(
-        Point, related_name='tendency', on_delete=models.CASCADE, primary_key=True)
-
-
-class Espectra(models.Model):
-
-    identifier = models.IntegerField()
-    point = models.ForeignKey(Point, on_delete=models.CASCADE)
-    value = models.DecimalField(decimal_places=2, max_digits=4)
-
-
-class TimeSignal(models.Model):
-
-    identifier = models.IntegerField()
-    point = models.ForeignKey(Point, on_delete=models.CASCADE)
-    value = models.DecimalField(decimal_places=2, max_digits=4)

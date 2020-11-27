@@ -154,30 +154,3 @@ class PointSerializer(serializers.ModelSerializer):
     class Meta:
         model = custom_models.Point
         fields = '__all__'
-
-
-class TendencySerializer(serializers.ModelSerializer):
-
-    point = PointSerializer()
-
-    class Meta:
-        model = custom_models.Tendency
-        fields = '__all__'
-
-
-class EspectraSerializer(serializers.ModelSerializer):
-
-    point = PointSerializer()
-
-    class Meta:
-        model = custom_models.Espectra
-        fields = '__all__'
-
-
-class TimeSignalSerializer(serializers.ModelSerializer):
-
-    point = PointSerializer()
-
-    class Meta:
-        model = custom_models.TimeSignal
-        fields = '__all__'
