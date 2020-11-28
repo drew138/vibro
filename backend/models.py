@@ -1,8 +1,5 @@
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractUser
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
-from django.conf import settings
 from django.db import models
 
 
@@ -69,39 +66,12 @@ class VibroUser(AbstractUser):
 
     def blur_email(self):
         import math
-        indexat = self.email.index("@")
-        total_stars = math.floor(indexat * 0.4)
-        character_list = list()
-        for index, character in enumerate(self.email):
-            if total_stars < index:
-                character_list.append("*")
-            else:
-                character_list.append(character)
-        new_email = "".join(character_list)
+        indexat = math.floor(self.email.index("@") * 0.4)
+        new_email = self.email[:indexat] + ("*" * (len(self.email) - indexat))
         return new_email
 
-    @staticmethod
-    def send_email(data):
-        """
-        function to be used in a view to send emails.
-        """
-
-        template = render_to_string(data['template'], data['variables'])
-        sender = settings.EMAIL_HOST_USER
-        email = EmailMessage(
-            data['subject'],
-            template,
-            sender,
-            data['receiver'])
-        email.content_subtype = "html"
-        email.fail_silently = True
-        if 'file' in data:
-            email.attach(
-                filename=data['filename'], content=data['file'].getvalue(), mimetype='application/pdf')
-        email.send()
-
     def __str__(self):
-        return f'{self.username}/{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name}'
 
 
 class Profile(models.Model):
