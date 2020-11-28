@@ -5,10 +5,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from . import serializers as custom_serializers
 from rest_framework.response import Response
 from . import models as custom_models
-from django.http import FileResponse
 from rest_framework import status
-from .report.report import Report
-from io import BytesIO
+from .tasks import send_email
+
 import jwt
 from django.contrib.auth.password_validation import validate_password
 
@@ -93,14 +92,13 @@ class RegisterAPI(generics.GenericAPIView):
     serializer_class = custom_serializers.RegisterVibroUserSerializer
 
     @staticmethod
-    def define_email(user):
+    def get_email_data(user):
         return {
             'subject': 'Bienvenido! - Vibromontajes',
             'template': 'email/welcome.html',
             'variables': {
                 'user': user.first_name,
-            },
-            'receiver': [user.email]
+            }
         }
 
     @staticmethod
@@ -120,7 +118,7 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        # user.send_email(self.define_email(user)) #! remove comment
+        # user.send_email(self.get_email_data(user)) #! remove comment
         # user.send_email(user)  # send email to staff #! do we want to allow users to assign a company for themselves?
         refresh = RefreshToken.for_user(self.request.user)
         return Response({
@@ -138,7 +136,7 @@ class ResetAPI(generics.GenericAPIView):
     serializer_class = custom_serializers.ResetSerializer
 
     @staticmethod
-    def define_email(request, user, refresh):
+    def get_email_data(request, user, refresh):
         return {
             'subject': 'Cambio de Contraseña - Vibromontajes',
             'template': 'email/password_reset.html',
@@ -147,8 +145,7 @@ class ResetAPI(generics.GenericAPIView):
                 'host': request.get_host(),
                 'username': user.username,
                 'token': str(refresh.access_token)
-            },
-            'receiver': [user.email]
+            }
         }
 
     def post(self, request, *args, **kwargs):
@@ -174,14 +171,13 @@ class ChangePassAPI(generics.UpdateAPIView):
     serializer_class = custom_serializers.ChangePassSerializer
 
     @staticmethod
-    def define_email(user):
+    def get_email_data(user):
         return {
             'subject': 'Cambio de Contraseña - Vibromontajes',
             'template': 'email/successful_change.html',
             'variables': {
                 'user': user.username,
-            },
-            'receiver': [user.email]
+            }
         }
 
     def update(self, request, *args, **kwargs):
@@ -196,7 +192,7 @@ class ChangePassAPI(generics.UpdateAPIView):
                 return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("new_password"))
             user.save()
-            # user.send_email(self.define_email(user))
+            # user.send_email(self.get_email_data(user))
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -220,14 +216,13 @@ class ForgotPassAPI(generics.UpdateAPIView):
     serializer_class = custom_serializers.ForgotPassSeriazliaer
 
     @staticmethod
-    def define_email(user):
+    def get_email_data(user):
         return {
             'subject': 'Cambio de Contraseña - Vibromontajes',
             'template': 'email/successful_change.html',
             'variables': {
                 'user': user.username,
-            },
-            'receiver': [user.email]
+            }
         }
 
     def update(self, request, *args, **kwargs):
@@ -240,7 +235,7 @@ class ForgotPassAPI(generics.UpdateAPIView):
                 return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("password"))
             user.save()
-            # user.send_email(self.define_email(user))
+            # user.send_email(self.get_email_data(user))
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -450,17 +445,13 @@ class ReportView(viewsets.ModelViewSet):
     permission_classes = [ReportPermissions]
 
     @staticmethod
-    def define_email(user, buffer, filename):
+    def get_email_data(user):
         return {
             'subject': 'SOLICITUD INFORME PREDICTIVO',
             'template': 'email/pred.html',
             'variables': {
                 'user': user.username,
-            },
-            # cambiar a user
-            'receiver': [user.email],
-            'file': buffer,
-            'filename': filename
+            }
         }
 
     def get(self, request):
@@ -482,18 +473,13 @@ class ReportView(viewsets.ModelViewSet):
         else:
             raise ValidationError('field date must be provided')
         queryset = queryset.order_by('machine__machine_type')
-        if queryset.exists():
-            return Response({"Error": "Reporte No Encontrado"}, status=status.HTTP_404_NOT_FOUND)
-        buffer = BytesIO()
-        pdf = Report(buffer, queryset, user)
-        pdf.build_doc()
-        buffer.seek(0)
-        filename = f'INFORME_PREDICTIVO_{company.upper()}_{date}.pdf'
-        self.request.user.send_email(user, buffer, filename)  # cambiar a user
-        return FileResponse(
-            buffer,
-            as_attachment=True,
-            filename=f'INFORME_PREDICTIVO_{company.upper()}.pdf')
+        if not queryset.exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        user = self.request.user
+        data = self.get_email_data(user)
+        send_email.delay(data, user, queryset=queryset, date=date)
+        return Response(status=status.HTTP_200_OK)
 
 
 # class MockReport(generics.GenericAPIView):

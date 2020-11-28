@@ -13,4 +13,4 @@ class TestVibroUser(TestCase):
     def test_blur_email(self):
         self.assertEqual(
             self.user.blur_email(),
-            'rando****************')
+            'rand*****************')
