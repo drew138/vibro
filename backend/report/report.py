@@ -7,8 +7,8 @@ from backend.models import VibroUser, Measurement
 class Report(Segment):
 
     """
-    class that calls methods to 
-    combine different segments 
+    class that calls methods to
+    combine different segments
     of the pdf.
     """
 
@@ -22,7 +22,7 @@ class Report(Segment):
 
     def write_preds(self):
         """
-        calls create_pred for all 
+        calls create_pred for all
         measurements in query instance.
         """
 
@@ -43,8 +43,8 @@ class Report(Segment):
 
     def build_doc(self):
         """
-        call write_pdf method to 
-        build all segments of the 
+        call write_pdf method to
+        build all segments of the
         pdf to then build report.
         """
 

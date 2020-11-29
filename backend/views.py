@@ -1,5 +1,6 @@
-from rest_framework.exceptions import ValidationError, NotAuthenticated, NotFound
-from .permissions import IsStaffOrSuperUser, UpdatePass, ReportPermissions
+from .permissions import IsStaffOrSuperUser, CanUpdatePass, CanGenerateReport, IsArduinoNode
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework import viewsets, generics, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from . import serializers as custom_serializers
@@ -7,9 +8,7 @@ from rest_framework.response import Response
 from . import models as custom_models
 from rest_framework import status
 from .tasks import send_email
-
 import jwt
-from django.contrib.auth.password_validation import validate_password
 
 
 class CityView(viewsets.ModelViewSet):
@@ -83,6 +82,10 @@ class UserAPI(generics.RetrieveAPIView):
     serializer_class = custom_serializers.VibroUserSerializer
 
     def get_object(self):
+        """
+        get user object
+        """
+
         return self.request.user
 
 
@@ -93,6 +96,11 @@ class RegisterAPI(generics.GenericAPIView):
 
     @staticmethod
     def get_email_data(user):
+        """
+        return object with relevant data to 
+        be used in send_email function.
+        """
+
         return {
             'subject': 'Bienvenido! - Vibromontajes',
             'template': 'email/welcome.html',
@@ -101,25 +109,16 @@ class RegisterAPI(generics.GenericAPIView):
             }
         }
 
-    @staticmethod
-    def define_internal_email(user):
-        staff_users = [vibrouser.email for vibrouser in custom_models.VibroUser.objects.filter(
-            is_staff=True).all()]
-        return {
-            'subject': 'ACTIVACIÓN DE CUENTA - NUEVO USUARIO',
-            'template': 'email/new_user.html',
-            'variables': {
-                'user': user.first_name,
-            },
-            'receiver': staff_users
-        }
-
     def post(self, request, *args, **kwargs):
+        """
+        create a new user and respond accoringly to user.
+        """
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        # user.send_email(self.get_email_data(user)) #! remove comment
-        # user.send_email(user)  # send email to staff #! do we want to allow users to assign a company for themselves?
+        data = self.get_email_data(user)
+        send_email.delay(data, user)
         refresh = RefreshToken.for_user(self.request.user)
         return Response({
             "user": custom_serializers.VibroUserSerializer(
@@ -137,6 +136,11 @@ class ResetAPI(generics.GenericAPIView):
 
     @staticmethod
     def get_email_data(request, user, refresh):
+        """
+        return object with relevant data to 
+        be used in send_email function.
+        """
+
         return {
             'subject': 'Cambio de Contraseña - Vibromontajes',
             'template': 'email/password_reset.html',
@@ -149,13 +153,19 @@ class ResetAPI(generics.GenericAPIView):
         }
 
     def post(self, request, *args, **kwargs):
+        """
+        confirm existence of user, generate jwt 
+        for recovery and respond to user accordingly.
+        """
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = custom_models.VibroUser.objects.filter(
             email=request.data['email']).first()
         if user.exists():
             refresh = RefreshToken.for_user(user)
-            user.send_email(request, user, refresh)
+            data = self.get_email_data(request, user, refresh)
+            send_email.delay(data, user)
         else:
             raise NotFound('usuario no encontrado')
         return Response({"detail": f"un correo de recuperacion ha sido enviado a la cuenta {user.blur_email()}"})
@@ -165,13 +175,18 @@ class ResetAPI(generics.GenericAPIView):
 class ChangePassAPI(generics.UpdateAPIView):
 
     permission_classes = [
-        permissions.IsAuthenticated & UpdatePass
+        permissions.IsAuthenticated & CanUpdatePass
     ]
 
     serializer_class = custom_serializers.ChangePassSerializer
 
     @staticmethod
     def get_email_data(user):
+        """
+        return object with relevant data to 
+        be used in send_email function.
+        """
+
         return {
             'subject': 'Cambio de Contraseña - Vibromontajes',
             'template': 'email/successful_change.html',
@@ -181,6 +196,10 @@ class ChangePassAPI(generics.UpdateAPIView):
         }
 
     def update(self, request, *args, **kwargs):
+        """
+        Change password of user granted they know their previous password.
+        """
+
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             if not self.get_object().check_password(serializer.data.get("password")):
@@ -192,7 +211,8 @@ class ChangePassAPI(generics.UpdateAPIView):
                 return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("new_password"))
             user.save()
-            # user.send_email(self.get_email_data(user))
+            data = self.get_email_data(user)
+            send_email.delay(data, user)
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -204,19 +224,28 @@ class ChangePassAPI(generics.UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_object(self):
+        """
+        get user object
+        """
+
         return self.request.user
 
 
 class ForgotPassAPI(generics.UpdateAPIView):
 
     permission_classes = [
-        permissions.IsAuthenticated & UpdatePass
+        permissions.IsAuthenticated & CanUpdatePass
     ]
 
     serializer_class = custom_serializers.ForgotPassSeriazliaer
 
     @staticmethod
     def get_email_data(user):
+        """
+        return object with relevant data to 
+        be used in send_email function.
+        """
+
         return {
             'subject': 'Cambio de Contraseña - Vibromontajes',
             'template': 'email/successful_change.html',
@@ -226,8 +255,12 @@ class ForgotPassAPI(generics.UpdateAPIView):
         }
 
     def update(self, request, *args, **kwargs):
+        """
+        Change password of user provided they have forgotten their password.
+        """
+
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = self.get_object()
             try:
                 validate_password(serializer.data.get("new_password"))
@@ -235,7 +268,8 @@ class ForgotPassAPI(generics.UpdateAPIView):
                 return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("password"))
             user.save()
-            # user.send_email(self.get_email_data(user))
+            data = self.get_email_data(user)
+            send_email.delay(data, user)
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -243,10 +277,16 @@ class ForgotPassAPI(generics.UpdateAPIView):
                     context=self.get_serializer_context()).data,
                 "refresh": str(refresh),
                 'access': str(refresh.access_token)
-            })
+            },
+                status=status.HTTP_200_OK
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_object(self):
+        """
+        get user object
+        """
+
         return self.request.user
 
 
@@ -442,7 +482,7 @@ class MeasurementView(viewsets.ModelViewSet):
 # TODO
 class ReportView(viewsets.ModelViewSet):
 
-    permission_classes = [ReportPermissions]
+    permission_classes = [CanGenerateReport]
 
     @staticmethod
     def get_email_data(user):
@@ -474,7 +514,7 @@ class ReportView(viewsets.ModelViewSet):
             raise ValidationError('field date must be provided')
         queryset = queryset.order_by('machine__machine_type')
         if not queryset.exists():
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise NotFound("Reporte no encontrado")
 
         user = self.request.user
         data = self.get_email_data(user)

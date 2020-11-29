@@ -13,7 +13,8 @@ import os
 # from django.config.settings import STATIC_URL
 
 # file location
-B_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+B_DIR = os.path.dirname(os.path.dirname(  # ! TODO needs to point to digitalocean
+    os.path.dirname(os.path.abspath(__file__))))
 LOGO = os.path.join(B_DIR, 'static', 'images', 'logo.jpg')
 SKF = os.path.join(B_DIR, 'static', 'images', 'skf.jpg')
 DIAGRAM = os.path.join(B_DIR, 'static', 'images', 'numeration.png')
@@ -355,7 +356,7 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def create_signature_line(string):
         """
-        return a paragraph flowable 
+        return a paragraph flowable
         with STANDARD style.
         """
         return Paragraph(string, style=STANDARD)
@@ -363,7 +364,7 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def create_signature_name(string):
         """
-        return a paragraph flowable 
+        return a paragraph flowable
         with BLACK_BOLD style.
         """
         return Paragraph(string, style=BLACK_BOLD)
@@ -786,7 +787,7 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def create_summary_title():
         """
-        return first title in the 
+        return first title in the
         summmary segment.
         """
 
@@ -796,8 +797,8 @@ class Flowables(BaseDocTemplate):
 
     def extend_sumary_table_data(self, data, styles, query_instance):
         """
-        extend data and style lists of the 
-        create_summary_table method according 
+        extend data and style lists of the
+        create_summary_table method according
         to the query instance.
         """
 
@@ -805,7 +806,7 @@ class Flowables(BaseDocTemplate):
 
     def create_summary_table(self, query_instance):
         """
-        create information table of a set 
+        create information table of a set
         of machines in the summary segment.
         """
 
@@ -843,7 +844,7 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def create_second_summary_title():
         """
-        return second title in 
+        return second title in
         summary segment.
         """
 
@@ -994,7 +995,7 @@ class Flowables(BaseDocTemplate):
     @staticmethod
     def create_graph_table_title(string):
         """
-        returns Paragraph flowable for the text in the 
+        returns Paragraph flowable for the text in the
         """
 
         return Paragraph(string, style=BLACK_BOLD_CENTER)
