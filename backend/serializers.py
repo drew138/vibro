@@ -87,6 +87,7 @@ class ChangePassSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
+# Change Password Serializer
 class ForgotPassSeriazliaer(serializers.Serializer):
 
     model = custom_models.VibroUser
@@ -111,6 +112,51 @@ class MachineSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SensorSerializer(serializers.ModelSerializer):
+
+    machine = MachineSerializer()
+
+    class Meta:
+        model = custom_models.Sensor
+        fields = "__all__"
+
+
+class GearSerializer(serializers.ModelSerializer):
+
+    machine = MachineSerializer()
+
+    class Meta:
+        model = custom_models.Gear
+        fields = "__all__"
+
+
+class AxisSerializer(serializers.ModelSerializer):
+
+    gear = GearSerializer()
+
+    class Meta:
+        model = custom_models.Axis
+        fields = '__all__'
+
+
+class BearingSerializer(serializers.ModelSerializer):
+
+    axis = AxisSerializer()
+
+    class Meta:
+        model = custom_models.Bearing
+        fields = '__all__'
+
+
+class CouplingSerializer(serializers.ModelSerializer):
+
+    gear = GearSerializer()
+
+    class Meta:
+        model = custom_models.Coupling
+        feilds = '__all__'
+
+
 class ImageSerializer(serializers.ModelSerializer):
 
     machine = MachineSerializer()
@@ -132,9 +178,22 @@ class DateSerializer(serializers.ModelSerializer):
 class MeasurementSerializer(serializers.ModelSerializer):
 
     machine = MachineSerializer()
+    engineer_one = VibroUserSerializer()
+    engineer_two = VibroUserSerializer()
+    analyst = VibroUserSerializer()
+    certifier = VibroUserSerializer()
 
     class Meta:
         model = custom_models.Measurement
+        fields = '__all__'
+
+
+class FlawSerializer(serializers.ModelSerializer):
+
+    measurement = MeasurementSerializer()
+
+    class Meta:
+        model = custom_models.Flaw
         fields = '__all__'
 
 

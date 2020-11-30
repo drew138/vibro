@@ -151,55 +151,31 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-
-# AWS_ACCESS_KEY_ID = os.getenv()  # 'your-spaces-access-key'
-# AWS_SECRET_ACCESS_KEY = os.getenv()  # 'your-spaces-secret-access-key'
-# AWS_STORAGE_BUCKET_NAME = os.getenv()  # 'your-storage-bucket-name'
-# AWS_S3_ENDPOINT_URL = os.getenv() 'https://nyc3.digitaloceanspaces.com'
-# AWS_S3_OBJECT_PARAMETERS = {
-#     'CacheControl': 'max-age=86400',
-# }
-# AWS_LOCATION = os.getenv()  # 'your-spaces-files-folder'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'backend/static'),
-]
-# STATIC_URL = os.getenv()  # 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
-# STATICFILES_STORAGE = os.getenv()  # 'storages.backends.s3boto3.S3Boto3Storage'
-
-#################################
-# AWS_ACCESS_KEY_ID = '<your_key>'
-# AWS_SECRET_ACCESS_KEY = '<your_secret_key>'
-
-# AWS_STORAGE_BUCKET_NAME = '<your_space_name>'
-# AWS_S3_ENDPOINT_URL = '<your_endpoint_url>'
-# # I enabled the CDN, so you get a custom domain. Use the end point in the AWS_S3_CUSTOM_DOMAIN setting.
-# AWS_S3_CUSTOM_DOMAIN = '<your_custom_domain_url>'
-# AWS_S3_OBJECT_PARAMETERS = {
-#     'CacheControl': 'max-age=86400',
-# }
-
-# AWS_DEFAULT_ACL = 'public-read'
-
-# STATICFILES_STORAGE = 'custom_storages.StaticStorage'
-# DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
-
-# # Use AWS_S3_ENDPOINT_URL here if you haven't enabled the CDN and got a custom domain.
-# STATIC_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, 'static')
-# STATIC_ROOT = 'static/'
-
-# MEDIA_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, 'media')
-# MEDIA_ROOT = 'media/'
-
 STATIC_URL = '/static/'
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
 MEDIA_URL = '/media/'
+STATIC_ROOT = 'static/'
+MEDIA_ROOT = "static/media/"
+
+if not DEBUG:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = "nyc3"
+    AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com'
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+    AWS_LOCATION = os.getenv("AWS_LOCATION")
+
+    AWS_IS_GZIPPED = True
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_S3_FILE_OVERWRITE = False
+    STATIC_URL = f'{AWS_S3_ENDPOINT_URL}/static/'
+    MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/media/'
 
 
 # SMTP configuration

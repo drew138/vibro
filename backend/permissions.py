@@ -12,7 +12,7 @@ class IsStaffOrSuperUser(BasePermission):
         return (request.user.is_staff or request.user.is_superuser) or ((request.method in SAFE_METHODS) and (request.user.is_authenticated))
 
 
-class UpdatePass(BasePermission):
+class CanUpdatePass(BasePermission):
 
     """
     Allow only PATCH methods.
@@ -22,7 +22,7 @@ class UpdatePass(BasePermission):
         return request.method == "PUT"
 
 
-class ReportPermissions(BasePermission):
+class CanGenerateReport(BasePermission):
 
     """
     allow access to Report endpoint.
@@ -32,7 +32,8 @@ class ReportPermissions(BasePermission):
         return request.user.is_authenticated and (request.method == 'GET') and request.user.is_active
 
 
-class ArduinoPermission(BasePermission):
+# TODO  finsih permission and create unit test
+class IsArduinoNode(BasePermission):
 
     "Identify Requests from Arduino"
 

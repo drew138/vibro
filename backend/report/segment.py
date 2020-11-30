@@ -9,7 +9,7 @@ class Segment(Graphs):
 
     """
     class containing methods that perform
-    complex operations to define the 
+    complex operations to define the
     structure of a segment of the document
     """
 
@@ -195,7 +195,7 @@ class Segment(Graphs):
 
     def create_pred(self, query_instance):
         """
-        creates a measurement segment 
+        creates a measurement segment
         for measurement instance.
         """
 

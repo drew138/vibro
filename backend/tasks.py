@@ -1,6 +1,6 @@
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-from .report.report import Report
+# from .report.report import Report
 from django.conf import settings
 from celery import shared_task
 from io import BytesIO
