@@ -140,21 +140,25 @@ class Flowables(BaseDocTemplate):
         self.leftMargin = 1.6 * cm
         self.bottomMargin = 2 * cm
         self.templates = [
-            PageTemplate(id='letter',
-                         frames=[MACHINE_FRAME],
-                         onPage=self._header_three,
-                         onPageEnd=self._footer),
-            PageTemplate(id='measurement',
-                         frames=[MACHINE_FRAME],
-                         onPage=self._header_one,
-                         onPageEnd=self._footer),
-            PageTemplate(id='measurement_two',
-                         frames=[STANDARD_FRAME],
-                         onPage=self._header_two,
-                         onPageEnd=self._footer),
-            PageTemplate(id='normal',
-                         frames=[STANDARD_FRAME],
-                         onPage=self._header_two),
+            PageTemplate(
+                id='letter',
+                frames=[MACHINE_FRAME],
+                onPage=self._header_three,
+                onPageEnd=self._footer),
+            PageTemplate(
+                id='measurement',
+                frames=[MACHINE_FRAME],
+                onPage=self._header_one,
+                onPageEnd=self._footer),
+            PageTemplate(
+                id='measurement_two',
+                frames=[STANDARD_FRAME],
+                onPage=self._header_two,
+                onPageEnd=self._footer),
+            PageTemplate(
+                id='normal',
+                frames=[STANDARD_FRAME],
+                onPage=self._header_two),
         ]
         self.addPageTemplates(self.templates)
 
@@ -379,11 +383,11 @@ class Flowables(BaseDocTemplate):
         self.create_signature_name
         line = '_'*36
         first_engineer_full_name = f"""{self.engineer_one.first_name}
-         {self.engineer_one.last_name}""".upper()  # space inbetween string
+        {self.engineer_one.last_name}""".upper()  # space inbetween string
 
         if self.engineer_two:
             second_engineer_name = f"""{self.engineer_two.first_name}
-             {self.engineer_two.last_name}""".upper()
+            {self.engineer_two.last_name}""".upper()
             data = [
                 [
                     self.create_signature_line(line),
@@ -1030,8 +1034,9 @@ class Flowables(BaseDocTemplate):
         tendency graphs.
         """
 
-        return Paragraph('GRAFICAS TENDENCIAS (En el Tiempo)',
-                         style=STANDARD_CENTER)
+        return Paragraph(
+            'GRAFICAS TENDENCIAS (En el Tiempo)',
+            style=STANDARD_CENTER)
 
     @staticmethod
     def create_espectra_title():
@@ -1041,8 +1046,9 @@ class Flowables(BaseDocTemplate):
         tendency graphs.
         """
 
-        return Paragraph('GRAFICAS ESPECTROS',
-                         style=STANDARD_CENTER)
+        return Paragraph(
+            'GRAFICAS ESPECTROS',
+            style=STANDARD_CENTER)
 
     @staticmethod
     def create_time_signal_title():
@@ -1052,5 +1058,6 @@ class Flowables(BaseDocTemplate):
         tendency graphs.
         """
 
-        return Paragraph('GRAFICAS SEÑAL EN EL TIEMPO',
-                         style=STANDARD_CENTER)
+        return Paragraph(
+            'GRAFICAS SEÑAL EN EL TIEMPO',
+            style=STANDARD_CENTER)

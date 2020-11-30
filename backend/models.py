@@ -31,6 +31,7 @@ class Company(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
+    hierarchy = ArrayField(models.CharField(max_length=50), default=list)
 
 
 class VibroUser(AbstractUser):
@@ -56,7 +57,7 @@ class VibroUser(AbstractUser):
         Company,
         related_name="user",
         to_field="name",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True)
     user_type = models.CharField(
@@ -77,7 +78,6 @@ class VibroUser(AbstractUser):
 class Profile(models.Model):
 
     certifications = models.CharField(max_length=50, default='undefined')
-    # TODO create a default.jpg
     picture = models.ImageField(upload_to="profile", default='default.jpg')
     user = models.OneToOneField(
         VibroUser,
@@ -85,21 +85,12 @@ class Profile(models.Model):
         on_delete=models.CASCADE)
 
 
-class Hierarchy(models.Model):
-    name = models.CharField(max_length=30, default='Nombre')
-    parent = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey(
-        Company,
-        related_name="hierarchies",
-        on_delete=models.CASCADE)
-
-
 class Machine(models.Model):
 
     class Meta:
-        unique_together = ["name", "machine_type", "company"]
+        unique_together = ["name", "company"]
 
+    # codes
     SAP = 'sap'
     INTERNO = 'int'
     CODE_CHOICES = (
@@ -107,6 +98,7 @@ class Machine(models.Model):
         (INTERNO, 'Interno'),
     )
 
+    # electric feed
     DIRECTA = 'dir'
     VARIADOR = 'var'
     ELECTRIC_FEED_CHOICES = (
@@ -114,6 +106,7 @@ class Machine(models.Model):
         (VARIADOR, 'Variador'),
     )
 
+    # power units
     KW = 'kW'
     HP = 'HP'
     POWER_UNIT_CHOICES = (
@@ -121,7 +114,7 @@ class Machine(models.Model):
         (HP, 'HorsePower'),
     )
 
-    identifier = models.IntegerField(blank=True, null=True)
+    identifier = models.IntegerField(blank=True, null=True)  # ! ES NUMERO?
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -136,15 +129,15 @@ class Machine(models.Model):
     power_units = models.CharField(
         max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
     norm = models.TextField(null=True, blank=True)
-    hierarchy = models.ForeignKey(
-        Hierarchy, related_name="machines", on_delete=models.SET_NULL, blank=True, null=True)
-
-    machine_type = models.CharField(max_length=50)  # TODO add machine types
-    transmission = models.TextField(blank=True, null=True)
+    hierarchy = models.IntegerField(default=0)
+    # machine_type = models.CharField(max_length=50)  # TODO preguntar si puedo remover
+    # transmission = models.TextField(blank=True, null=True) # TODO preguntar si puedo remover
     rpm = models.IntegerField(blank=True, null=True)
 
 
 class Sensor(models.Model):
+
+    # sensor
     VIBRACION = 'Vibración'
     DUAL = 'Dual'
     SENSOR_CHOICES = (
@@ -156,7 +149,7 @@ class Sensor(models.Model):
         max_length=9, choices=SENSOR_CHOICES, default=VIBRACION)
     sensitivity = models.IntegerField()
     channel = models.IntegerField()
-    arduino = models.IntegerField()
+    arduino = models.CharField(max_length=50, unique=True)
     machine = models.ForeignKey(
         Machine, related_name="sensor", on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -168,7 +161,8 @@ class Gear(models.Model):  # equipo
     VENTILADOR = 'Ventilador'
     BOMBA = 'Bombda'
     COMPRESOR = 'Compresor'
-    GENERADOR_SOPLADOR = 'Generador Soplador'
+    GENERADOR = 'Generador'
+    SOPLADOR = 'Soplador'
     MOLINO = 'Molino'
     PELET = 'Pelet'
     ZARANDA = 'Zaranda'
@@ -182,7 +176,8 @@ class Gear(models.Model):  # equipo
         (VENTILADOR,  'Ventilador'),
         (BOMBA, 'Bombda'),
         (COMPRESOR, 'Compresor'),
-        (GENERADOR_SOPLADOR, 'Generador Soplador'),
+        (GENERADOR, 'Generador'),
+        (SOPLADOR, 'Soplador'),
         (MOLINO, 'Molino'),
         (PELET, 'Pelet'),
         (ZARANDA, 'Zaranda'),
@@ -222,14 +217,14 @@ class Gear(models.Model):  # equipo
         (LAMINILLA, 'Laminilla'),
         (RIGIDO, 'Rigido'),
     )
-
+    machine = models.ForeignKey(
+        Machine, related_name='gears', on_delete=models.CASCADE)
     gear_type = models.CharField(
         max_length=20, choices=GEAR_TYPE_CHOICES, default="N/A")
-    num_axis = models.IntegerField()  # ! required? or can count on request?
     support = models.CharField(
-        max_length=10, choices=SUPPORT_CHOICES, default='N/A')
+        max_length=10, choices=SUPPORT_CHOICES, default='N/A')  # TODO contar num ejes
     transmission = models.CharField(
-        max_length=12, choices=TRANSMISSION_CHOICES, default="N/A")
+        max_length=12, choices=TRANSMISSION_CHOICES, default="N/A")  # TODO preguntar transmision entre equipos
 
 
 class Axis(models.Model):  # eje
@@ -248,8 +243,14 @@ class Axis(models.Model):  # eje
         (HZ, 'Hz'),
     )
 
+    gear = models.ForeignKey(
+        Gear,
+        related_name='axis',
+        on_delete=models.CASCADE)
     type_axis = models.CharField(
-        max_length=13, choices=TYPE_CHOICES, default='Undefined')
+        max_length=13, choices=TYPE_CHOICES, default='Undefined')  # TODO contar num cojinetes
+    velocity = models.IntegerField()
+    # ! TODO preguntar si puedo hacer conversion en frontend
     units = models.CharField(max_length=3, choices=UNITS_CHOICES, default=RPM)
 
 
@@ -272,7 +273,12 @@ class Bearing(models.Model):  # cojinetes
     frequency = models.CharField(
         max_length=4, choices=FREQUENCY_CHOICES, default='N/A')
     axis = models.ForeignKey(
-        Axis, related_name='bearing', on_delete=models.CASCADE)
+        Axis, related_name='bearings', on_delete=models.CASCADE)
+
+
+class Coupling(models.Model):
+    RIG = "Rígido"
+    FLEX = 'Flexible'
 
 
 class Image(models.Model):
@@ -284,9 +290,6 @@ class Image(models.Model):
         related_name="images",
         on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.machine.name
-
 
 class Date(models.Model):
 
@@ -297,12 +300,10 @@ class Date(models.Model):
     company = models.ForeignKey(
         Company,
         related_name="date",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True)
+        on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.company} {self.date}'
+        return f'{self.company.name} {self.date}'
 
 
 class Measurement(models.Model):
@@ -388,9 +389,7 @@ class Measurement(models.Model):
     date = models.ForeignKey(
         Date,
         related_name="measurements",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True)
+        on_delete=models.CASCADE)
     analysis = models.TextField()
     diagnostic = models.TextField()
     severity = models.CharField(
@@ -413,6 +412,12 @@ class Measurement(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
+    certifier = models.ForeignKey(
+        VibroUser,
+        related_name="measurements_four",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True)
     revised = models.BooleanField(default=False)
     resolved = models.BooleanField(default=False)
     prev_changes = models.TextField(null=True, blank=True)
@@ -425,7 +430,6 @@ class Flaw(models.Model):  # falla
     GREEN = 'green'
     YELLOW = 'yellow'
     BLACK = 'black'
-    UNDEFINED = 'undefined'
 
     # severity
     SEVERITY_CHOICES = [
@@ -433,7 +437,6 @@ class Flaw(models.Model):  # falla
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
         (BLACK, 'Black'),
-        (UNDEFINED, 'Undefined')
     ]
 
     # flaw types
@@ -469,18 +472,18 @@ class Flaw(models.Model):  # falla
         (VAC, 'Vacio'),
         (ELE, 'Electrico'),
         (INS, 'Inspeccion'),
-        (OTR, 'Otro'),
         (EST, 'Estructural'),
         (RES, 'Resonancia'),
         (NOM, 'No medido'),
+        (OTR, 'Otro'),
     ]
 
     measurement = models.ForeignKey(
-        Measurement, related_name="flaw", on_delete=models.CASCADE)
+        Measurement, related_name="flaws", on_delete=models.CASCADE)
     flaw_type = models.CharField(
         max_length=3, choices=FLAW_CHOICES, default=OTR)
     severity = models.CharField(
-        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
+        max_length=9, choices=SEVERITY_CHOICES, default=BLACK)
 
 
 class TermoImage(models.Model):
@@ -501,31 +504,42 @@ class TermoImage(models.Model):
 
 class Point(models.Model):
 
-    # position
+    # direction
     VER = 'V'
     HOR = 'H'
     AX = 'A'
+    ORT = "O"
     # type
     ACC = 'A'
     VEL = 'V'
     DEZ = 'D'  # Desplazamiento
+    TEMP = 'T'  # temperatura
     ENV = 'E'  # Envolvente
     HFD = 'H'  # HFD
-    TEMP = 'T'
+    MAN = "M"  # Manual
+    CAL = "C"  # Calculado
 
-    POSITION_CHOICES = [(VER, 'Vertical'), (HOR, 'Horizontal'), (AX, 'Axial')]
+    DIRECTION_CHOICES = [
+        (VER, 'Vertical'),
+        (HOR, 'Horizontal'),
+        (AX, 'Axial'),
+        (ORT, 'Ortogonal')
+    ]
+
     TYPE_CHOICES = [
         (VEL, 'Velocity'),
         (ACC, 'Acceleration'),
         (DEZ, 'Displacement'),
+        (TEMP, 'Temperature'),
         (ENV, 'Envol'),
         (HFD, 'HFD'),
-        (TEMP, 'Temperature')
+        (MAN, "Manual"),
+        (CAL, "Calculado")
     ]
-
-    number = models.IntegerField()
-    position = models.CharField(
-        max_length=1, choices=POSITION_CHOICES, default='undefined')
+    #!TODO preguntar orden de columnas y orbita en diagrama de clases
+    position = models.IntegerField()
+    direction = models.CharField(
+        max_length=1, choices=DIRECTION_CHOICES, default='undefined')
     point_type = models.CharField(
         max_length=1, choices=TYPE_CHOICES, default='undefined')
     measurement = models.ForeignKey(
@@ -539,4 +553,4 @@ class Point(models.Model):
         decimal_places=2, max_digits=4), default=list)
 
     def __str__(self):
-        return f'{self.number}{self.position}{self.point_type}'
+        return f'{self.position}{self.direction}{self.point_type}'
