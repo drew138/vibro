@@ -10,11 +10,18 @@ class CitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class DefaultCompanySerializer(serializers.ModelSerializer):
 
-    city = CitySerializer()
+    class Meta:
+        model = custom_models.Company
+        fields = '__all__'
 
-    rut_city = CitySerializer()
+
+class GetCompanySerializer(serializers.ModelSerializer):
+
+    city = serializers.StringRelatedField(read_only=True)
+
+    rut_city = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = custom_models.Company
@@ -40,7 +47,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
 # Register Serializer
 class RegisterVibroUserSerializer(serializers.ModelSerializer):
 
-    company = CompanySerializer(required=False)
+    company = DefaultCompanySerializer(required=False)
 
     class Meta:
         model = custom_models.VibroUser
@@ -105,7 +112,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class MachineSerializer(serializers.ModelSerializer):
 
-    company = CompanySerializer()
+    company = DefaultCompanySerializer()
 
     class Meta:
         model = custom_models.Machine
@@ -168,7 +175,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class DateSerializer(serializers.ModelSerializer):
 
-    company = CompanySerializer()
+    company = DefaultCompanySerializer()
 
     class Meta:
         model = custom_models.Date

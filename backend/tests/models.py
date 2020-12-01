@@ -3,6 +3,20 @@ from backend import models as custom_models
 from model_bakery import baker
 
 
+class TestCity(TestCase):
+
+    def setUp(self):
+        self.city = baker.make("backend.City")
+        self.name = self.city.name
+
+    def test_str(self):
+        """
+        test str dunder method.
+        """
+
+        self.assertEqual(self.city.__str__(), self.name)
+
+
 class TestVibroUser(TestCase):
 
     @classmethod

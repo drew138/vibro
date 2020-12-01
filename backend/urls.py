@@ -35,3 +35,15 @@ router.register('point', views.PointView, 'point')
 
 
 urlpatterns = auth_views + router.urls
+"""
+GET REQUESTS
+trailing slash followed by query params
+###########################
+DELETE REQUESTS
+trailing slash followed by id of instance to be deleted then another slash
+###########################
+POST REQUESTS
+trailing slash followed by id of instance to be added then trailing slash again
+PATCH REQUESTS
+trailing slash followed by id of instance to be patched then trailing slash
+"""
