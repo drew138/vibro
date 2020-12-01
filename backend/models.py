@@ -11,6 +11,9 @@ class City(models.Model):
     name = models.CharField(max_length=30)
     state = models.CharField(max_length=30, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Company(models.Model):
 
@@ -56,7 +59,6 @@ class VibroUser(AbstractUser):
     company = models.ForeignKey(
         Company,
         related_name="user",
-        to_field="name",
         on_delete=models.SET_NULL,
         null=True,
         blank=True)

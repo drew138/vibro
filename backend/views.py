@@ -37,8 +37,8 @@ class CityView(viewsets.ModelViewSet):
 
 class CompanyView(viewsets.ModelViewSet):
 
-    serializer_class = custom_serializers.CompanySerializer
-    permission_classes = [IsStaffOrSuperUser]
+    serializer_class = custom_serializers.DefaultCompanySerializer
+    # permission_classes = [IsStaffOrSuperUser]
 
     def get_queryset(self):
         """
@@ -78,6 +78,11 @@ class CompanyView(viewsets.ModelViewSet):
         if rut_city_id is not None:
             queryset = queryset.filter(rut_city__id=rut_city_id)
         return queryset
+
+    def get_serializer_class(self):
+        if self.action in {'list', 'retrieve'}:
+            return custom_serializers.GetCompanySerializer
+        return custom_serializers.DefaultCompanySerializer
 
 
 # Get User API
@@ -686,29 +691,20 @@ class ReportView(viewsets.ModelViewSet):
 
     def get(self, request):
 
-        company = request.query_params.get('company', None)
-        date = request.query_params.get('date', None)
+        id = request.query_params.get('id', None)
 
         user = request.user
-        if user.is_staff or user.is_superuser:
-            if company is None:
-                raise ValidationError('field company must be provided')
-            queryset = custom_models.Measurement.filter(
-                company__id=company)
-        else:
-            queryset = custom_models.Measurement.filter(
+        queryset = custom_models.Measurement.objects.all()
+        if not (user.is_staff or user.is_superuser):
+            queryset = queryset.filter(
                 machine__company__user=user)
-        if date is not None:
-            queryset = queryset.filter(date__id=date)
-        else:
-            raise ValidationError('field date must be provided')
-        queryset = queryset.order_by('machine__machine_type')
+        queryset = queryset.filter(id=id)
+        # ! TODO add additional constraints to ordering
+        queryset = queryset.order_by(['machine__hierarchy'])
         if not queryset.exists():
             raise NotFound("Reporte no encontrado")
-
-        user = self.request.user
         data = self.get_email_data(user)
-        send_email.delay(data, user, queryset=queryset, date=date)
+        send_email.delay(data, user, queryset=queryset)
         return Response(status=status.HTTP_200_OK)
 
 

@@ -12,9 +12,36 @@ class TestIsStaffOrSuperUser(TestCase):
         self.user.is_staff = True
         self.factory = RequestFactory()
 
+    def test_admin_put_requests_return_false(self):
+        """
+        asserts admins always have permission 
+        for non put requests
+        """
+
+        self.user.is_staff = False
+        request = self.factory.put("/")
+        request.user = self.user
+        permission_class = custom_permissions.IsStaffOrSuperUser()
+        permission = permission_class.has_permission(request, None)
+        self.assertFalse(permission)
+
+    def test_staff_put_requests_return_false(self):
+        """
+        asserts admins always have permission 
+        for non put requests
+        """
+
+        self.user.is_superuser = False
+        request = self.factory.put("/")
+        request.user = self.user
+        permission_class = custom_permissions.IsStaffOrSuperUser()
+        permission = permission_class.has_permission(request, None)
+        self.assertFalse(permission)
+
     def test_admin_user_returns_true(self):
         """
-        asserts admins always have permission
+        asserts admins always have permission 
+        for non put requests
         """
 
         self.user.is_staff = False
@@ -27,6 +54,7 @@ class TestIsStaffOrSuperUser(TestCase):
     def test_staff_user_returns_true(self):
         """
         asserts staff users always have permission
+        for non put requests
         """
 
         self.user.is_superuser = False

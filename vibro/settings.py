@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'backend',
     'corsheaders',
     'storages',
+    'django_celery_beat'
 ]
 
 AUTH_USER_MODEL = 'backend.VibroUser'
@@ -196,4 +197,14 @@ CELERY_BROKER_URL = ''
 CELERY_ACCEPT_CONTENT = ['json']
 
 CELERY_TASK_SERIALIZER = 'json'
+
+# Celery Beat Configuration
+
+CELERY_BEAT_SCHEDULE = {
+    "scheduled_task": {  # change name of task
+        "task": "",
+        "schedule": "",
+    }
+}
+
 # https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html

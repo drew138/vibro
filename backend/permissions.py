@@ -9,7 +9,11 @@ class IsStaffOrSuperUser(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return (request.user.is_staff or request.user.is_superuser) or ((request.method in SAFE_METHODS) and (request.user.is_authenticated))
+        staff_permissions = (
+            request.user.is_staff or request.user.is_superuser) and request.method != "PUT"
+        customer_permissions = (request.method in SAFE_METHODS) and (
+            request.user.is_authenticated)
+        return staff_permissions or customer_permissions
 
 
 class CanUpdatePass(BasePermission):
