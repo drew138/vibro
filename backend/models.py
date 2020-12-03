@@ -66,6 +66,12 @@ class VibroUser(AbstractUser):
         max_length=8,
         choices=USER_CHOICES,
         default=CLIENT)
+    certifications = ArrayField(
+        models.CharField(
+            max_length=50),
+        default=list,
+        max_length=5)
+    picture = models.ImageField(upload_to="profile", default='default.jpg')
 
     def blur_email(self):
         import math
@@ -75,16 +81,6 @@ class VibroUser(AbstractUser):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
-
-
-class Profile(models.Model):
-
-    certifications = models.CharField(max_length=50, default='undefined')
-    picture = models.ImageField(upload_to="profile", default='default.jpg')
-    user = models.OneToOneField(
-        VibroUser,
-        related_name='profile',
-        on_delete=models.CASCADE)
 
 
 class Machine(models.Model):
@@ -504,7 +500,7 @@ class TermoImage(models.Model):
     image = models.ImageField(upload_to="termals")
 
 
-class Point(models.Model):
+class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
 
     # direction
     VER = 'V'

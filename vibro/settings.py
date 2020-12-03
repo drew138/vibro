@@ -59,7 +59,9 @@ AUTH_USER_MODEL = 'backend.VibroUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
-    ('rest_framework_simplejwt.authentication.JWTAuthentication',)
+    ('rest_framework_simplejwt.authentication.JWTAuthentication',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 50
 }
 
 SIMPLE_JWT = {
@@ -80,9 +82,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8080",
-# ]
 
 ROOT_URLCONF = 'vibro.urls'
 
@@ -203,8 +202,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "scheduled_task": {  # change name of task
         "task": "",
-        "schedule": "",
+        "schedule": timedelta(hours=24),
     }
 }
 
 # https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
+
+# Cors Headers configuration
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8080",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True

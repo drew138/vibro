@@ -2,10 +2,12 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 import jwt
 
 
-class IsStaffOrSuperUser(BasePermission):
+class CanReadOrIsStaffOrSuperUser(BasePermission):
 
     """
-    Custom permission to allow readonly requests to non superuser or staff users.
+    Custom permission to allow readonly requests 
+    to non superuser or staff users, or access to non 
+    put requests to authorized users.
     """
 
     def has_permission(self, request, view):
@@ -16,7 +18,17 @@ class IsStaffOrSuperUser(BasePermission):
         return staff_permissions or customer_permissions
 
 
-class CanUpdatePass(BasePermission):
+class IsSuperUser(BasePermission):
+
+    """
+    only allow access to superusers.
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_superuser
+
+
+class IsUpdateMethod(BasePermission):
 
     """
     Allow only PATCH methods.
@@ -24,6 +36,20 @@ class CanUpdatePass(BasePermission):
 
     def has_permission(self, request, view):
         return request.method == "PUT"
+
+
+class HasUserPermissions(BasePermission):
+
+    """
+    Allow only GET methods.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = request.user.is_authenticated
+        is_superuser = request.user.is_superuser
+        can_update = request.method in {"PUT", "GET"}
+        has_permission = is_superuser or can_update
+        return is_authenticated and has_permission
 
 
 class CanGenerateReport(BasePermission):

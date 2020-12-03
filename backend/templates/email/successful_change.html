@@ -1,4 +1,9 @@
-Hola {{user}}!<br /><br />
-El cambio de contraseña de tu cuenta has sido exitoso.<br /><br />
-Atentamente,<br />
-El equipo de Vibromontajes.
+{% extends 'email/main.html' %}
+
+{% block content %}
+
+El cambio de contraseña de tu cuenta has sido exitoso.<br/><br/>
+
+En caso de tener algun inconveniente, favor ponerse en contacto.
+
+{% end block %}
