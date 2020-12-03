@@ -1,4 +1,3 @@
-from django.contrib.auth import authenticate
 from rest_framework import serializers
 from . import models as custom_models
 
@@ -70,6 +69,37 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
         return user
 
 
+# Register admin Serializer
+class RegisterAdminUserSerializer(serializers.ModelSerializer):
+
+    company = DefaultCompanySerializer(required=False)
+    user_type = serializers.CharField(required=False)
+
+    class Meta:
+        model = custom_models.VibroUser
+        fields = [
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'company',
+            'password',
+            'phone',
+            'ext',
+            'celphone_one',
+            'celphone_two',
+            'user_type',
+            'is_staff',
+            'is_superuser'
+        ]
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
+
+    def create(self, validated_data):
+        user = custom_models.VibroUser.objects.create_user(
+            **validated_data)
+        return user
+
+
 # Rest Password Serializer
 class ResetSerializer(serializers.Serializer):
 
@@ -95,24 +125,31 @@ class ChangePassSerializer(serializers.Serializer):
 
 
 # Change Password Serializer
-class ForgotPassSeriazliaer(serializers.Serializer):
+class ForgotPassSerialiazer(serializers.Serializer):
 
     model = custom_models.VibroUser
     password = serializers.CharField(required=True)
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-
-    user = VibroUserSerializer()
+class UpdadateUserSerialiazer(serializers.ModelSerializer):
 
     class Meta:
-        model = custom_models.Profile
-        fields = '__all__'
+        model = custom_models.VibroUser
+        fields = [
+            'phone',
+            'ext',
+            'celphone_one',
+            'celphone_two',
+            'company',
+            'user_type',
+            'certifications',
+            'picture',
+        ]
 
 
 class MachineSerializer(serializers.ModelSerializer):
 
-    company = DefaultCompanySerializer()
+    # company = DefaultCompanySerializer()
 
     class Meta:
         model = custom_models.Machine
@@ -121,7 +158,7 @@ class MachineSerializer(serializers.ModelSerializer):
 
 class SensorSerializer(serializers.ModelSerializer):
 
-    machine = MachineSerializer()
+    # machine = MachineSerializer()
 
     class Meta:
         model = custom_models.Sensor
@@ -130,7 +167,7 @@ class SensorSerializer(serializers.ModelSerializer):
 
 class GearSerializer(serializers.ModelSerializer):
 
-    machine = MachineSerializer()
+    # machine = MachineSerializer()
 
     class Meta:
         model = custom_models.Gear
@@ -139,7 +176,7 @@ class GearSerializer(serializers.ModelSerializer):
 
 class AxisSerializer(serializers.ModelSerializer):
 
-    gear = GearSerializer()
+    # gear = GearSerializer()
 
     class Meta:
         model = custom_models.Axis
@@ -148,7 +185,7 @@ class AxisSerializer(serializers.ModelSerializer):
 
 class BearingSerializer(serializers.ModelSerializer):
 
-    axis = AxisSerializer()
+    # axis = AxisSerializer()
 
     class Meta:
         model = custom_models.Bearing
@@ -157,7 +194,7 @@ class BearingSerializer(serializers.ModelSerializer):
 
 class CouplingSerializer(serializers.ModelSerializer):
 
-    gear = GearSerializer()
+    # gear = GearSerializer()
 
     class Meta:
         model = custom_models.Coupling
@@ -166,7 +203,7 @@ class CouplingSerializer(serializers.ModelSerializer):
 
 class ImageSerializer(serializers.ModelSerializer):
 
-    machine = MachineSerializer()
+    # machine = MachineSerializer()
 
     class Meta:
         model = custom_models.Image
@@ -175,7 +212,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class DateSerializer(serializers.ModelSerializer):
 
-    company = DefaultCompanySerializer()
+    # company = DefaultCompanySerializer()
 
     class Meta:
         model = custom_models.Date
@@ -184,11 +221,11 @@ class DateSerializer(serializers.ModelSerializer):
 
 class MeasurementSerializer(serializers.ModelSerializer):
 
-    machine = MachineSerializer()
-    engineer_one = VibroUserSerializer()
-    engineer_two = VibroUserSerializer()
-    analyst = VibroUserSerializer()
-    certifier = VibroUserSerializer()
+    # machine = MachineSerializer()
+    # engineer_one = VibroUserSerializer()
+    # engineer_two = VibroUserSerializer()
+    # analyst = VibroUserSerializer()
+    # certifier = VibroUserSerializer()
 
     class Meta:
         model = custom_models.Measurement
@@ -197,7 +234,7 @@ class MeasurementSerializer(serializers.ModelSerializer):
 
 class FlawSerializer(serializers.ModelSerializer):
 
-    measurement = MeasurementSerializer()
+    # measurement = MeasurementSerializer()
 
     class Meta:
         model = custom_models.Flaw
@@ -206,7 +243,7 @@ class FlawSerializer(serializers.ModelSerializer):
 
 class TermoImageSerializer(serializers.ModelSerializer):
 
-    measurement = MeasurementSerializer()
+    # measurement = MeasurementSerializer()
 
     class Meta:
         model = custom_models.TermoImage
@@ -215,7 +252,7 @@ class TermoImageSerializer(serializers.ModelSerializer):
 
 class PointSerializer(serializers.ModelSerializer):
 
-    measurement = MeasurementSerializer()
+    # measurement = MeasurementSerializer()
 
     class Meta:
         model = custom_models.Point
