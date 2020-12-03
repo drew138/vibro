@@ -36,6 +36,7 @@ coverage = "*"
 model-bakery = "*"
 redis = "*"
 django-celery-beat = "*"
+pycodestyle = "*"
 
 [requires]
 python_version = "3.8"

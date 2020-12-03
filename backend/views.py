@@ -454,7 +454,7 @@ class ReportView(viewsets.ModelViewSet):
         queryset = queryset.order_by(['machine__hierarchy'])
         if not queryset.exists():
             raise NotFound("Reporte no encontrado")
-        Email.delay('report', request, queryset)
+        Email.report(request, queryset).delay()
         return Response(status=status.HTTP_200_OK)
 
 
