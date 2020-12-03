@@ -28,8 +28,6 @@ if DEBUG:
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.getenv('SECRET_KEY')  # TODO change .env key before production
-
 
 ALLOWED_HOSTS = [
     # !Remove comments on production
@@ -107,6 +105,8 @@ WSGI_APPLICATION = 'vibro.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 if os.getenv('GITHUB_WROKFLOW'):
+    SECRET_KEY = "super-secret-django-secret-key"
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -118,6 +118,9 @@ if os.getenv('GITHUB_WROKFLOW'):
         }
     }
 else:
+    # TODO change .env key before production
+    SECRET_KEY = os.getenv('SECRET_KEY')
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
