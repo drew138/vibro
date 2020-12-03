@@ -27,7 +27,8 @@ if DEBUG:
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
+# TODO change .env key before production
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 ALLOWED_HOSTS = [
     # !Remove comments on production
@@ -105,7 +106,6 @@ WSGI_APPLICATION = 'vibro.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 if os.getenv('WORKKFLOW'):
-    SECRET_KEY = "super-secret-django-secret-key"
 
     DATABASES = {
         'default': {
@@ -118,8 +118,6 @@ if os.getenv('WORKKFLOW'):
         }
     }
 else:
-    # TODO change .env key before production
-    SECRET_KEY = os.getenv('SECRET_KEY')
 
     DATABASES = {
         'default': {
