@@ -104,7 +104,7 @@ WSGI_APPLICATION = 'vibro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if os.getenv('GITHUB_WROKFLOW'):
+if os.getenv('WORKKFLOW'):
     SECRET_KEY = "super-secret-django-secret-key"
 
     DATABASES = {
