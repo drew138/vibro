@@ -34,7 +34,6 @@ jobs:
     steps:
       env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          WORKFLOW: ${{ secrets.WORKFLOW }}
       - name: Checkout code # checking our the code at current commit that triggers the workflow
         uses: actions/checkout@v2
       - name: Cache dependency # caching dependency will make our build faster.

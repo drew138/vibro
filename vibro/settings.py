@@ -105,7 +105,8 @@ WSGI_APPLICATION = 'vibro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if os.getenv('WORKKFLOW'):
+
+if os.getenv('GITHUB_WORKKFLOW'):
 
     DATABASES = {
         'default': {
