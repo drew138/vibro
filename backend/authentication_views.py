@@ -49,6 +49,7 @@ class RegisterAPI(generics.GenericAPIView):
         })
 
 
+# Register Admin
 class RegisterAdminAPI(generics.GenericAPIView):
 
     permission_classes = [custom_permissions.IsSuperUser]
@@ -62,7 +63,7 @@ class RegisterAdminAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        Email.delay('register', request)
+        Email().register(request).delay()  # ! TODO test task
         refresh = RefreshToken.for_user(self.request.user)
         return Response({
             "user": custom_serializers.VibroUserSerializer(
@@ -89,7 +90,7 @@ class ResetAPI(generics.GenericAPIView):
         user = custom_models.VibroUser.objects.filter(
             email=request.data['email']).first()
         if user.exists():
-            Email.delay('reset', request)
+            Email.reset(request).delay()
         else:
             raise NotFound('usuario no encontrado')
         return Response({"detail": f"un correo de recuperacion ha sido enviado a la cuenta {user.blur_email()}"})
@@ -120,7 +121,7 @@ class ChangePassAPI(generics.UpdateAPIView):
                 return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("new_password"))
             user.save()
-            Email.delay('change_password', request)
+            Email.change_password().delay()
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -162,7 +163,7 @@ class ForgotPassAPI(generics.UpdateAPIView):
             user.set_password(serializer.data.get("password"))
             user.save()
 
-            Email.delay('change_password', request)
+            Email.change_password(request).delay()
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -183,6 +184,7 @@ class ForgotPassAPI(generics.UpdateAPIView):
         return self.request.user
 
 
+# ViewSet to modify user objects
 class VibroUserView(viewsets.ModelViewSet):
 
     permission_classes = [

@@ -47,32 +47,54 @@ def send_email(data, user, queryset=None):
         email.send()
 
 
-class Email(Task):
+@shared_task
+def send_emal():
+    """
+    function to be used in a view to send emails.
+    """
+
+    print("hello")
+
+
+class Email(Task, EmailMessage):
 
     ignore_result = True
     name = "email"
 
+    def __init__(self):
+        EmailMessage.__init__(self)
+        self.content_subtype = "html"
+        self.from_email = settings.EMAIL_HOST_USER
+        self.fail_silently = True
+
     def set_user(self, request):
-        self.request = request
+
         self.user = request.user
         self.variables = {'name': request.user.first_name}
-        self.email.to = [request.user.email]
+        self.to = [request.user.email]
 
-    def register(self):
-        self.email.subject = 'Bienvenido! - Vibromontajes'
+    def register(self, request):
+
+        self.set_user(request)
+        self.subject = 'Bienvenido! - Vibromontajes'
         self.template = 'email/welcome.html'
+        return self
 
-    def reset(self):
+    def reset(self, request):
 
-        self.email.subject = 'Cambio de Contraseña - Vibromontajes'
+        self.set_user(request)
+        self.subject = 'Cambio de Contraseña - Vibromontajes'
         self.template = 'email/password_reset.html'
         self.variables['host'] = self.request.get_host()
         self.variables['token'] = str(RefreshToken.for_user(self.user))
+        return self
 
-    def change_password(self):
+    def change_password(self, request):
 
-        self.email.subject = 'Cambio de Contraseña - Vibromontajes'
+        self.set_user(request)
+        self.subject = 'Cambio de Contraseña - Vibromontajes'
         self.template = 'email/successful_change.html'
+        return self
 
     def attach_report(self):
 
@@ -92,38 +114,24 @@ class Email(Task):
                     content=buffer.getvalue(),
                     mimetype='application/pdf')
             finally:
-                self.email.send()
+                self.send()
 
-    def report(self):
+    def report(self, request, queryset):
 
-        self.email.subject = 'Solicitud Informe Predictivo - Vibromontajes'
-        self.template = 'email/report.html'
-
-    def set_action(self, action):
-
-        if action == 'register':
-            self.register()
-        elif action == 'reset':
-            self.reset()
-        elif action == 'change_password':
-            self.change_password()
-        elif action == 'report':
-            self.report()
-
-    def run(self, action, request, queryset=None):
-
-        self.set_action(action)
-        self.queryset = queryset
         self.set_user(request)
-        self.email = EmailMessage()
-        self.email.body = render_to_string(self.template, self.variables)
-        self.email.content_subtype = "html"
-        self.email.from_email = settings.EMAIL_HOST_USER
-        self.email.fail_silently = True
+        self.queryset = queryset
+        self.subject = 'Solicitud Informe Predictivo - Vibromontajes'
+        self.template = 'email/report.html'
+        return self
+
+    def run(self):
+
+        self.body = render_to_string(self.template, self.variables)
+
         if self.queryset:
             self.attach_report()
         else:
-            self.email.send()
+            self.send()
 
 
 app.tasks.register(Email())
