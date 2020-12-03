@@ -30,6 +30,7 @@ numpy==1.19.4
 pillow==7.1.2
 prompt-toolkit==3.0.8
 psycopg2==2.8.6
+pycodestyle==2.6.0
 pycparser==2.20
 pyjwt==1.7.1
 pyparsing==2.4.7
