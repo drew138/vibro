@@ -18,7 +18,7 @@ class CityView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields on the City table
-        based on url parameter. 
+        based on url parameter.
         """
 
         id = self.request.query_params.get('id', None)
@@ -42,7 +42,7 @@ class CompanyView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on params. For non staff/superusers,
-        companies are always filtered by user to prevent users from 
+        companies are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -92,7 +92,7 @@ class MachineView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on url params. For non staff/superusers,
-        machines are always filtered by user to prevent users from 
+        machines are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -151,8 +151,8 @@ class SensorView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url parameters. For non 
-        staff/superusers, sensors are always filtered by user  
+        Optionally filter fields based on url parameters. For non
+        staff/superusers, sensors are always filtered by user
         to prevent users from seeing unauthorized data.
         """
 
@@ -188,7 +188,7 @@ class GearView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on url params. For non staff/superusers,
-        gears are always filtered by user to prevent users from 
+        gears are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -224,7 +224,7 @@ class AxisView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on url params. For non staff/superusers,
-        axis are always filtered by user to prevent users from 
+        axis are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -254,7 +254,7 @@ class BearingView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on url params. For non staff/superusers,
-        bearings are always filtered by user to prevent users from 
+        bearings are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -466,7 +466,7 @@ class TermoImageView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on url params. For non staff/superusers,
-        termal images are always filtered by user to prevent users from 
+        termal images are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -496,7 +496,7 @@ class PointView(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Optionally filter fields based on url params. For non staff/superusers,
-        points are always filtered by user to prevent users from 
+        points are always filtered by user to prevent users from
         seeing unauthorized data.
         """
 

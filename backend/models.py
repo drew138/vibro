@@ -34,7 +34,9 @@ class Company(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
-    hierarchy = ArrayField(models.CharField(max_length=50), default=list)
+    hierarchy = ArrayField(
+        models.CharField(max_length=50),
+        default=list)
 
 
 class VibroUser(AbstractUser):
@@ -54,8 +56,7 @@ class VibroUser(AbstractUser):
     email = models.EmailField(unique=True)
     phone = models.IntegerField(blank=True, null=True)
     ext = models.IntegerField(blank=True, null=True)
-    celphone_one = models.IntegerField(blank=True, null=True)
-    celphone_two = models.IntegerField(blank=True, null=True)
+    celphone = models.IntegerField(blank=True, null=True)
     company = models.ForeignKey(
         Company,
         related_name="user",
@@ -71,7 +72,9 @@ class VibroUser(AbstractUser):
             max_length=50),
         default=list,
         max_length=5)
-    picture = models.ImageField(upload_to="profile", default='default.jpg')
+    picture = models.ImageField(
+        upload_to="profile",
+        default='default.jpg')
 
     def blur_email(self):
         import math
@@ -149,7 +152,10 @@ class Sensor(models.Model):
     channel = models.IntegerField()
     arduino = models.CharField(max_length=50, unique=True)
     machine = models.ForeignKey(
-        Machine, related_name="sensor", on_delete=models.SET_NULL, null=True, blank=True)
+        Machine, related_name="sensor",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True)
 
 
 class Gear(models.Model):  # equipo
@@ -246,10 +252,15 @@ class Axis(models.Model):  # eje
         related_name='axis',
         on_delete=models.CASCADE)
     type_axis = models.CharField(
-        max_length=13, choices=TYPE_CHOICES, default='Undefined')  # TODO contar num cojinetes
+        max_length=13,
+        choices=TYPE_CHOICES,
+        default='Undefined')  # TODO contar num cojinetes
     velocity = models.IntegerField()
     # ! TODO preguntar si puedo hacer conversion en frontend
-    units = models.CharField(max_length=3, choices=UNITS_CHOICES, default=RPM)
+    units = models.CharField(
+        max_length=3,
+        choices=UNITS_CHOICES,
+        default=RPM)
 
 
 class Bearing(models.Model):  # cojinetes
@@ -534,7 +545,7 @@ class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
         (MAN, "Manual"),
         (CAL, "Calculado")
     ]
-    #!TODO preguntar orden de columnas y orbita en diagrama de clases
+    # !TODO preguntar orden de columnas y orbita en diagrama de clases
     position = models.IntegerField()
     direction = models.CharField(
         max_length=1, choices=DIRECTION_CHOICES, default='undefined')
@@ -545,8 +556,11 @@ class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
         related_name="points",
         on_delete=models.CASCADE)
     tendency = models.DecimalField(decimal_places=2, max_digits=4, default=0)
-    espectra = ArrayField(models.DecimalField(
-        decimal_places=2, max_digits=4), default=list)
+    espectra = ArrayField(
+        models.DecimalField(
+            decimal_places=2,
+            max_digits=4),
+        default=list)
     time_signal = ArrayField(models.DecimalField(
         decimal_places=2, max_digits=4), default=list)
 

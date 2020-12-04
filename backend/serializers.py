@@ -30,6 +30,8 @@ class GetCompanySerializer(serializers.ModelSerializer):
 # User Serializer
 class VibroUserSerializer(serializers.ModelSerializer):
 
+    company = DefaultCompanySerializer(required=False)
+
     class Meta:
         model = custom_models.VibroUser
         fields = [
@@ -59,8 +61,7 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
             'password',
             'phone',
             'ext',
-            'celphone_one',
-            'celphone_two'
+            'celphone',
         ]
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
@@ -86,8 +87,7 @@ class RegisterAdminUserSerializer(serializers.ModelSerializer):
             'password',
             'phone',
             'ext',
-            'celphone_one',
-            'celphone_two',
+            'celphone',
             'user_type',
             'is_staff',
             'is_superuser'
@@ -138,8 +138,7 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
         fields = [
             'phone',
             'ext',
-            'celphone_one',
-            'celphone_two',
+            'celphone',
             'company',
             'user_type',
             'certifications',

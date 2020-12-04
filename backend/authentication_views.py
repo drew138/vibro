@@ -113,7 +113,9 @@ class ChangePassAPI(generics.UpdateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             if not self.get_object().check_password(serializer.data.get("password")):
-                return Response({"Error": "Contraseña incorrecta"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"Error": "Contraseña incorrecta"},
+                    status=status.HTTP_400_BAD_REQUEST)
             user = self.get_object()
             try:
                 validate_password(serializer.data.get("new_password"))
