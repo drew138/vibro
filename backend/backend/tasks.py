@@ -5,7 +5,6 @@ from .report.report import Report
 from django.conf import settings
 from celery import shared_task
 from vibro.celery import app
-from .models import Company
 from celery import Task
 from io import BytesIO
 import datetime
@@ -45,15 +44,6 @@ def send_email(data, user, queryset=None):
             email.send()
     else:
         email.send()
-
-
-@shared_task
-def send_emal():
-    """
-    function to be used in a view to send emails.
-    """
-
-    print("hello")
 
 
 class Email(Task, EmailMessage):

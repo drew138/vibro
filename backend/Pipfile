@@ -5,8 +5,8 @@ verify_ssl = true
 
 [dev-packages]
 autopep8 = "*"
-python-dotenv = "*"
 coverage = "*"
+python-dotenv = "*"
 
 [packages]
 asgiref = "==3.2.7"
@@ -36,9 +36,9 @@ django-storages = "*"
 model-bakery = "*"
 redis = "*"
 django-celery-beat = "*"
-pycodestyle = "*"
 gunicorn = "*"
-faker = "*"
+Faker = "*"
+pycodestyle = "*"
 
 [requires]
 python_version = "3.8"
