@@ -38,7 +38,7 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        Email.delay('register', request)
+        Email.register(request).delay()
         refresh = RefreshToken.for_user(self.request.user)
         return Response({
             "user": custom_serializers.VibroUserSerializer(
@@ -204,7 +204,7 @@ class VibroUserView(viewsets.ModelViewSet):
 
         if not (self.request.user.is_superuser or self.request.user.is_staff):
             queryset = custom_models.VibroUser.objects.exclude(
-                user_type="Client")
+                user_type="client")
         else:
             queryset = custom_models.VibroUser.objects.all()
         if id:
@@ -225,7 +225,7 @@ class VibroUserView(viewsets.ModelViewSet):
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        if not (request.user.user_type in {"Admin", "Engineer"}):
+        if not (request.user.user_type in {"admin", "engineer"}):
             serializer.validated_data.pop('certifications', None)
         if not (request.user.is_superuser or request.user.is_staff):
             serializer.validated_data.pop('user_type', None)

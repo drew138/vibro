@@ -47,8 +47,8 @@ class HasUserPermissions(BasePermission):
     def has_permission(self, request, view):
         is_authenticated = request.user.is_authenticated
         is_superuser = request.user.is_superuser
-        can_update = request.method in {"PUT", "GET"}
-        has_permission = is_superuser or can_update
+        allowed_methdods = request.method in {"PUT", "GET"}
+        has_permission = is_superuser or allowed_methdods
         return is_authenticated and has_permission
 
 

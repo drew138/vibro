@@ -1,4 +1,6 @@
-from .models import *
-from .views import *
+from .serializers import TestRegisterVibroUserSerializer, TestRegisterAdminUserSerializer
+from .city_view import TestCityView
+from .authentication_views import *
 from .permissions import *
-from .serializers import *
+from .models import *
+from tasks import *

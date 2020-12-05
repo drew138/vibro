@@ -1,5 +1,5 @@
-from django.test import TestCase
 from backend import models as custom_models
+from django.test import TestCase
 from model_bakery import baker
 
 
