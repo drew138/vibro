@@ -36,9 +36,9 @@ django-storages = "*"
 model-bakery = "*"
 redis = "*"
 django-celery-beat = "*"
-pycodestyle = "*"
 gunicorn = "*"
 Faker = "*"
+pycodestyle = "*"
 
 [requires]
 python_version = "3.8"
