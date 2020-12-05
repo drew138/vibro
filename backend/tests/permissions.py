@@ -1,4 +1,3 @@
-from backend import permissions
 from backend import permissions as custom_permissions
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, RequestFactory

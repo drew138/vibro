@@ -7,7 +7,6 @@ from . import models as custom_models
 from rest_framework import viewsets
 from rest_framework import status
 from .tasks import Email
-import jwt
 
 
 class CityView(viewsets.ModelViewSet):

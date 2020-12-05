@@ -9,7 +9,7 @@ class City(models.Model):
         unique_together = ["name", "state"]
 
     name = models.CharField(max_length=30)
-    state = models.CharField(max_length=30, blank=True, null=True)
+    state = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
@@ -19,8 +19,8 @@ class Company(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     nit = models.CharField(max_length=15, unique=True)
-    address = models.CharField(max_length=50, blank=True, null=True)
-    rut_address = models.CharField(max_length=50, blank=True, null=True)
+    address = models.CharField(max_length=50)
+    rut_address = models.CharField(max_length=50)
     pbx = models.IntegerField(blank=True, null=True)
     city = models.ForeignKey(
         City,
@@ -45,12 +45,14 @@ class VibroUser(AbstractUser):
     ENGINEER = 'engineer'
     CLIENT = 'client'
     SUPPORT = 'support'
+    ARDUINO = 'arduino'
 
     USER_CHOICES = [
         (ADMIN, 'Admin'),
         (ENGINEER, 'Engineer'),
         (CLIENT, 'Client'),
-        (SUPPORT, 'Support')
+        (SUPPORT, 'Support'),
+        (ARDUINO, 'Arduino')
     ]
 
     email = models.EmailField(unique=True)
@@ -77,8 +79,8 @@ class VibroUser(AbstractUser):
         default='default.jpg')
 
     def blur_email(self):
-        import math
-        indexat = math.floor(self.email.index("@") * 0.4)
+
+        indexat = int(self.email.index("@") * 0.4)
         new_email = self.email[:indexat] + ("*" * (len(self.email) - indexat))
         return new_email
 
@@ -125,7 +127,7 @@ class Machine(models.Model):
         max_length=3, choices=CODE_CHOICES, blank=True, null=True)
     electric_feed = models.CharField(
         max_length=3, choices=CODE_CHOICES, blank=True, null=True)
-    brand = models.TextField(blank=True, null=True)
+    brand = models.CharField(max_length=50)
     power = models.IntegerField(default=0)
     power_units = models.CharField(
         max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
@@ -150,7 +152,12 @@ class Sensor(models.Model):
         max_length=9, choices=SENSOR_CHOICES, default=VIBRACION)
     sensitivity = models.IntegerField()
     channel = models.IntegerField()
-    arduino = models.CharField(max_length=50, unique=True)
+    arduino = models.ForeignKey(
+        VibroUser,
+        related_name='sensor',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True)
     machine = models.ForeignKey(
         Machine, related_name="sensor",
         on_delete=models.SET_NULL,
@@ -325,7 +332,6 @@ class Measurement(models.Model):
     GREEN = 'green'
     YELLOW = 'yellow'
     BLACK = 'black'
-    UNDEFINED = 'undefined'
 
     # service type
     PRED = 'pred'
@@ -356,7 +362,6 @@ class Measurement(models.Model):
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
         (BLACK, 'Black'),
-        (UNDEFINED, 'Undefined')
     ]
     SERVICE_CHOICES = [
         (PRED, 'Predictivo'),
@@ -402,7 +407,7 @@ class Measurement(models.Model):
     analysis = models.TextField()
     diagnostic = models.TextField()
     severity = models.CharField(
-        max_length=9, choices=SEVERITY_CHOICES, default=UNDEFINED)
+        max_length=9, choices=SEVERITY_CHOICES, default=BLACK)
     engineer_one = models.ForeignKey(
         VibroUser,
         related_name="measurements",

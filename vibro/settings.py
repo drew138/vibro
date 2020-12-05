@@ -16,8 +16,9 @@ from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 if DEBUG:
     from dotenv import load_dotenv
@@ -27,18 +28,12 @@ if DEBUG:
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# TODO change .env key before production
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-ALLOWED_HOSTS = [
-    # !Remove comments on production
-    # "www.vibromontajes.com",
-    # "vibromontajes.com",
-]
-
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -104,8 +99,6 @@ WSGI_APPLICATION = 'vibro.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-
 if os.getenv('GITHUB_WORKKFLOW'):
 
     DATABASES = {
@@ -120,6 +113,7 @@ if os.getenv('GITHUB_WORKKFLOW'):
     }
 else:
 
+    # https://stackoverflow.com/questions/11618898/pg-config-executable-not-found
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -130,10 +124,10 @@ else:
             'PORT': os.getenv('DATABASE_PORT'),
         }
     }
-# https://stackoverflow.com/questions/11618898/pg-config-executable-not-found
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -152,7 +146,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'America/Bogota'
@@ -163,6 +156,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+# Static Files Configuration
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 STATIC_ROOT = 'static/'
@@ -176,7 +171,7 @@ if not DEBUG:
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_REGION_NAME = "nyc3"
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
     AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com'
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
     AWS_LOCATION = os.getenv("AWS_LOCATION")
@@ -191,7 +186,6 @@ if not DEBUG:
 
 
 # SMTP configuration
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -202,15 +196,13 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 
 # Celery Configuration
-
-CELERY_BROKER_URL = ''
-
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_ACCEPT_CONTENT = ['json']
-
 CELERY_TASK_SERIALIZER = 'json'
 
-# Celery Beat Configuration
 
+# Celery Beat Configuration
+# https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
 CELERY_BEAT_SCHEDULE = {
     "scheduled_task": {  # change name of task
         "task": "",
@@ -218,12 +210,7 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
-# https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
 
 # Cors Headers configuration
-
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8080",
-# ]
-
-CORS_ALLOW_ALL_ORIGINS = True
+# https://github.com/adamchainz/django-cors-headers#configuration
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS').split(',')
