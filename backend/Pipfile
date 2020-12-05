@@ -1,0 +1,44 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+autopep8 = "*"
+coverage = "*"
+python-dotenv = "*"
+
+[packages]
+asgiref = "==3.2.7"
+cffi = "==1.14.0"
+cryptography = "==3.2"
+Django = "==3.0.7"
+django-filter = "==2.2.0"
+djangorestframework = "==3.11.0"
+importlib-metadata = "==1.6.0"
+Markdown = "==3.2.2"
+Pillow = "==7.1.2"
+psycopg2 = "*"
+pycparser = "==2.20"
+pytz = "==2020.1"
+six = "==1.15.0"
+sqlparse = "==0.3.1"
+zipp = "==3.1.0"
+reportlab = "*"
+numpy = "*"
+djangorestframework-simplejwt = "*"
+matplotlib = "*"
+django-cors-headers = "*"
+PyJWT = "*"
+celery = "*"
+boto3 = "*"
+django-storages = "*"
+model-bakery = "*"
+redis = "*"
+django-celery-beat = "*"
+pycodestyle = "*"
+gunicorn = "*"
+Faker = "*"
+
+[requires]
+python_version = "3.8"

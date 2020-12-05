@@ -1,8 +1,8 @@
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from . import authentication_views
 from rest_framework import routers
 from django.urls import path
 from . import views
-from . import authentication_views
 
 
 # TODO test endpoints
