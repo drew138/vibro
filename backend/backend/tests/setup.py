@@ -7,15 +7,15 @@ class TestSetUp(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user_url = reverse('user')
+
         cls.register_url = reverse('register')
         cls.register_admin_url = reverse('register-admin')
         cls.reset_url = reverse('reset')
         cls.change_password_url = reverse('change')
         cls.forgot_password_url = reverse('change-forgot')
-        cls.city_url = reverse('city-list')
+
         cls.company_url = reverse('company-list')
-        cls.vibrouser_url = reverse('vibrouser-list')
+
         cls.machine_url = reverse('machine-list')
         cls.sensor_url = reverse('sensor-list')
         cls.gear_url = reverse('gear-list')

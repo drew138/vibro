@@ -1,5 +1,4 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-import jwt
 
 
 class CanReadOrIsStaffOrSuperUser(BasePermission):
@@ -31,7 +30,7 @@ class IsSuperUser(BasePermission):
 class IsUpdateMethod(BasePermission):
 
     """
-    Allow only PATCH methods.
+    Allow only PUT methods.
     """
 
     def has_permission(self, request, view):
@@ -41,15 +40,13 @@ class IsUpdateMethod(BasePermission):
 class HasUserPermissions(BasePermission):
 
     """
-    Allow only GET methods.
+    Allow only GET and Patch methods.
     """
 
     def has_permission(self, request, view):
         is_authenticated = request.user.is_authenticated
-        is_superuser = request.user.is_superuser
-        allowed_methdods = request.method in {"PUT", "GET"}
-        has_permission = is_superuser or allowed_methdods
-        return is_authenticated and has_permission
+        allowed_methdods = request.method in {"PATCH", "GET"}
+        return is_authenticated and allowed_methdods
 
 
 class CanGenerateReport(BasePermission):
