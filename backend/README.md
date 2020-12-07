@@ -1,3 +1,7 @@
+# Backend
+
+Developed in python using: Django, Django REST Framework, Celery, Reportlab, among other libraries to contruct an API and corresponding background tasks.
+
 Environment variables structure
 
 ```
