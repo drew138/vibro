@@ -1,3 +1,3 @@
-# V website
+# vibro
 
-FullStack application for the V website
+FullStack application which implements nginx, django and react in the implementation of its functionalities.
