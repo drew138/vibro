@@ -1,3 +1,3 @@
-# vibro
+# Vibro
 
-FullStack application which implements nginx, django and react in the implementation of its functionalities.
+FullStack application which implements docker, nginx, django and react in the implementation of its functionalities.
