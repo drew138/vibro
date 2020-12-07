@@ -136,6 +136,8 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
     class Meta:
         model = custom_models.VibroUser
         fields = [
+            'first_name',
+            'last_name',
             'phone',
             'ext',
             'celphone',
