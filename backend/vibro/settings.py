@@ -162,7 +162,7 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = 'static/'
 MEDIA_ROOT = "static/media/"
 
-if not DEBUG:
+if not DEBUG and not os.getenv('WORKFLOW'):
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 

@@ -40,26 +40,26 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:163ab6f9030ade265af9b36a10e608f12911cb5f3557e8e3390dffeba919262e",
-                "sha256:848aa8d11c9927daa13512072a501e2fc70ba86b073fc6927b86466f4a459b4d"
+                "sha256:21a482c23cedf06eab040a5ca770d7b9e9d00c5bcd1dd3ef22c1fdce4371de27",
+                "sha256:2f4b4e3a78efd3979a26f2c4c9e3e7ce359c3244450f8eb9628138e4f0d523b3"
             ],
             "index": "pypi",
-            "version": "==1.16.30"
+            "version": "==1.16.32"
         },
         "botocore": {
             "hashes": [
-                "sha256:70a8ec8d76096927b619a2f1f0dffe326fc9a4f9224afc6cf5d7ef2fd98a94a2",
-                "sha256:822f9dd11f11c54b9c4666cfec9b7246a32990dbca1be27528a75a8dabed4dc2"
+                "sha256:6631e4bb9f2fc1bede6e6ee538255e0af944d4f71e1530c2e39d03b64baa0bf1",
+                "sha256:74c7351b99d8f4bf9d8d9c66da8766c861254865d4c049e7107c39ac6b65e4bf"
             ],
-            "version": "==1.19.30"
+            "version": "==1.19.32"
         },
         "celery": {
             "hashes": [
-                "sha256:2cc87518fdd41375c8f40e2b0b59391568a3fb0a0b5f859f7bedef9b37efbc90",
-                "sha256:d7bcb0fca6fc94c41c946e8979c4c276a02cc7532c68757b43b25c2fa9eda68b"
+                "sha256:45bb7909061862305cefec94289fabc1b89ac004680f4dc7d9dea642a2507e53",
+                "sha256:533f3635065b7ed362ffc04228635b4c82d53a9ab812118ccdedb5eae281fb97"
             ],
             "index": "pypi",
-            "version": "==5.0.3"
+            "version": "==5.0.4"
         },
         "cffi": {
             "hashes": [
@@ -222,11 +222,11 @@
         },
         "faker": {
             "hashes": [
-                "sha256:7bca5b074299ac6532be2f72979e6793f1a2403ca8105cb4cf0b385a964469c4",
-                "sha256:fb21a76064847561033d8cab1cfd11af436ddf2c6fe72eb51b3cda51dff86bdc"
+                "sha256:1fcb415562ee6e2395b041e85fa6901d4708d30b84d54015226fa754ed0822c3",
+                "sha256:e8beccb398ee9b8cc1a91d9295121d66512b6753b4846eb1e7370545d46b3311"
             ],
             "index": "pypi",
-            "version": "==5.0.0"
+            "version": "==5.0.1"
         },
         "gunicorn": {
             "hashes": [

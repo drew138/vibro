@@ -101,7 +101,6 @@ class TestVibroUserView(APITestCase):
                          ['user_type'], self.user.user_type)
         self.assertEqual(
             res.data["results"][0]['certifications'], self.user.certifications)
-        print(res.data["results"][0]['picture'], self.user.picture.path)
         response_picture_file_name = os.path.basename(
             res.data["results"][0]['picture'])
         user_picture_file_name = os.path.basename(self.user.picture.path)
