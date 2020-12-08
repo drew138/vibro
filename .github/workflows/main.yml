@@ -32,8 +32,6 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      # env:
-      #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
       - name: Checkout code # checking our the code at current commit that triggers the workflow
         uses: actions/checkout@v2
       - name: Cache dependency # caching dependency will make our build faster.
@@ -56,6 +54,9 @@ jobs:
       #   run: pycodestyle --statistics .
       - name: Run Migrations # run migrations to create table in side car db container
         working-directory: ./backend
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG: ${{ secrets.DEBUG }}
         run: python manage.py migrate
       - name: Run Test # running tests
         working-directory: ./backend
