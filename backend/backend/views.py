@@ -356,7 +356,7 @@ class MeasurementView(viewsets.ModelViewSet):
         seeing unauthorized data.
         """
 
-        measurement_id = self.request.query_params.get('id', None)
+        id = self.request.query_params.get('id', None)
         service = self.request.query_params.get('service', None)
         measurement_type = self.request.query_params.get(
             'measurement_type', None)
@@ -370,13 +370,13 @@ class MeasurementView(viewsets.ModelViewSet):
         revised = self.request.query_params.get('revised', None)
         resolved = self.request.query_params.get('resolved', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            queryset = custom_models.Measurement.objects.all()
+        else:
             queryset = custom_models.Measurement.objects.filter(
                 machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Measurement.objects.all()
-        if measurement_id:
-            queryset = queryset.filter(id=measurement_id)
+        if id:
+            queryset = queryset.filter(id=id)
         if service:
             queryset = queryset.filter(service=service)
         if measurement_type:
@@ -415,7 +415,7 @@ class FlawView(viewsets.ModelViewSet):
         """
 
         id = self.request.query_params.get('id', None)
-        measurement_id = self.request.query_params.get('measurement_id', None)
+        measurement = self.request.query_params.get('measurement', None)
         flaw_type = self.request.query_params.get('flaw_type', None)
         severity = self.request.query_params.get('severity', None)
 
@@ -426,8 +426,8 @@ class FlawView(viewsets.ModelViewSet):
             queryset = custom_models.Flaw.objects.all()
         if id:
             queryset = queryset.filter(id=id)
-        if measurement_id:
-            queryset = queryset.filter(measurement__id=measurement_id)
+        if measurement:
+            queryset = queryset.filter(measurement__id=measurement)
         if flaw_type:
             queryset = queryset.filter(flaw_type=flaw_type)
         if severity:
