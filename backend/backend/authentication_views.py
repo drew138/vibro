@@ -39,7 +39,7 @@ class RegisterAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         Email.register(request).delay()
-        refresh = RefreshToken.for_user(self.request.user)
+        refresh = RefreshToken.for_user(user)
         return Response({
             "user": custom_serializers.VibroUserSerializer(
                 user,
@@ -64,7 +64,7 @@ class RegisterAdminAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         Email().register(request).delay()  # ! TODO test task
-        refresh = RefreshToken.for_user(self.request.user)
+        refresh = RefreshToken.for_user(user)
         return Response({
             "user": custom_serializers.VibroUserSerializer(
                 user,
@@ -202,11 +202,11 @@ class VibroUserView(viewsets.ModelViewSet):
         first_name = self.request.query_params.get('first_name', None)
         last_name = self.request.query_params.get('last_name', None)
 
-        if not (self.request.user.is_superuser or self.request.user.is_staff):
-            queryset = custom_models.VibroUser.objects.exclude(
-                user_type="client")
-        else:
+        if self.request.user.is_superuser or self.request.user.is_staff:
             queryset = custom_models.VibroUser.objects.all()
+        else:
+            queryset = custom_models.VibroUser.objects.exclude(
+                user_type="client").exclude(user_type='arduino')
         if id:
             queryset = queryset.filter(id=id)
         if user_type:
@@ -225,6 +225,7 @@ class VibroUserView(viewsets.ModelViewSet):
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data.pop("id", None)
         if not (request.user.user_type in {"admin", "engineer"}):
             serializer.validated_data.pop('certifications', None)
         if not (request.user.is_superuser or request.user.is_staff):

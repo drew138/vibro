@@ -5,6 +5,7 @@ from rest_framework import status
 from django.urls import reverse
 from model_bakery import baker
 from faker import Faker
+import os
 
 
 class TestVibroUserView(APITestCase):
@@ -20,22 +21,22 @@ class TestVibroUserView(APITestCase):
             'vibrouser-detail', kwargs={"pk": cls.user.id})
         cls.refresh = str(RefreshToken.for_user(cls.user).access_token)
         cls.faker = Faker()
-
-    def test_patch_method(self):
-        """
-        assert any user can modify relevant fields of their profile.
-        """
-
-        user_types = [
+        cls.user_types = [
             'admin',
             'engineer',
             'client',
             'support',
             'arduino'
         ]
+
+    def test_patch_method(self):
+        """
+        assert any user can modify relevant fields of their profile.
+        """
+
         self.user.is_staff = bool(getrandbits(1))
         self.user.is_superuser = bool(getrandbits(1))
-        self.user.user_type = choice(user_types)
+        self.user.user_type = choice(self.user_types)
         self.user.save()
         self.data = {
             'first_name': self.faker.first_name(),
@@ -44,7 +45,7 @@ class TestVibroUserView(APITestCase):
             'ext': self.faker.random_number(),
             'celphone': self.faker.random_number(),
             'company': self.company.id,
-            'user_type': choice(user_types),
+            'user_type': choice(self.user_types),
             'certifications': [self.faker.word() for _ in range(4)]
         }
 
@@ -66,10 +67,13 @@ class TestVibroUserView(APITestCase):
         else:
             self.assertEqual(res.data['user_type'], self.user.user_type)
 
-    def test_get_method(self):
+    def test_get_method_admin_or_staff_user(self):
         """
         veriffy any user can get users data. (profiles)
         """
+        self.user.is_staff = True
+        self.user.is_superuser = True
+        self.user.save()
 
         self.data = {
             'id': self.user.id,
@@ -81,8 +85,48 @@ class TestVibroUserView(APITestCase):
 
         self.refresh = str(RefreshToken.for_user(self.user).access_token)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.refresh}')
-        res = self.client.get(self.vibrouser_url_detail, self.data)
+        res = self.client.get(self.vibrouser_url, self.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["results"][0]['id'], self.user.id)
+        self.assertEqual(res.data["results"][0]
+                         ['first_name'], self.user.first_name)
+        self.assertEqual(res.data["results"][0]
+                         ['last_name'], self.user.last_name)
+        self.assertEqual(res.data["results"][0]['phone'], self.user.phone)
+        self.assertEqual(res.data["results"][0]['ext'], self.user.ext)
+        self.assertEqual(res.data["results"][0]['ext'], self.user.ext)
+        self.assertEqual(res.data["results"][0]
+                         ['company'], self.user.company.id)
+        self.assertEqual(res.data["results"][0]
+                         ['user_type'], self.user.user_type)
+        self.assertEqual(
+            res.data["results"][0]['certifications'], self.user.certifications)
+        response_picture_file_name = os.path.basename(
+            res.data["results"][0]['picture'])
+        user_picture_file_name = os.path.basename(self.user.picture.path)
+        self.assertEqual(response_picture_file_name, user_picture_file_name)
+
+    def test_get_method_client_user(self):
+        """
+        veriffy any user can get users data. (profiles)
+        """
+        self.user.is_staff = False
+        self.user.is_superuser = False
+        self.user.save()
+
+        self.data = {
+            'id': self.user.id,
+            'user_type': self.user.user_type,
+            'company_name': self.user.company.name,
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name
+        }
+
+        self.refresh = str(RefreshToken.for_user(self.user).access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.refresh}')
+        res = self.client.get(self.vibrouser_url, self.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["results"], [])
 
     def test_post_method_not_allowed(self):
         """
@@ -116,5 +160,5 @@ class TestVibroUserView(APITestCase):
         assert non authenticated users are not allowed.
         """
 
-        res = self.client.patch(self.vibrouser_url)
+        res = self.client.patch(self.vibrouser_url_detail)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
