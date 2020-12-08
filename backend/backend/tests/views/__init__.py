@@ -13,3 +13,4 @@ from .image_view import TestImageView
 from .date_view import TestDateView
 from .measurement_view import TestMeasurementView
 from .flaw_view import TestFlawView
+
