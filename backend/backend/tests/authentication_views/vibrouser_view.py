@@ -107,6 +107,7 @@ class TestVibroUserView(APITestCase):
         print(response_picture_file_name, user_picture_file_name)
         self.assertEqual(response_picture_file_name, user_picture_file_name)
 
+
     def test_get_method_client_user(self):
         """
         veriffy any user can get users data. (profiles)
