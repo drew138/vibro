@@ -59,6 +59,7 @@ jobs:
           DEBUG: ${{ secrets.DEBUG }}
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
           CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+          GITHUB_WORKFLOW: ${{ secrets.GITHUB_WORKFLOW }}
         run: python manage.py migrate
       - name: Run Test # running tests
         working-directory: ./backend
