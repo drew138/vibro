@@ -469,7 +469,7 @@ class TermoImageView(viewsets.ModelViewSet):
         seeing unauthorized data.
         """
 
-        termo_iamge_id = self.request.query_params.get('id', None)
+        id = self.request.query_params.get('id', None)
         measurement = self.request.query_params.get('measurement', None)
         image_type = self.request.query_params.get('image_type', None)
 
@@ -478,8 +478,8 @@ class TermoImageView(viewsets.ModelViewSet):
                 measurement__machine__company__user=self.request.user)
         else:
             queryset = custom_models.TermoImage.objects.all()
-        if termo_iamge_id:
-            queryset = queryset.filter(id=termo_iamge_id)
+        if id:
+            queryset = queryset.filter(id=id)
         if measurement:
             queryset = queryset.filter(measurement__id=measurement)
         if image_type:
@@ -499,25 +499,25 @@ class PointView(viewsets.ModelViewSet):
         seeing unauthorized data.
         """
 
-        point_id = self.request.query_params.get('id', None)
-        position = self.request.query_params.get('number', None)
-        direction = self.request.query_params.get('position', None)
+        id = self.request.query_params.get('id', None)
+        position = self.request.query_params.get('position', None)
+        direction = self.request.query_params.get('direction', None)
         point_type = self.request.query_params.get('point_type', None)
         measurement = self.request.query_params.get('measurement', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            queryset = custom_models.Point.objects.all()
+        else:
             queryset = custom_models.Point.objects.filter(
                 measurement__machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Point.objects.all()
-        if point_id:
-            queryset = queryset.filter(id=point_id)
+        if id:
+            queryset = queryset.filter(id=id)
         if position:
             queryset = queryset.filter(position=position)
         if direction:
             queryset = queryset.filter(direction=direction)
         if point_type:
-            queryset = queryset.filter(point_typed=point_type)
+            queryset = queryset.filter(point_type=point_type)
         if measurement:
             queryset = queryset.filter(measurement__id=measurement)
         return queryset

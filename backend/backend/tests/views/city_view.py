@@ -14,7 +14,6 @@ class TestCityView(APITestCase):
         cls.user = baker.make('backend.VibroUser')
 
     def setUp(self):
-        super().setUp()
         faker = Faker()
         self.city = baker.make('backend.City')
         self.data = {

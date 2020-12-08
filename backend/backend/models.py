@@ -518,6 +518,10 @@ class TermoImage(models.Model):
 
 class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
 
+    POSITION_CHOICES = [
+        (num, num) for num in range(1, 13)
+    ]
+
     # direction
     VER = 'V'
     HOR = 'H'
@@ -551,7 +555,7 @@ class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
         (CAL, "Calculado")
     ]
     # !TODO preguntar orden de columnas y orbita en diagrama de clases
-    position = models.IntegerField()
+    position = models.IntegerField(choices=POSITION_CHOICES)
     direction = models.CharField(
         max_length=1, choices=DIRECTION_CHOICES, default='undefined')
     point_type = models.CharField(
