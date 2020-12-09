@@ -75,7 +75,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'vibro.urls'
 
 TEMPLATES = [
@@ -95,7 +94,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'vibro.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -124,7 +122,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -142,7 +139,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 LANGUAGE_CODE = 'en-us'
@@ -154,7 +150,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static Files Configuration
 STATIC_URL = '/static/'
@@ -183,7 +178,6 @@ if not DEBUG and not os.getenv('WORKFLOW'):
     STATIC_URL = f'{AWS_S3_ENDPOINT_URL}/static/'
     MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/media/'
 
-
 # SMTP configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -193,12 +187,10 @@ EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.getenv('EMAIL_USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
-
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
 
 # Celery Beat Configuration
 # https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
@@ -208,7 +200,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(hours=24),
     }
 }
-
 
 # Cors Headers configuration
 # https://github.com/adamchainz/django-cors-headers#configuration

@@ -51,14 +51,14 @@ class CompanyView(viewsets.ModelViewSet):
         address = self.request.query_params.get('address', None)
         rut_address = self.request.query_params.get('rut_address', None)
         pbx = self.request.query_params.get('pbx', None)
-        city_id = self.request.query_params.get('city_id', None)
-        rut_city_id = self.request.query_params.get('rut_city_id', None)
+        city = self.request.query_params.get('city', None)
+        rut_city = self.request.query_params.get('rut_city', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = self.request.user.company
-            return queryset
-        else:
+        if self.request.user.is_staff or self.request.user.is_superuser:
             queryset = custom_models.Company.objects.all()
+        else:
+            queryset = custom_models.Company.objects.filter(
+                id=self.request.user.company.id)
         if id:
             queryset = queryset.filter(id=id)
         if name:
@@ -71,10 +71,10 @@ class CompanyView(viewsets.ModelViewSet):
             queryset = queryset.filter(rut_address=rut_address)
         if pbx:
             queryset = queryset.filter(pbx=pbx)
-        if city_id:
-            queryset = queryset.filter(city__id=city_id)
-        if rut_city_id:
-            queryset = queryset.filter(rut_city__id=rut_city_id)
+        if city:
+            queryset = queryset.filter(city__id=city)
+        if rut_city:
+            queryset = queryset.filter(rut_city__id=rut_city)
         return queryset
 
     def get_serializer_class(self):
