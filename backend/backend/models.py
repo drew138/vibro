@@ -117,7 +117,7 @@ class Machine(models.Model):
         (HP, 'HorsePower'),
     )
 
-    identifier = models.IntegerField(blank=True, null=True)  # ! ES NUMERO?
+    identifier = models.IntegerField(blank=True, null=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -133,8 +133,6 @@ class Machine(models.Model):
         max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
     norm = models.TextField(null=True, blank=True)
     hierarchy = models.IntegerField(default=0)
-    # machine_type = models.CharField(max_length=50)  # TODO preguntar si puedo remover
-    # transmission = models.TextField(blank=True, null=True) # TODO preguntar si puedo remover
     rpm = models.IntegerField(blank=True, null=True)
 
 
@@ -253,7 +251,6 @@ class Axis(models.Model):  # eje
         (RPM, 'rpm'),
         (HZ, 'Hz'),
     )
-
     gear = models.ForeignKey(
         Gear,
         related_name='axis',
@@ -263,7 +260,6 @@ class Axis(models.Model):  # eje
         choices=TYPE_CHOICES,
         default='Undefined')  # TODO contar num cojinetes
     velocity = models.IntegerField()
-    # ! TODO preguntar si puedo hacer conversion en frontend
     units = models.CharField(
         max_length=3,
         choices=UNITS_CHOICES,
@@ -516,7 +512,7 @@ class TermoImage(models.Model):
     image = models.ImageField(upload_to="termals")
 
 
-class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
+class Point(models.Model):
 
     POSITION_CHOICES = [
         (num, num) for num in range(1, 13)
@@ -530,7 +526,7 @@ class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
     # type
     ACC = 'A'
     VEL = 'V'
-    DEZ = 'D'  # Desplazamiento
+    DES = 'D'  # Desplazamiento
     TEMP = 'T'  # temperatura
     ENV = 'E'  # Envolvente
     HFD = 'H'  # HFD
@@ -547,14 +543,14 @@ class Point(models.Model):  # ! medicion se hace sobre maqui o sobre equipo?
     TYPE_CHOICES = [
         (VEL, 'Velocity'),
         (ACC, 'Acceleration'),
-        (DEZ, 'Displacement'),
+        (DES, 'Displacement'),
         (TEMP, 'Temperature'),
         (ENV, 'Envol'),
         (HFD, 'HFD'),
         (MAN, "Manual"),
         (CAL, "Calculado")
     ]
-    # !TODO preguntar orden de columnas y orbita en diagrama de clases
+
     position = models.IntegerField(choices=POSITION_CHOICES)
     direction = models.CharField(
         max_length=1, choices=DIRECTION_CHOICES, default='undefined')
