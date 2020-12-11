@@ -1,3 +1,4 @@
+# from django.contrib.postgres.fields.array import ArrayField
 from rest_framework import serializers
 from . import models as custom_models
 
@@ -73,7 +74,7 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
 # Register admin Serializer
 class RegisterAdminUserSerializer(serializers.ModelSerializer):
 
-    company = DefaultCompanySerializer(required=False)
+    # company = DefaultCompanySerializer(required=False)
     user_type = serializers.CharField(required=False)
 
     class Meta:
@@ -255,6 +256,10 @@ class TermoImageSerializer(serializers.ModelSerializer):
 class PointSerializer(serializers.ModelSerializer):
 
     # measurement = MeasurementSerializer()
+    espectra = serializers.ListField(
+        child=serializers.DecimalField(decimal_places=2, max_digits=4, default=0), required=False)
+    time_signal = serializers.ListField(
+        child=serializers.DecimalField(decimal_places=2, max_digits=4, default=0), required=False)
 
     class Meta:
         model = custom_models.Point

@@ -8,18 +8,24 @@ import { history } from "../../../../history"
 
 class RegisterJWT extends React.Component {
   state = {
+    username: "",
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
-    name: "",
-    confirmPass: ""
+    confirmPass: "",
+    celphone: undefined
   }
 
   handleRegister = e => {
     e.preventDefault()
     this.props.signupWithJWT(
+      this.state.username,
+      this.state.first_name,
+      this.state.last_name,
       this.state.email,
       this.state.password,
-      this.state.name
+      this.state.celphone
     )
   }
 
@@ -29,13 +35,36 @@ class RegisterJWT extends React.Component {
         <FormGroup className="form-label-group">
           <Input
             type="text"
-            placeholder="Name"
+            placeholder="Usuario"
             required
-            value={this.state.name}
-            onChange={e => this.setState({ name: e.target.value })}
+            value={this.state.username}
+            onChange={e => this.setState({ username: e.target.value })}
           />
-          <Label>Name</Label>
+          <Label>Usuario</Label>
         </FormGroup>
+
+        <FormGroup className="form-label-group">
+          <Input
+            type="text"
+            placeholder="Nombre"
+            required
+            value={this.state.first_name}
+            onChange={e => this.setState({ first_name: e.target.value })}
+          />
+          <Label>Nombre</Label>
+        </FormGroup>
+
+        <FormGroup className="form-label-group">
+          <Input
+            type="text"
+            placeholder="Apellido"
+            required
+            value={this.state.last_name}
+            onChange={e => this.setState({ last_name: e.target.value })}
+          />
+          <Label>Apellido</Label>
+        </FormGroup>
+
         <FormGroup className="form-label-group">
           <Input
             type="email"
@@ -46,34 +75,42 @@ class RegisterJWT extends React.Component {
           />
           <Label>Email</Label>
         </FormGroup>
+
         <FormGroup className="form-label-group">
           <Input
             type="password"
-            placeholder="Password"
+            placeholder="Contraseña"
             required
             value={this.state.password}
             onChange={e => this.setState({ password: e.target.value })}
           />
-          <Label>Password</Label>
+          <Label>Contraseña</Label>
         </FormGroup>
+
         <FormGroup className="form-label-group">
           <Input
             type="password"
-            placeholder="Confirm Password"
+            placeholder="Confirma Contraseña"
             required
             value={this.state.confirmPass}
             onChange={e => this.setState({ confirmPass: e.target.value })}
           />
-          <Label>Confirm Password</Label>
+          <Label>Confirma Contraseña</Label>
         </FormGroup>
-        {/* <FormGroup>
-          <Checkbox
-            color="primary"
-            icon={<Check className="vx-icon" size={16} />}
-            label=" I accept the terms & conditions."
-            defaultChecked={true}
+
+        <FormGroup className="form-label-group">
+          <Input
+            type="number"
+            placeholder="Celular"
+            required
+            value={this.state.celphone}
+            onChange={e => this.setState({ celphone: e.target.value })}
           />
-        </FormGroup> */}
+          <Label>Celular</Label>
+        </FormGroup>
+        
+        
+        
         <div className="d-flex justify-content-between">
           <Button.Ripple
             color="primary"
@@ -82,10 +119,10 @@ class RegisterJWT extends React.Component {
               history.push("/pages/login")
             }}
           >
-            Login
+            Ingresar
           </Button.Ripple>
           <Button.Ripple color="primary" type="submit">
-            Register
+            Registrarse
           </Button.Ripple>
         </div>
       </Form>
