@@ -4,13 +4,13 @@ ENV PYTHONBUFFERED=1
 
 RUN apk add --update --no-cache --virtual .tmp gcc libc-dev linux-headers
 
-RUN mkdir /api
+RUN mkdir /backend
 
-WORKDIR /api/
+WORKDIR /backend/
 
-COPY . /api/
+COPY . /backend/
 
-RUN pip install -r /api/requirements.txt
+RUN pip install -r /backend/requirements.txt
 
 RUN apk del .tmp
 

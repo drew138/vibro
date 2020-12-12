@@ -52,11 +52,11 @@ class Register extends React.Component {
                 <Card className="rounded-0 mb-0 p-2">
                   <CardHeader className="pb-1 pt-50">
                     <CardTitle>
-                      <h4 className="mb-0">Create Account</h4>
+                      <h4 className="mb-0">Crear una cuenta</h4>
                     </CardTitle>
                   </CardHeader>
                   <p className="px-2 auth-title mb-0">
-                    Fill the below form to create a new account.
+                    Llena la siguiente forma para crear una cuenta.
                   </p>
                   {/* <Nav tabs className="px-2">
                     <NavItem>
