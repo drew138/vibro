@@ -57,7 +57,7 @@ export const signupWithFirebase = (email, password, name) => {
 export const signupWithJWT = (username, first_name, last_name, email, password, celphone) => {
   return dispatch => {
     axios
-      .post("/api/authenticate/register/user", {
+      .post("/api/auth/register/", {
         username,
         first_name,
         last_name,

@@ -177,6 +177,9 @@ const register = lazy(() =>
 const accessControl = lazy(() =>
   import("./extensions/access-control/AccessControl")
 )
+const espectra = lazy(() => import("./views/apps/measurements/Espectra"))
+const upload = lazy(() => import("./views/apps/measurements/Upload"))
+
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
   <Route
@@ -219,6 +222,8 @@ class AppRouter extends React.Component {
       <Router history={history}>
         <Switch>
           <AppRoute exact path="/" component={analyticsDashboard} />
+          <AppRoute exact path="/measurements/espectra" component={espectra} />
+          <AppRoute exact path="/measurements/upload" component={upload} />
           <AppRoute
             path="/ecommerce-dashboard"
             component={ecommerceDashboard}

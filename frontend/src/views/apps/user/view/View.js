@@ -15,15 +15,22 @@ import { Link } from "react-router-dom"
 import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
 import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
 import "../../../../assets/scss/pages/users.scss"
+import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+
 class UserView extends React.Component {
   render() {
     return (
       <React.Fragment>
+        <Breadcrumbs
+          breadCrumbTitle="Perfil de Usuario"
+          breadCrumbParent="Usuario"
+          breadCrumbActive="Perfil"
+        />
         <Row>
           <Col sm="12">
             <Card>
               <CardHeader>
-                <CardTitle>Account</CardTitle>
+                <CardTitle>Perfil</CardTitle>
               </CardHeader>
               <CardBody>
                 <Row className="mx-0" col="12">
@@ -45,13 +52,13 @@ class UserView extends React.Component {
                             <div className="users-page-view-table">
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
-                                  Username
+                                  Usuario
                                 </div>
                                 <div>crystal</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
-                                  Name
+                                  Nombre
                                 </div>
                                 <div>Crystal Hamilton</div>
                               </div>
@@ -61,6 +68,14 @@ class UserView extends React.Component {
                                 </div>
                                 <div className="text-truncate">
                                   <span>crystalhamilton@gmail.com</span>
+                                </div>
+                              </div>
+                              <div className="d-flex user-info">
+                                <div className="user-info-title font-weight-bold">
+                                  Celular
+                                </div>
+                                <div className="text-truncate">
+                                  <span>300-300-3000</span>
                                 </div>
                               </div>
                             </div>
@@ -75,18 +90,27 @@ class UserView extends React.Component {
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
-                                  Role
+                                  Tipo
                                 </div>
                                 <div>admin</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
-                                  Company
+                                  Empresa
                                 </div>
                                 <div>
                                   <span>North Star Aviation Pvt Ltd</span>
                                 </div>
                               </div>
+                              <div className="d-flex user-info">
+                                <div className="user-info-title font-weight-bold">
+                                  Telefono
+                                </div>
+                                <div>
+                                  <span>300-3000</span>
+                                </div>
+                              </div>
+                             {/* TODO add certifications */}
                             </div>
                           </Col>
                         </Row>
@@ -109,7 +133,7 @@ class UserView extends React.Component {
               </CardBody>
             </Card>
           </Col>
-          <Col sm="12" md="6">
+          {/* <Col sm="12" md="6">
             <Card>
               <CardHeader>
                 <CardTitle>Information</CardTitle>
@@ -163,8 +187,8 @@ class UserView extends React.Component {
                 </div>
               </CardBody>
             </Card>
-          </Col>
-          <Col sm="12" md="6">
+          </Col> */}
+          {/* <Col sm="12" md="6">
             <Card>
               <CardHeader>
                 <CardTitle>Social Links</CardTitle>
@@ -222,9 +246,9 @@ class UserView extends React.Component {
                 </div>
               </CardBody>
             </Card>
-          </Col>
-          <Col sm="12">
-            <Card>
+          </Col> */}
+          {/* <Col sm="12"> */}
+            {/* <Card>
               <CardHeader className="border-bottom pb-1 mx-2 px-0">
                 <CardTitle>
                   <Lock size={18} />
@@ -367,8 +391,8 @@ class UserView extends React.Component {
                   </tbody>
                 </Table>
               </CardBody>
-            </Card>
-          </Col>
+            </Card> */}
+          {/* </Col> */}
         </Row>
       </React.Fragment>
     )

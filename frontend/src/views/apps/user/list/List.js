@@ -34,6 +34,8 @@ import classnames from "classnames"
 import { history } from "../../../../history"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
+import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+
 class UsersList extends React.Component {
   state = {
     rowData: null,
@@ -252,6 +254,13 @@ class UsersList extends React.Component {
   render() {
     const { rowData, columnDefs, defaultColDef, pageSize } = this.state
     return (
+      <React.Fragment>
+        <Breadcrumbs
+          breadCrumbTitle="Lista de Usuarios"
+          breadCrumbParent="Usuarios"
+          breadCrumbActive="Lista"
+        />
+      
       <Row className="app-user-list">
         <Col sm="12">
           <Card
@@ -514,6 +523,7 @@ class UsersList extends React.Component {
           </Card>
         </Col>
       </Row>
+      </React.Fragment>
     )
   }
 }
