@@ -16,6 +16,8 @@ import AccountTab from "./Account"
 import InfoTab from "./Information"
 import SocialTab from "./Social"
 import "../../../../assets/scss/pages/users.scss"
+import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+
 class UserEdit extends React.Component {
   state = {
     activeTab: "1"
@@ -28,6 +30,12 @@ class UserEdit extends React.Component {
   }
   render() {
     return (
+      <React.Fragment>
+        <Breadcrumbs
+          breadCrumbTitle="Editar Usuario"
+          breadCrumbParent="Usuario"
+          breadCrumbActive="Editar"
+        />
       <Row>
         <Col sm="12">
           <Card>
@@ -46,7 +54,7 @@ class UserEdit extends React.Component {
                     <span className="align-middle ml-50">Account</span>
                   </NavLink>
                 </NavItem>
-                <NavItem>
+                {/* <NavItem>
                   <NavLink
                     className={classnames({
                       active: this.state.activeTab === "2"
@@ -58,8 +66,8 @@ class UserEdit extends React.Component {
                     <Info size={16} />
                     <span className="align-middle ml-50">Information</span>
                   </NavLink>
-                </NavItem>
-                <NavItem>
+                </NavItem> */}
+                {/* <NavItem>
                   <NavLink
                     className={classnames({
                       active: this.state.activeTab === "3"
@@ -71,7 +79,7 @@ class UserEdit extends React.Component {
                     <Share size={16} />
                     <span className="align-middle ml-50">Social</span>
                   </NavLink>
-                </NavItem>
+                </NavItem> */}
               </Nav>
               <TabContent activeTab={this.state.activeTab}>
                 <TabPane tabId="1">
@@ -88,6 +96,7 @@ class UserEdit extends React.Component {
           </Card>
         </Col>
       </Row>
+      </React.Fragment>
     )
   }
 }

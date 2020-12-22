@@ -29,23 +29,23 @@ const UserDropdown = props => {
   const { logout, isAuthenticated } = useAuth0()
   return (
     <DropdownMenu right>
-      <DropdownItem
+      {/* <DropdownItem
         tag="a"
         href="#"
         onClick={e => handleNavigation(e, "/pages/profile")}
       >
         <Icon.User size={14} className="mr-50" />
         <span className="align-middle">Edit Profile</span>
-      </DropdownItem>
-      <DropdownItem
+      </DropdownItem> */}
+      {/* <DropdownItem
         tag="a"
         href="#"
         onClick={e => handleNavigation(e, "/email/inbox")}
       >
         <Icon.Mail size={14} className="mr-50" />
         <span className="align-middle">My Inbox</span>
-      </DropdownItem>
-      <DropdownItem
+      </DropdownItem> */}
+      {/* <DropdownItem
         tag="a"
         href="#"
         onClick={e => handleNavigation(e, "/todo/all")}
@@ -64,7 +64,7 @@ const UserDropdown = props => {
       <DropdownItem tag="a" href="#" onClick={e => handleNavigation(e, "/ecommerce/wishlist")}>
         <Icon.Heart size={14} className="mr-50" />
         <span className="align-middle">WishList</span>
-      </DropdownItem>
+      </DropdownItem> */}
       <DropdownItem divider />
       <DropdownItem
         tag="a"
@@ -110,7 +110,7 @@ class NavbarUser extends React.PureComponent {
               <span className="user-name text-bold-600">
                 {this.props.userName}
               </span>
-              <span className="user-status">Available</span>
+              {/* <span className="user-status">Available</span> */}
             </div>
             <span data-tour="user">
               <img

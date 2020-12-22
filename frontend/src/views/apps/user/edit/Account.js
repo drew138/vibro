@@ -13,9 +13,13 @@ import {
 import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
 import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
 import { Check, Lock } from "react-feather"
+
+
 class UserAccountTab extends React.Component {
   render() {
     return (
+      
+      
       <Row>
         <Col sm="12">
           <Media className="mb-2">
@@ -47,7 +51,7 @@ class UserAccountTab extends React.Component {
             <Row>
               <Col md="6" sm="12">
                 <FormGroup>
-                  <Label for="username">Username</Label>
+                  <Label for="username">Usuario</Label>
                   <Input
                     type="text"
                     defaultValue="crystal"
@@ -100,7 +104,7 @@ class UserAccountTab extends React.Component {
               </Col>
               <Col md="6" sm="12">
                 <FormGroup>
-                  <Label for="company">Company</Label>
+                  <Label for="company">Empresa</Label>
                   <Input
                     type="text"
                     id="company"
@@ -109,6 +113,30 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="company">Celular</Label>
+                  <Input
+                    type="text"
+                    id="celphone"
+                    defaultValue="300-300-3000"
+                    placeholder="company"
+                  />
+                </FormGroup>
+              </Col>
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="company">Telefono</Label>
+                  <Input
+                    type="text"
+                    id="phone"
+                    defaultValue="300-3000"
+                    placeholder="phone"
+                  />
+                </FormGroup>
+              </Col>
+
+              {/* TODO permissions */}
               <Col sm="12">
                 <div className="permissions border px-2">
                   <div className="title pt-2 pb-0">
@@ -254,6 +282,7 @@ class UserAccountTab extends React.Component {
           </Form>
         </Col>
       </Row>
+
     )
   }
 }

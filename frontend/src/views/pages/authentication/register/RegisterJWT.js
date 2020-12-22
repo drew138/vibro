@@ -5,7 +5,8 @@ import { Check } from "react-feather"
 import { connect } from "react-redux"
 import { signupWithJWT } from "../../../../redux/actions/auth/registerActions"
 import { history } from "../../../../history"
-
+import Slider from "../../../../extensions/sweet-alert/SweetAlert"
+import SweetAlert from 'react-bootstrap-sweetalert';
 class RegisterJWT extends React.Component {
   state = {
     username: "",
@@ -14,7 +15,8 @@ class RegisterJWT extends React.Component {
     email: "",
     password: "",
     confirmPass: "",
-    celphone: undefined
+    celphone: undefined,
+    infoAlert: true
   }
 
   handleRegister = e => {
@@ -27,6 +29,10 @@ class RegisterJWT extends React.Component {
       this.state.password,
       this.state.celphone
     )
+  }
+
+  handleAlert = (state, value) => {
+    this.setState({ [state] : value })
   }
 
   render() {
@@ -125,6 +131,14 @@ class RegisterJWT extends React.Component {
             Registrarse
           </Button.Ripple>
         </div>
+        <SweetAlert info title="Info!"
+          show={this.state.infoAlert} 
+          onConfirm={() => this.handleAlert("infoAlert", false)}
+        >
+            <p className="sweet-alert-text">
+              You clicked the button!
+            </p>
+        </SweetAlert>
       </Form>
     )
   }
