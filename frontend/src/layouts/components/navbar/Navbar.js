@@ -12,27 +12,17 @@ import NavbarUser from "./NavbarUser"
 import userImg from "../../../assets/img/portrait/small/avatar-s-11.jpg"
 
 const UserName = props => {
-  let username = ""
-  if (props.userdata !== undefined) {
-    username = props.userdata.name
-  } else if (props.user.login.values !== undefined) {
-    username = props.user.login.values.name
-    if (
-      props.user.login.values.loggedInWith !== undefined &&
-      props.user.login.values.loggedInWith === "jwt"
-    ) {
-      username = props.user.login.values.loggedInUser.name
-    }
-  } else {
-    username = "John Doe"
+  if (!props.user.login.values) { // TODO remove condition after development
+    return "John doe"
   }
+  return props.user.login.values.username
 
-  return username
 }
 const ThemeNavbar = props => {
   const { user } = useAuth0()
   const colorsArr = [ "primary", "danger", "success", "info", "warning", "dark"]
   const navbarTypes = ["floating" , "static" , "sticky" , "hidden"]
+  console.log(props.user)
   return (
     <React.Fragment>
       <div className="content-overlay" />
@@ -87,14 +77,9 @@ const ThemeNavbar = props => {
               <NavbarUser
                 handleAppOverlay={props.handleAppOverlay}
                 changeCurrentLang={props.changeCurrentLang}
-                userName={<UserName userdata={user} {...props} />}
+                userName={<UserName {...props} />}
                 userImg={
-                  props.user.login.values !== undefined &&
-                  props.user.login.values.loggedInWith !== "jwt" &&
-                  props.user.login.values.photoUrl
-                    ? props.user.login.values.photoUrl 
-                    : user !== undefined && user.picture ? user.picture
-                    : userImg
+                  !props.user.login.values ? userImg : props.user.login.values.picture
                 }
                 loggedInWith={
                   props.user !== undefined &&

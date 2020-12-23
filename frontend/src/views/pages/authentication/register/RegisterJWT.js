@@ -1,11 +1,11 @@
 import React from "react"
 import { Form, FormGroup, Input, Label, Button } from "reactstrap"
-import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
-import { Check } from "react-feather"
+// import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
+// import { Check } from "react-feather"
 import { connect } from "react-redux"
 import { signupWithJWT } from "../../../../redux/actions/auth/registerActions"
 import { history } from "../../../../history"
-import Slider from "../../../../extensions/sweet-alert/SweetAlert"
+// import Slider from "../../../../extensions/sweet-alert/SweetAlert"
 import SweetAlert from 'react-bootstrap-sweetalert';
 class RegisterJWT extends React.Component {
   state = {

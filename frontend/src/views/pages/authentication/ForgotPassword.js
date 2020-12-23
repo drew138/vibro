@@ -39,12 +39,12 @@ class ForgotPassword extends React.Component {
                 <Card className="rounded-0 mb-0 px-2 py-1">
                   <CardHeader className="pb-1">
                     <CardTitle>
-                      <h4 className="mb-0">Recover your password</h4>
+                      <h4 className="mb-0">Recupera tu Contraseña</h4>
                     </CardTitle>
                   </CardHeader>
                   <p className="px-2 auth-title">
-                    Please enter your email address and we'll send you
-                    instructions on how to reset your password.
+                    Por favor entra tu correo electronico y te enviaremos
+                    instrucciones para cambiar tu contraseña.
                   </p>
                   <CardBody className="pt-1 pb-0">
                     <Form>
@@ -59,7 +59,7 @@ class ForgotPassword extends React.Component {
                           className="px-75 btn-block"
                           onClick={() => history.push("/pages/login")}
                         >
-                          Back to Login
+                          Ingresar
                         </Button.Ripple>
                       </div>
                       <div className="float-md-right d-block mb-1">
@@ -72,7 +72,7 @@ class ForgotPassword extends React.Component {
                             history.push("/")
                           }}
                         >
-                          Recover Password
+                          Recuperar Contraseña
                         </Button.Ripple>
                       </div>
                     </Form>

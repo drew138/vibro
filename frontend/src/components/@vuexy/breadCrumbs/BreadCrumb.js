@@ -2,12 +2,14 @@ import React from "react"
 import {
   Breadcrumb,
   BreadcrumbItem,
-  UncontrolledButtonDropdown,
-  DropdownMenu,
-  DropdownItem,
-  DropdownToggle
+  // UncontrolledButtonDropdown,
+  // DropdownMenu,
+  // DropdownItem,
+  // DropdownToggle
 } from "reactstrap"
-import { Home, Settings } from "react-feather"
+import { Home
+  // , Settings 
+} from "react-feather"
 import { NavLink } from "react-router-dom"
 class BreadCrumbs extends React.Component {
   render() {

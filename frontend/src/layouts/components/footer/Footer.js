@@ -1,7 +1,7 @@
 import React from "react"
-import ScrollToTop from "react-scroll-up"
-import { Button } from "reactstrap"
-import { Heart, ArrowUp } from "react-feather"
+// import ScrollToTop from "react-scroll-up"
+// import { Button } from "reactstrap"
+// import { Heart, ArrowUp } from "react-feather"
 import classnames from "classnames"
 
 const Footer = props => {

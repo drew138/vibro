@@ -5,30 +5,20 @@ import {
   CardTitle,
   Row,
   Col,
-  Nav,
-  NavItem,
-  NavLink,
-  TabContent,
-  TabPane
+  // Nav,
+  // NavItem,
+  // NavLink,
+  // TabContent,
+  // TabPane
 } from "reactstrap"
-import classnames from "classnames"
+// import classnames from "classnames"
 import loginImg from "../../../../assets/img/pages/login.png"
 import "../../../../assets/scss/pages/authentication.scss"
-import LoginAuth0 from "./LoginAuth0"
-import LoginFirebase from "./LoginFirebase"
+// import LoginAuth0 from "./LoginAuth0"
+// import LoginFirebase from "./LoginFirebase"
 import LoginJWT from "./LoginJWT"
 
 class Login extends React.Component {
-  state = {
-    activeTab: "1"
-  }
-  toggle = tab => {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      })
-    }
-  }
   render() {
     return (
       <Row className="m-0 justify-content-center">
@@ -51,61 +41,13 @@ class Login extends React.Component {
                 <Card className="rounded-0 mb-0 px-2 login-tabs-container">
                   <CardHeader className="pb-1">
                     <CardTitle>
-                      <h4 className="mb-0">Login</h4>
+                      <h4 className="mb-0">Ingresar</h4>
                     </CardTitle>
                   </CardHeader>
                   <p className="px-2 auth-title">
-                    Welcome back, please login to your account.
+                    Bienvenido de vuelta, por favor ingresa a tu cuenta.
                   </p>
-                  {/* <Nav tabs className="px-2">
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: this.state.activeTab === "1"
-                        })}
-                        onClick={() => {
-                          this.toggle("1")
-                        }}
-                      >
-                        JWT
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: this.state.activeTab === "2"
-                        })}
-                        onClick={() => {
-                          this.toggle("2")
-                        }}
-                      >
-                        Firebase
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: this.state.activeTab === "3"
-                        })}
-                        onClick={() => {
-                          this.toggle("3")
-                        }}
-                      >
-                        Auth0
-                      </NavLink>
-                    </NavItem>
-                  </Nav> */}
-                  <TabContent activeTab={"1"}>
-                    <TabPane tabId="1">
-                      <LoginJWT />
-                    </TabPane>
-                    {/* <TabPane tabId="2">
-                      <LoginFirebase />
-                    </TabPane>
-                    <TabPane tabId="3">
-                      <LoginAuth0 />
-                    </TabPane> */}
-                  </TabContent>
+                  <LoginJWT />
                 </Card>
               </Col>
             </Row>

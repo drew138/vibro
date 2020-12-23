@@ -44,6 +44,10 @@ class ApexLineCharts extends React.Component {
       {
         name: "line-series",
         data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
+      },
+      {
+        name: "lin-se2ries",
+        data: [12, 49, 38, 55, 31, 88, 35, 55, 122]
       }
     ]
   }

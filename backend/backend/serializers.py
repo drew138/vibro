@@ -1,6 +1,7 @@
 # from django.contrib.postgres.fields.array import ArrayField
 from rest_framework import serializers
 from . import models as custom_models
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -38,11 +39,17 @@ class VibroUserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'username',
+            'first_name',
+            "last_name",
+            'celphone',
+            'phone',
+            'ext',
             'email',
             'company',
             'user_type',
             'is_staff',
-            'is_superuser'
+            'is_superuser',
+            'picture'
         ]
 
 
@@ -148,6 +155,36 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
             'certifications',
             'picture',
         ]
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields[self.username_field] = serializers.CharField()
+        self.fields['password'] = PasswordField()
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+        data['id'] = self.user.id
+        data['username'] = self.user.username
+        data["first_name"] = self.user.first_name
+        data["last_name"] = self.user.last_name
+        data["celphone"] = self.user.celphone
+        data["phone"] = self.user.phone
+        data["ext"] = self.user.ext
+        data["email"] = self.user.email
+        data["company"] = self.user.company
+        data["user_type"] = self.user.user_type
+        data["is_staff"] = self.user.is_staff
+        data["is_superuser"] = self.user.is_superuser
+        request = self.context.get('request')
+        data["picture"] = request.build_absolute_uri(self.user.picture.url)
+        return data
 
 
 class MachineSerializer(serializers.ModelSerializer):

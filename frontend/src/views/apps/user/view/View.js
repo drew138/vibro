@@ -8,14 +8,17 @@ import {
   Row,
   Col,
   Button,
-  Table
+  // Table
 } from "reactstrap"
-import { Edit, Trash, Lock, Check } from "react-feather"
+import { Edit, Trash
+  // , Lock, Check 
+} from "react-feather"
 import { Link } from "react-router-dom"
-import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
+// import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
 import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+import { connect } from "react-redux"
 
 class UserView extends React.Component {
   render() {
@@ -40,7 +43,12 @@ class UserView extends React.Component {
                         <Media
                           className="rounded mr-2"
                           object
-                          src={userImg}
+                          
+                          // src={userImg}
+                          src={
+                            // TODO remove condition in production
+                            !this.props.user.login.values ? userImg : this.props.user.login.values.picture
+                          }
                           alt="Generic placeholder image"
                           height="112"
                           width="112"
@@ -54,20 +62,20 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Usuario
                                 </div>
-                                <div>crystal</div>
+                                <div>{this.props.user.login.values.username}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Nombre
                                 </div>
-                                <div>Crystal Hamilton</div>
+                                <div>{this.props.user.login.values.first_name}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Email
                                 </div>
                                 <div className="text-truncate">
-                                  <span>crystalhamilton@gmail.com</span>
+                                  <span>{this.props.user.login.values.email}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -75,7 +83,7 @@ class UserView extends React.Component {
                                   Celular
                                 </div>
                                 <div className="text-truncate">
-                                  <span>300-300-3000</span>
+                                  <span>{this.props.user.login.values.celphone}</span>
                                 </div>
                               </div>
                             </div>
@@ -92,14 +100,14 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Tipo
                                 </div>
-                                <div>admin</div>
+                                <div>{this.props.user.login.values.user_type}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Empresa
                                 </div>
                                 <div>
-                                  <span>North Star Aviation Pvt Ltd</span>
+                                  <span>{this.props.user.login.values.company}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -107,7 +115,7 @@ class UserView extends React.Component {
                                   Telefono
                                 </div>
                                 <div>
-                                  <span>300-3000</span>
+                                  <span>{this.props.user.login.values.phone}</span>
                                 </div>
                               </div>
                              {/* TODO add certifications */}
@@ -121,12 +129,12 @@ class UserView extends React.Component {
                     <Button.Ripple className="mr-1" color="primary" outline>
                       <Link to="/app/user/edit">
                         <Edit size={15} />
-                        <span className="align-middle ml-50">Edit</span>
+                        <span className="align-middle ml-50">Editar</span>
                       </Link>
                     </Button.Ripple>
                     <Button.Ripple color="danger" outline>
                       <Trash size={15} />
-                      <span className="align-middle ml-50">Delete</span>
+                      <span className="align-middle ml-50">Borrar</span>
                     </Button.Ripple>
                   </Col>
                 </Row>
@@ -398,4 +406,10 @@ class UserView extends React.Component {
     )
   }
 }
-export default UserView
+const mapStateToProps = state => {
+  return {
+    user: state.auth
+  }
+}
+
+export default connect(mapStateToProps)(UserView)

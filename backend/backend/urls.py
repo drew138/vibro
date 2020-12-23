@@ -15,8 +15,8 @@ auth_views = [
     path('auth/change', authentication_views.ChangePassAPI.as_view(), name='change'),
     path('auth/change/forgot',
          authentication_views.ForgotPassAPI.as_view(), name='change-forgot'),
-    path('auth/login/', TokenObtainPairView.as_view(), name='login'),
-    path('auth/token/refresh/', TokenRefreshView.as_view(), name='refresh'),
+    path('auth/login/', authentication_views.LoginView.as_view(), name='login'),
+    path('auth/refresh/', TokenRefreshView.as_view(), name='refresh'),
 ]
 
 router = routers.DefaultRouter()

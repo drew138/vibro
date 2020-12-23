@@ -9,9 +9,12 @@ from . import models as custom_models
 from rest_framework import viewsets
 from rest_framework import status
 from .tasks import Email
-
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 # Get User API
+
+
 class UserAPI(generics.RetrieveAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
@@ -240,3 +243,8 @@ class VibroUserView(viewsets.ModelViewSet):
         """
 
         return self.request.user
+
+
+class LoginView(TokenObtainPairView):
+
+    serializer_class = custom_serializers.LoginSerializer
