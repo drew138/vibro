@@ -99,7 +99,7 @@ export const loginWithTwitter = () => {
     let provider = new firebase.auth.TwitterAuthProvider()
     firebaseAuth
       .signInWithPopup(provider)
-      .then(function(result) {
+      .then(function (result) {
         let token = result.credential.accessToken,
           user = result.user.email,
           name = result.user.displayName,
@@ -116,7 +116,7 @@ export const loginWithTwitter = () => {
         })
         history.push("/")
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error)
       })
   }
@@ -127,7 +127,7 @@ export const loginWithGoogle = () => {
     let provider = new firebase.auth.GoogleAuthProvider()
     firebaseAuth
       .signInWithPopup(provider)
-      .then(function(result) {
+      .then(function (result) {
         let token = result.credential.accessToken,
           user = result.user.email,
           name = result.user.displayName,
@@ -144,7 +144,7 @@ export const loginWithGoogle = () => {
         })
         history.push("/")
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error)
       })
   }
@@ -155,7 +155,7 @@ export const loginWithGithub = () => {
     let provider = new firebase.auth.GithubAuthProvider()
     firebaseAuth
       .signInWithPopup(provider)
-      .then(function(result) {
+      .then(function (result) {
         let token = result.credential.accessToken,
           user = result.user.email,
           name = result.additionalUserInfo.username,
@@ -173,34 +173,37 @@ export const loginWithGithub = () => {
         })
         history.push("/")
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error)
       })
   }
 }
 
 export const loginWithJWT = user => {
-  return dispatch => {
-    axios
-      .post("/api/authenticate/login/user", {
-        email: user.email,
-        password: user.password
+  return async dispatch => {
+
+    try {
+      let res = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
+      username: user.username,
+      password: user.password
       })
-      .then(response => {
-        var loggedInUser
 
-        if (response.data) {
-          loggedInUser = response.data.user
-
-          dispatch({
-            type: "LOGIN_WITH_JWT",
-            payload: { loggedInUser, loggedInWith: "jwt" }
-          })
-
-          history.push("/")
-        }
-      })
-      .catch(err => console.log(err))
+      // res = await axios.get("http://127.0.0.1:8000/api/auth/user",
+      // { headers: { Authorization: `Bearer ${res.data.access}` } })
+      // res = res.data
+      // res["tokens"] = tokens
+      console.log(res)
+      dispatch({
+        type: "LOGIN_WITH_JWT",
+        payload: { ...res.data, loggedInWith: "jwt" }
+      }
+      
+      )
+      history.push("/")
+    } catch (e) {
+      console.log(e)
+    }
+    
   }
 }
 

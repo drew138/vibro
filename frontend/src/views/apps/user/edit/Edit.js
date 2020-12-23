@@ -11,7 +11,9 @@ import {
   TabPane
 } from "reactstrap"
 import classnames from "classnames"
-import { User, Info, Share } from "react-feather"
+import { User
+  // , Info, Share 
+} from "react-feather"
 import AccountTab from "./Account"
 import InfoTab from "./Information"
 import SocialTab from "./Social"

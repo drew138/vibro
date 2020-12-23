@@ -179,6 +179,8 @@ const accessControl = lazy(() =>
 )
 const espectra = lazy(() => import("./views/apps/measurements/Espectra"))
 const upload = lazy(() => import("./views/apps/measurements/Upload"))
+const wform = lazy(() => import("./views/apps/measurements/WizardForm"))
+
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -233,6 +235,7 @@ class AppRouter extends React.Component {
             exact
             component={() => <Redirect to="/email/inbox" />}
           />
+          <AppRoute path="/measurements/wizard" component={wform}/>
           <AppRoute path="/email/:filter" component={email} />
           <AppRoute path="/chat" component={chat} />
           <AppRoute

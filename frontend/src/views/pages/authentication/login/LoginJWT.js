@@ -9,8 +9,8 @@ import { history } from "../../../../history"
 
 class LoginJWT extends React.Component {
   state = {
-    email: "demo@demo.com",
-    password: "demodemo",
+    username: "drew",
+    password: "1234",
     remember: false
   }
 
@@ -25,10 +25,10 @@ class LoginJWT extends React.Component {
           <Form action="/" onSubmit={this.handleLogin}>
             <FormGroup className="form-label-group position-relative has-icon-left">
               <Input
-                type="email"
-                placeholder="Email"
-                value={this.state.email}
-                onChange={e => this.setState({ email: e.target.value })}
+                type="text"
+                placeholder="Usuario"
+                value={this.state.username}
+                onChange={e => this.setState({ username: e.target.value })}
                 required
               />
               <div className="form-control-position">
@@ -53,12 +53,12 @@ class LoginJWT extends React.Component {
               <Checkbox
                 color="primary"
                 icon={<Check className="vx-icon" size={16} />}
-                label="Remember me"
+                label="Recordarme"
                 defaultChecked={false}
                 onChange={this.handleRemember}
               />
               <div className="float-right">
-                <Link to="/pages/forgot-password">Forgot Password?</Link>
+                <Link to="/pages/forgot-password">Olvidaste tu Contraseña?</Link>
               </div>
             </FormGroup>
             <div className="d-flex justify-content-between">
@@ -69,10 +69,10 @@ class LoginJWT extends React.Component {
                   history.push("/pages/register")
                 }}
               >
-                Register
+                Registrarse
               </Button.Ripple>
               <Button.Ripple color="primary" type="submit">
-                Login
+                Ingresar
               </Button.Ripple>
             </div>
           </Form>

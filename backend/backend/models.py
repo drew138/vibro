@@ -76,7 +76,7 @@ class VibroUser(AbstractUser):
         max_length=5)
     picture = models.ImageField(
         upload_to="profile",
-        default='default.jpg')
+        default='profile/default.png')
 
     def blur_email(self):
 
