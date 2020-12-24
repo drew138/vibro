@@ -66,32 +66,86 @@ const navigationConfig = [
   //   navLink: "/calendar"
   // },
   {
-    id: "Mediciones",
-    title: "Mediciones",
+    id: "Servicios",
+    title: "Servicios",
     type: "collapse",
     icon: <Icon.Activity size={20}/>,
-    children: [{
-      id: "Cargar",
-      title: "Cargar Archivo",
-      type: "item",
-      icon: <Icon.Circle size={12}/>,
-      permissions: ["admin", "editor"],
-      navLink: "/measurements/upload",
-  
-    },
-    {
-      id: "Espectra",
-      title: "Espectra",
-      type: "item",
-      icon: <Icon.Circle size={12}/>,
-      permissions: ["admin", "editor"],
-      navLink: "/measurements/espectra",
-  
-    },
-  ]
+    children: [
+      {
+        id: "Predictivo ",
+        title: "Predictivo ",
+        type: "collapse",
+        icon: <Icon.Settings size={20}/>,
+        permissions: ["admin", "editor"],
+        children: []
+        // navLink: "/services/engineering",
+        
+      },
+      {
+        id: "Correctivo",
+        title: "Correctivo",
+        type: "collapse",
+        icon: <Icon.Tool size={20}/>,
+        permissions: ["admin", "editor"],
+        children: []
+        // navLink: "/services/corrective",
+        
+      },
+      {
+        id: "Ingeniería ",
+        title: "Ingeniería ",
+        type: "collapse",
+        icon: <Icon.Compass size={20}/>,
+        permissions: ["admin", "editor"],
+        children: []
+        // navLink: "/services/engineering",
+        
+      },
+      {
+        id: "Monitoreo",
+        title: "Monitoreo",
+        type: "collapse",
+        icon: <Icon.Wifi size={20}/>,
+        permissions: ["admin", "editor"],
+        children: [
+          {
+            id: "list-monitoring",
+            title: "Lista",
+            type: "item",
+            icon: <Icon.Circle size={12} />,
+            permissions: ["admin", "editor"],
+            badge: "danger",
+            navLink: "/services/monitoring/list"
+          },
+        ]
+        // navLink: "/services/monitoring",
+        
+      },
+    ]
+    
 
   },
   
+//   [{
+//     id: "Cargar",
+//     title: "Cargar Archivo",
+//     type: "item",
+//     icon: <Icon.Circle size={12}/>,
+//     permissions: ["admin", "editor"],
+//     navLink: "/measurements/upload",
+
+//   },
+//   {
+//     id: "Espectra",
+//     title: "Espectra",
+//     type: "item",
+//     icon: <Icon.Circle size={12}/>,
+//     permissions: ["admin", "editor"],
+//     navLink: "/measurements/espectra",
+
+//   },
+// ]
+
   // {
   //   id: "eCommerce",
   //   title: "Ecommerce",

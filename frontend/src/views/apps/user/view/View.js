@@ -20,7 +20,18 @@ import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { connect } from "react-redux"
 
+const user_type_map = {
+  'admin': "Admin",
+  'engineer': "Ingeniero",
+  'client': "Cliente",
+  'support': "Soporte",
+  'arduino': "Arduino"
+}
+
+
 class UserView extends React.Component {
+  
+
   render() {
     return (
       <React.Fragment>
@@ -43,11 +54,8 @@ class UserView extends React.Component {
                         <Media
                           className="rounded mr-2"
                           object
-                          
-                          // src={userImg}
                           src={
-                            // TODO remove condition in production
-                            !this.props.user.login.values ? userImg : this.props.user.login.values.picture
+                            this.props.user.login.values.picture
                           }
                           alt="Generic placeholder image"
                           height="112"
@@ -68,14 +76,21 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Nombre
                                 </div>
-                                <div>{this.props.user.login.values.first_name}</div>
+                                <div>
+                                {
+                                !this.props.user.login.values.first_name ? "N/A" 
+                                : 
+                                `${this.props.user.login.values.first_name.toUpperCase()} 
+                                ${this.props.user.login.values.last_name.toUpperCase()}`
+                                }
+                                </div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Email
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{this.props.user.login.values.email}</span>
+                                  <span>{!this.props.user.login.values.email ? "N/A" : this.props.user.login.values.email}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -83,7 +98,7 @@ class UserView extends React.Component {
                                   Celular
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{this.props.user.login.values.celphone}</span>
+                                  <span>{!this.props.user.login.values.celphone ? "N/A" : this.props.user.login.values.celphone}</span>
                                 </div>
                               </div>
                             </div>
@@ -100,14 +115,14 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Tipo
                                 </div>
-                                <div>{this.props.user.login.values.user_type}</div>
+                                <div>{user_type_map[this.props.user.login.values.user_type]}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Empresa
                                 </div>
                                 <div>
-                                  <span>{this.props.user.login.values.company}</span>
+                                  <span>{!this.props.user.login.values.company ? "N/A" : this.props.user.login.values.company}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -115,7 +130,14 @@ class UserView extends React.Component {
                                   Telefono
                                 </div>
                                 <div>
-                                  <span>{this.props.user.login.values.phone}</span>
+                                  <span>
+                                  {!this.props.user.login.values.phone ? "N/A" : // if not phone
+                                  this.props.user.login.values.ext ? // else if ext and phone
+                                  `(${this.props.user.login.values.ext}) - 
+                                  ${this.props.user.login.values.phone}` : // concat ext with phone
+                                  this.props.user.login.values.phone // else display phone alone
+                                  }
+                                  </span>
                                 </div>
                               </div>
                              {/* TODO add certifications */}
@@ -141,266 +163,6 @@ class UserView extends React.Component {
               </CardBody>
             </Card>
           </Col>
-          {/* <Col sm="12" md="6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Information</CardTitle>
-              </CardHeader>
-              <CardBody>
-                <div className="users-page-view-table">
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Birth Date
-                    </div>
-                    <div> 28 January 1998</div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Mobile
-                    </div>
-                    <div>+65958951757</div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Website
-                    </div>
-                    <div className="text-truncate">
-                      <span>https://rowboat.com/insititious/Crystal</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Languages
-                    </div>
-                    <div className="text-truncate">
-                      <span>English, French</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Gender
-                    </div>
-                    <div className="text-truncate">
-                      <span>Female</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Contact
-                    </div>
-                    <div className="text-truncate">
-                      <span>email, message, phone</span>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Col> */}
-          {/* <Col sm="12" md="6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Social Links</CardTitle>
-              </CardHeader>
-              <CardBody>
-                <div className="users-page-view-table">
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Twitter
-                    </div>
-                    <div className="text-truncate">
-                      <span>https://twitter.com/crystal</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Facebook
-                    </div>
-                    <div className="text-truncate">
-                      <span>https://www.facebook.com/crystal</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Instagram
-                    </div>
-                    <div className="text-truncate">
-                      <span>https://www.instagram.com/crystal</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Github
-                    </div>
-                    <div className="text-truncate">
-                      <span>https://github.com/crystal</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      CodePen
-                    </div>
-                    <div className="text-truncate">
-                      <span>https://codepen.io/crystal</span>
-                    </div>
-                  </div>
-                  <div className="d-flex user-info">
-                    <div className="user-info-title font-weight-bold">
-                      Slack
-                    </div>
-                    <div className="text-truncate">
-                      <span>@crystal</span>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Col> */}
-          {/* <Col sm="12"> */}
-            {/* <Card>
-              <CardHeader className="border-bottom pb-1 mx-2 px-0">
-                <CardTitle>
-                  <Lock size={18} />
-                  <span className="align-middle ml-50">Permissions</span>
-                </CardTitle>
-              </CardHeader>
-              <CardBody>
-                {" "}
-                <Table className="permissions-table" borderless responsive>
-                  <thead>
-                    <tr>
-                      <th>Module</th>
-                      <th>Read</th>
-                      <th>Write</th>
-                      <th>Create</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Users</td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={true}
-                        />
-                      </td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={false}
-                        />
-                      </td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={false}
-                        />
-                      </td>
-                      <td>
-                        {" "}
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={true}
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Articles</td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={false}
-                        />
-                      </td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={true}
-                        />
-                      </td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={false}
-                        />
-                      </td>
-                      <td>
-                        {" "}
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={true}
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Staff</td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={true}
-                        />
-                      </td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={true}
-                        />
-                      </td>
-                      <td>
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={false}
-                        />
-                      </td>
-                      <td>
-                        {" "}
-                        <Checkbox
-                          disabled
-                          color="primary"
-                          icon={<Check className="vx-icon" size={16} />}
-                          label=""
-                          defaultChecked={false}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </CardBody>
-            </Card> */}
-          {/* </Col> */}
         </Row>
       </React.Fragment>
     )

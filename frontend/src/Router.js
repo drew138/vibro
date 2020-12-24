@@ -177,10 +177,10 @@ const register = lazy(() =>
 const accessControl = lazy(() =>
   import("./extensions/access-control/AccessControl")
 )
-const espectra = lazy(() => import("./views/apps/measurements/Espectra"))
-const upload = lazy(() => import("./views/apps/measurements/Upload"))
-const wform = lazy(() => import("./views/apps/measurements/WizardForm"))
-
+const espectra = lazy(() => import("./views/apps/services/Espectra"))
+const upload = lazy(() => import("./views/apps/services/Upload"))
+const wform = lazy(() => import("./views/apps/services/WizardForm"))
+const llist = lazy(() => import("./views/apps/services/monitoring/List"))
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -226,6 +226,7 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/" component={analyticsDashboard} />
           <AppRoute exact path="/measurements/espectra" component={espectra} />
           <AppRoute exact path="/measurements/upload" component={upload} />
+          <AppRoute exact path="/services/monitoring/list" component={llist} />
           <AppRoute
             path="/ecommerce-dashboard"
             component={ecommerceDashboard}

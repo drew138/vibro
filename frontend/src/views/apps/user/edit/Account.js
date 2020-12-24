@@ -13,6 +13,7 @@ import {
 import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
 import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
 import { Check, Lock } from "react-feather"
+import { connect } from "react-redux"
 
 
 class UserAccountTab extends React.Component {
@@ -23,11 +24,13 @@ class UserAccountTab extends React.Component {
       <Row>
         <Col sm="12">
           <Media className="mb-2">
-            <Media className="mr-2 my-25" left href="#">
+            <Media className="mr-2 my-25" left>
               <Media
                 className="users-avatar-shadow rounded"
                 object
-                src={userImg}
+                src={
+                  this.props.user.login.values.picture
+                }
                 alt="user profile image"
                 height="84"
                 width="84"
@@ -35,13 +38,14 @@ class UserAccountTab extends React.Component {
             </Media>
             <Media className="mt-2" body>
               <Media className="font-medium-1 text-bold-600" tag="p" heading>
-                Crystal Hamilton
+                {`${this.props.user.login.values.first_name} 
+                ${this.props.user.login.values.last_name}`}
               </Media>
               <div className="d-flex flex-wrap">
                 <Button.Ripple className="mr-1" color="primary" outline>
-                  Change
+                  Cambiar
                 </Button.Ripple>
-                <Button.Ripple color="flat-danger">Remove Avatar</Button.Ripple>
+                <Button.Ripple color="flat-danger">Quitar Foto</Button.Ripple>
               </div>
             </Media>
           </Media>
@@ -54,9 +58,9 @@ class UserAccountTab extends React.Component {
                   <Label for="username">Usuario</Label>
                   <Input
                     type="text"
-                    defaultValue="crystal"
+                    defaultValue={this.props.user.login.values.username}
                     id="username"
-                    placeholder="Username"
+                    placeholder="Usuario"
                   />
                 </FormGroup>
               </Col>
@@ -73,12 +77,12 @@ class UserAccountTab extends React.Component {
 
               <Col md="6" sm="12">
                 <FormGroup>
-                  <Label for="name">Name</Label>
+                  <Label for="name">Nombre</Label>
                   <Input
                     type="text"
-                    defaultValue="Crystal Hamilton"
+                    defaultValue={this.props.user.login.values.first_name}
                     id="name"
-                    placeholder="Name"
+                    placeholder="Nombre"
                   />
                 </FormGroup>
               </Col>
@@ -96,7 +100,7 @@ class UserAccountTab extends React.Component {
                   <Label for="email">Email</Label>
                   <Input
                     type="text"
-                    defaultValue="crystalhamilton@gmail.com"
+                    defaultValue={this.props.user.login.values.email}
                     id="email"
                     placeholder="Email"
                   />
@@ -108,8 +112,8 @@ class UserAccountTab extends React.Component {
                   <Input
                     type="text"
                     id="company"
-                    defaultValue="North Star Aviation Pvt Ltd"
-                    placeholder="company"
+                    defaultValue={this.props.user.login.values.company}
+                    placeholder="Empresa"
                   />
                 </FormGroup>
               </Col>
@@ -119,8 +123,8 @@ class UserAccountTab extends React.Component {
                   <Input
                     type="text"
                     id="celphone"
-                    defaultValue="300-300-3000"
-                    placeholder="company"
+                    defaultValue={this.props.user.login.values.celphone}
+                    placeholder="Celular"
                   />
                 </FormGroup>
               </Col>
@@ -130,8 +134,8 @@ class UserAccountTab extends React.Component {
                   <Input
                     type="text"
                     id="phone"
-                    defaultValue="300-3000"
-                    placeholder="phone"
+                    defaultValue={this.props.user.login.values.phone}
+                    placeholder="Telefono"
                   />
                 </FormGroup>
               </Col>
@@ -274,9 +278,9 @@ class UserAccountTab extends React.Component {
                 sm="12"
               >
                 <Button.Ripple className="mr-1" color="primary">
-                  Save Changes
+                  Guardar Cambios
                 </Button.Ripple>
-                <Button.Ripple color="flat-warning">Reset</Button.Ripple>
+                <Button.Ripple color="flat-warning">Resetear</Button.Ripple>
               </Col>
             </Row>
           </Form>
@@ -286,4 +290,11 @@ class UserAccountTab extends React.Component {
     )
   }
 }
-export default UserAccountTab
+
+const mapStateToProps = state => {
+  return {
+    user: state.auth
+  }
+}
+
+export default connect(mapStateToProps)(UserAccountTab)

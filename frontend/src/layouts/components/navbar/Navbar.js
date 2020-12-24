@@ -18,6 +18,15 @@ const UserName = props => {
   return props.user.login.values.username
 
 }
+
+const user_type_map = {
+  'admin': "Admin",
+  'engineer': "Ingeniero",
+  'client': "Cliente",
+  'support': "Soporte",
+  'arduino': "Arduino"
+}
+
 const ThemeNavbar = props => {
   const { user } = useAuth0()
   const colorsArr = [ "primary", "danger", "success", "info", "warning", "dark"]
@@ -89,6 +98,10 @@ const ThemeNavbar = props => {
                 }
                 logoutWithJWT={props.logoutWithJWT}
                 logoutWithFirebase={props.logoutWithFirebase}
+                userType={
+                  !props.user.login.values ? "demo" // TODO remove in production
+                  : user_type_map[props.user.login.values.user_type]
+                }
               />
             </div>
           </div>
