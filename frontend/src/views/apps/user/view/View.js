@@ -15,7 +15,7 @@ import { Edit, Trash
 } from "react-feather"
 import { Link } from "react-router-dom"
 // import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
-import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
+// import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { connect } from "react-redux"
@@ -109,20 +109,27 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Status
                                 </div>
-                                <div>active</div>
+                                <div>
+                                  {
+                                    this.props.user.login.values.is_active ? "ACTIVO" : "INACTIVO"
+                                  }
+                                  </div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Tipo
                                 </div>
-                                <div>{user_type_map[this.props.user.login.values.user_type]}</div>
+                                <div>{user_type_map[this.props.user.login.values.user_type].toUpperCase()}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Empresa
                                 </div>
                                 <div>
-                                  <span>{!this.props.user.login.values.company ? "N/A" : this.props.user.login.values.company}</span>
+                                  <span>
+                                    {!this.props.user.login.values.company ?
+                                     "N/A" : this.props.user.login.values.companytoUpperCase()}
+                                  </span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -154,10 +161,10 @@ class UserView extends React.Component {
                         <span className="align-middle ml-50">Editar</span>
                       </Link>
                     </Button.Ripple>
-                    <Button.Ripple color="danger" outline>
+                    {/* <Button.Ripple color="danger" outline>
                       <Trash size={15} />
                       <span className="align-middle ml-50">Borrar</span>
-                    </Button.Ripple>
+                    </Button.Ripple> */}
                   </Col>
                 </Row>
               </CardBody>

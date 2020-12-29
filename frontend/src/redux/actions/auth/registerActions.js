@@ -55,35 +55,28 @@ export const signupWithFirebase = (email, password, name) => {
 }
 
 export const signupWithJWT = (username, first_name, last_name, email, password, celphone) => {
-  return dispatch => {
-    axios
-      .post("/api/auth/register/", {
-        username,
-        first_name,
-        last_name,
-        email,
-        password,
-        celphone
-      })
-      .then(response => {
-        var loggedInUser
-
-        if(response.data){
-
-          loggedInUser = response.data.user
-
-          localStorage.setItem("token", response.data.token)
-
-          dispatch({
-            type: "LOGIN_WITH_JWT",
-            payload: { loggedInUser, loggedInWith: "jwt" }
-          })
-
-          history.push("/")
-        }
-
-      })
-      .catch(err => console.log(err))
-
+  return async dispatch => {
+    try {
+      let res = await axios.post("http://127.0.0.1:8000/api/auth/register", {
+      username,
+      first_name,
+      last_name,
+      email,
+      password,
+      celphone
+    })
+    localStorage.setItem("token", res.data.access)
+    localStorage.setItem("refresh", res.data.refresh)
+    let user = res.data.user
+    user["access"] = res.data["access"]
+    user["refresh"] = res.data["refresh"]
+    dispatch({
+      type: "LOGIN_WITH_JWT",
+      payload: { ...user, loggedInWith: "jwt" }
+    })
+    history.push("/")
+    } catch (e) {
+      console.log(e)
+    }
   }
 }

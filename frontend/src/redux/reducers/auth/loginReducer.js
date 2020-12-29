@@ -16,7 +16,7 @@ export const login = (state = { userRole: "admin" }, action) => {
       return { ...state, values: action.payload }
     }
     case "LOGIN_WITH_JWT": {
-      return { ...state, values: action.payload }
+      return { ...state, values: { ...state.values, ...action.payload }}
     }
     case "LOGOUT_WITH_JWT": {
       return { ...state, values: action.payload }

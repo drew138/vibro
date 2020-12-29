@@ -41,7 +41,7 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        Email.register(request).delay()
+        # Email.register(request).delay()
         refresh = RefreshToken.for_user(user)
         return Response({
             "user": custom_serializers.VibroUserSerializer(
@@ -224,7 +224,8 @@ class VibroUserView(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
-        instance = self.get_object()
+        id = kwargs['pk']
+        instance = self.get_object(id)
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -233,16 +234,19 @@ class VibroUserView(viewsets.ModelViewSet):
             serializer.validated_data.pop('certifications', None)
         if not (request.user.is_superuser or request.user.is_staff):
             serializer.validated_data.pop('user_type', None)
-            serializer.validated_data.pop('picture', None)
+            serializer.validated_data.pop('is_active', None)
         self.perform_update(serializer)
         return Response(serializer.data)
 
-    def get_object(self):
+    def get_object(self, id):
         """
         get user object
         """
-
-        return self.request.user
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            user = custom_models.VibroUser.objects.filter(id=id)
+        else:
+            user = self.request.user
+        return user
 
 
 class LoginView(TokenObtainPairView):

@@ -49,7 +49,8 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'user_type',
             'is_staff',
             'is_superuser',
-            'picture'
+            'picture',
+            'is_active'
         ]
 
 
@@ -150,10 +151,12 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
             'phone',
             'ext',
             'celphone',
+            'email',
             'company',
             'user_type',
             'certifications',
             'picture',
+            'is_active'
         ]
 
 
@@ -182,6 +185,7 @@ class LoginSerializer(TokenObtainPairSerializer):
         data["user_type"] = self.user.user_type
         data["is_staff"] = self.user.is_staff
         data["is_superuser"] = self.user.is_superuser
+        data["is_active"] = self.user.is_active
         request = self.context.get('request')
         data["picture"] = request.build_absolute_uri(self.user.picture.url)
         return data

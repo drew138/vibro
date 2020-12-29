@@ -4,6 +4,7 @@ import "firebase/auth"
 import "firebase/database"
 import axios from "axios"
 import { config } from "../../../authServices/firebase/firebaseConfig"
+import { LOGIN_WITH_JWT_ENDPOINT } from '../../../config'
 
 // Init firebase if not already initialized
 if (!firebase.apps.length) {
@@ -183,7 +184,7 @@ export const loginWithJWT = user => {
   return async dispatch => {
 
     try {
-      let res = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
+      let res = await axios.post(LOGIN_WITH_JWT_ENDPOINT, {
       username: user.username,
       password: user.password
       })
@@ -192,10 +193,11 @@ export const loginWithJWT = user => {
       // { headers: { Authorization: `Bearer ${res.data.access}` } })
       // res = res.data
       // res["tokens"] = tokens
-      console.log(res)
+      localStorage.setItem("token", res.data.access)
+      localStorage.setItem("refresh", res.data.refresh)
       dispatch({
         type: "LOGIN_WITH_JWT",
-        payload: { ...res.data, loggedInWith: "jwt" }
+        payload: { ...res.data, loggedInWith: "jwt" } // TODO check if i can remove loggedInWith ?
       }
       
       )
