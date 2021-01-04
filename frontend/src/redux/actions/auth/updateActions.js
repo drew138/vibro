@@ -20,22 +20,15 @@ export const updateProfile = user => {
         const res = await axios.patch(
           `${UPDATE_USER_PROFILE_ENDPOINT}${user.id}/`, 
           data, 
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-          )
+          { headers: { 'Authorization': `Bearer ${token}` } })
         const da = res.data
         console.log({da})
         dispatch({
           type: "LOGIN_WITH_JWT",
           payload: { ...res.data }
         })
-        // return undefined
       } catch (e) {
         console.log(e);
-        // return e
       }
     }
 }

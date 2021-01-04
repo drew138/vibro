@@ -20,6 +20,8 @@ import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { connect } from "react-redux"
 
+
+
 const user_type_map = {
   'admin': "Admin",
   'engineer': "Ingeniero",
@@ -30,7 +32,12 @@ const user_type_map = {
 
 
 class UserView extends React.Component {
-  
+  //  componentWillMount = () => {
+    
+  //   if (!this.props.user.login.values) {
+  //     history.push("/pages/login")
+  //   }
+  // }
 
   render() {
     return (

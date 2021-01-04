@@ -4,7 +4,10 @@ import "firebase/auth"
 import "firebase/database"
 import axios from "axios"
 import { config } from "../../../authServices/firebase/firebaseConfig"
-import { LOGIN_WITH_JWT_ENDPOINT } from '../../../config'
+import { 
+  LOGIN_WITH_JWT_ENDPOINT, 
+  GET_USER_WITH_JWT_ENDPOINT, 
+  REFRESH_JWT_ENDPOINT } from '../../../config'
 
 // Init firebase if not already initialized
 if (!firebase.apps.length) {
@@ -184,7 +187,7 @@ export const loginWithJWT = user => {
   return async dispatch => {
 
     try {
-      let res = await axios.post(LOGIN_WITH_JWT_ENDPOINT, {
+      const res = await axios.post(LOGIN_WITH_JWT_ENDPOINT, {
       username: user.username,
       password: user.password
       })
@@ -193,17 +196,58 @@ export const loginWithJWT = user => {
       // { headers: { Authorization: `Bearer ${res.data.access}` } })
       // res = res.data
       // res["tokens"] = tokens
-      localStorage.setItem("token", res.data.access)
+      localStorage.setItem("access", res.data.access)
       localStorage.setItem("refresh", res.data.refresh)
+      const tokens = {
+        "access": res.data.access,
+        "refresh": res.data.refresh
+      }
+      const values = {
+        ...res.data
+      }
+      delete values["access"]
+      delete values["refresh"]
       dispatch({
         type: "LOGIN_WITH_JWT",
-        payload: { ...res.data, loggedInWith: "jwt" } // TODO check if i can remove loggedInWith ?
+        payload: { tokens, values } 
       }
       
       )
       history.push("/")
     } catch (e) {
       console.log(e)
+    }
+    
+  }
+}
+
+export const refreshJWT = ( refresh ) => {
+  return async dispatch => {
+    // const refresh = localStorage.getItem("refresh")
+    const res = axios.get(REFRESH_JWT_ENDPOINT, { refresh })
+    localStorage.setItem("access", res.data.access)
+    localStorage.setItem("refresh", res.data.refresh)
+    dispatch({
+      type: "REFRESH_JWT",
+      payload: { ...res.data } 
+    })
+    history.push("/pages/login")
+  }
+}
+
+export const getUserWithJWT = ( access ) => {
+  return async dispatch => {
+    try {
+      // const access = localStorage.getItem("access")
+      const res = axios.get(
+        GET_USER_WITH_JWT_ENDPOINT, 
+        { headers: {'Authorization': `Bearer ${access}`} })
+      dispatch({
+          type: "GET_USER_WITH_JWT",
+          payload: { ...res.data } 
+      })
+    } catch (e) {
+
     }
     
   }
