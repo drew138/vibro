@@ -40,9 +40,10 @@ class CompanyView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on params. For non staff/superusers,
-        companies are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on params.
+        For non staff/superusers, companies are
+        always filtered by user to prevent users
+        from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -90,9 +91,10 @@ class MachineView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        machines are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, machines
+        are always filtered by user to prevent
+        users from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -186,8 +188,9 @@ class GearView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        gears are always filtered by user to prevent users from
+        Optionally filter fields based on url params. 
+        For non staff/superusers, gears are always 
+        filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -222,9 +225,10 @@ class AxisView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        axis are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, axis
+        are always filtered by user to prevent
+        users from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -252,9 +256,11 @@ class BearingView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        bearings are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on
+        url params. For non staff/superusers,
+        bearings are always filtered by user
+        to prevent users from seeing unauthorized
+        data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -351,9 +357,11 @@ class MeasurementView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        measurements are always filtered by user to prevent users from 
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers,
+        measurements are always filtered by
+        user to prevent users from seeing
+        unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -409,9 +417,11 @@ class FlawView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        flaws are always filtered by user to prevent users from 
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers,
+        flaws are always filtered by user to
+        prevent users from seeing unauthorized
+        data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -464,9 +474,11 @@ class TermoImageView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        termal images are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, termal
+        images are always filtered by user to
+        prevent users from seeing unauthorized
+        data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -494,9 +506,10 @@ class PointView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        points are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, points
+        are always filtered by user to prevent
+        users from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
