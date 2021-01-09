@@ -110,20 +110,21 @@ class ChangePassAPI(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         """
-        Change password of user granted they know their previous password.
+        Change password of user granted
+        they know their previous password.
         """
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             if not self.get_object().check_password(serializer.data.get("password")):
                 return Response(
-                    {"Error": "Contraseña incorrecta"},
+                    {"error": "Contraseña incorrecta"},
                     status=status.HTTP_400_BAD_REQUEST)
             user = self.get_object()
             try:
                 validate_password(serializer.data.get("new_password"))
-            except Exception as e:
-                return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception:
+                return Response({"error": "Contraseña invalida"}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("new_password"))
             user.save()
             Email.change_password().delay()
@@ -155,7 +156,8 @@ class ForgotPassAPI(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         """
-        Change password of user provided they have forgotten their password.
+        Change password of user provided they
+        have forgotten their password.
         """
 
         serializer = self.get_serializer(data=request.data)
@@ -163,8 +165,8 @@ class ForgotPassAPI(generics.UpdateAPIView):
             user = self.get_object()
             try:
                 validate_password(serializer.data.get("new_password"))
-            except Exception as e:
-                return Response({"Error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception:
+                return Response({"error": "Contraseña invalida"}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("password"))
             user.save()
 
@@ -243,10 +245,15 @@ class VibroUserView(viewsets.ModelViewSet):
         get user object
         """
         if self.request.user.is_staff or self.request.user.is_superuser:
-            user = custom_models.VibroUser.objects.filter(id=id)
+            user = custom_models.VibroUser.objects.filter(id=id).first()
         else:
             user = self.request.user
         return user
+
+    def get_serializer_class(self):
+        if self.action in {'list', 'retrieve'}:
+            return custom_serializers.VibroUserSerializer
+        return custom_serializers.UpdadateUserSerialiazer
 
 
 class LoginView(TokenObtainPairView):
