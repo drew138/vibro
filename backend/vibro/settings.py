@@ -75,6 +75,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'vibro.urls'
 
 TEMPLATES = [
@@ -141,7 +142,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
-LANGUAGE_CODE = 'en-us'
+
+LANGUAGE_CODE = 'es-CO'
+
+LANGUAGES = [
+    ('es-CO', 'Spanish'),
+    ('en-US', 'English'),
+]
 
 TIME_ZONE = 'America/Bogota'
 
