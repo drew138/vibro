@@ -1,7 +1,8 @@
 import ListQuery from "../../../ui-elements/search/ListQuery";
 import React from 'react'
 import { history } from "../../../../history"
-
+import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+import {GET_COMPANIES_ENDPOINT} from '../../../../config'
 
 const columnDefs = [
   {
@@ -37,7 +38,12 @@ class CompaniesList extends React.Component {
     render() {
       return (
         <React.Fragment>
-          <ListQuery columnDefs={columnDefs} dataEndpoint={"api/users/list"}/>
+          <Breadcrumbs
+          breadCrumbTitle="Lista de Empresas"
+          breadCrumbParent="Empresas"
+          breadCrumbActive="Lista"
+          />
+          <ListQuery columnDefs={columnDefs} dataEndpoint={GET_COMPANIES_ENDPOINT}/>
         </React.Fragment>
       )
     }

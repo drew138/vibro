@@ -10,7 +10,8 @@ import {
   Button,
   // Table
 } from "reactstrap"
-import { Edit, Trash
+import { Edit, 
+  // Trash
   // , Lock, Check 
 } from "react-feather"
 import { Link } from "react-router-dom"

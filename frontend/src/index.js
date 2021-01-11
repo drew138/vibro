@@ -10,6 +10,7 @@ import { store } from "./redux/storeConfig/store"
 import Spinner from "./components/@vuexy/spinner/Fallback-spinner"
 import "./index.scss"
 import "./@fake-db"
+import Alert from "./views/ui-elements/alerts/Alert"
 
 const LazyApp = lazy(() => import("./App"))
 
@@ -25,6 +26,7 @@ ReactDOM.render(
         <Layout>
           <IntlProviderWrapper>
             <LazyApp />
+            <Alert/>
           </IntlProviderWrapper>
         </Layout>
       </Suspense>

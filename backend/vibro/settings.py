@@ -147,7 +147,7 @@ LANGUAGE_CODE = 'es-CO'
 
 LANGUAGES = [
     ('es-CO', 'Spanish'),
-    ('en-US', 'English'),
+    # ('en-US', 'English'),
 ]
 
 TIME_ZONE = 'America/Bogota'

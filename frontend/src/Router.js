@@ -160,9 +160,9 @@ const Export = lazy(() => import("./extensions/import-export/Export"))
 const ExportSelected = lazy(() =>
   import("./extensions/import-export/ExportSelected")
 )
-const userList = lazy(() => import("./views/apps/user/list/List"))
-const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
-const userView = lazy(() => import("./views/apps/user/view/View"))
+const userList = lazy(() => import("./views/apps/auth/list/List"))
+const accountEdit = lazy(() => import("./views/apps/auth/edit/Edit"))
+const accountView = lazy(() => import("./views/apps/auth/view/View"))
 const Login = lazy(() => import("./views/pages/authentication/login/Login"))
 const forgotPassword = lazy(() =>
   import("./views/pages/authentication/ForgotPassword")
@@ -182,6 +182,8 @@ const upload = lazy(() => import("./views/apps/services/Upload"))
 const wform = lazy(() => import("./views/apps/services/WizardForm"))
 const llist = lazy(() => import("./views/apps/services/monitoring/List"))
 const companies = lazy(() => import("./views/apps/companies/list/CompaniesList"))
+const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
+
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -261,6 +263,7 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/measurements/upload" component={upload} />
           <AppRoute exact path="/services/monitoring/list" component={llist} />
           <AppRoute exact path="/app/companies/list" component={companies}/>
+          <AppRoute exact path="/app/companies/list/user" component={userEdit}/>
 
 
 
@@ -417,8 +420,8 @@ class AppRouter extends React.Component {
             fullLayout
           />
           <AppRoute path="/app/user/list" component={userList} />
-          <AppRoute path="/app/user/edit" component={userEdit} />
-          <AppRoute path="/app/user/view" component={userView} />
+          <AppRoute path="/app/user/edit" component={accountEdit} />
+          <AppRoute path="/app/user/view" component={accountView} />
           <AppRoute path="/charts/apex" component={apex} />
           <AppRoute path="/charts/chartjs" component={chartjs} />
           <AppRoute path="/charts/recharts" component={extreme} />

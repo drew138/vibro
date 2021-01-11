@@ -42,7 +42,6 @@ class TestVibroUserView(APITestCase):
             'first_name': self.faker.first_name(),
             'last_name': self.faker.last_name(),
             'phone': self.faker.random_number(),
-            'ext': self.faker.random_number(),
             'celphone': self.faker.random_number(),
             'company': self.company.id,
             'user_type': choice(self.user_types),
@@ -55,7 +54,6 @@ class TestVibroUserView(APITestCase):
         self.assertEqual(res.data['first_name'], self.data['first_name'])
         self.assertEqual(res.data['last_name'], self.data['last_name'])
         self.assertEqual(res.data['phone'], self.data['phone'])
-        self.assertEqual(res.data['ext'], self.data['ext'])
         self.assertEqual(res.data['celphone'], self.data['celphone'])
         if self.user.user_type in {"admin", "engineer"}:
             self.assertEqual(res.data['certifications'],

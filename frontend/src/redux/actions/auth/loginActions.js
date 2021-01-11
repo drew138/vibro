@@ -199,8 +199,8 @@ export const loginWithJWT = user => {
       localStorage.setItem("access", res.data.access)
       localStorage.setItem("refresh", res.data.refresh)
       const tokens = {
-        "access": res.data.access,
-        "refresh": res.data.refresh
+        access: res.data.access,
+        refresh: res.data.refresh
       }
       const values = {
         ...res.data

@@ -9,18 +9,15 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownToggle,
-
 } from "reactstrap"
 import axios from "axios"
 import { ContextLayout } from "../../../utility/context/Layout"
 import { AgGridReact } from "ag-grid-react"
-import {
-
-  ChevronDown,
-
-} from "react-feather"
+import {ChevronDown} from "react-feather"
 import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../assets/scss/pages/users.scss"
+import { connect } from "react-redux"
+import { displayAlert } from "../../../redux/actions/alerts"
 
 class ListQuery extends React.Component {
   state = {
@@ -42,10 +39,20 @@ class ListQuery extends React.Component {
   }
 
   async componentDidMount() {
-    await axios.get(this.props.dataEndpoint).then(response => {
-      let rowData = response.data
-      this.setState({ rowData })
-    })
+    try {
+      const res = await axios.get(this.props.dataEndpoint, {
+      headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
+      this.setState({ rowData: res.data.results })
+    } catch {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ rowData: [] })
+    }
   }
 
   onGridReady = params => {
@@ -159,5 +166,9 @@ class ListQuery extends React.Component {
     )
   }
 }
-
-export default ListQuery
+const mapStateToProps = state => {
+  return {
+    auth: state.auth
+  }
+}
+export default connect(mapStateToProps, { displayAlert })(ListQuery)

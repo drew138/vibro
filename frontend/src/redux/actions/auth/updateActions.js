@@ -1,9 +1,8 @@
-import "firebase/auth"
-import "firebase/database"
+
 import axios from "axios"
 import { UPDATE_USER_PROFILE_ENDPOINT } from '../../../config'
 
-export const updateProfile = user => {
+export const updateProfile = (user, token) => {
     return async dispatch => {
       try {
         const data = new FormData();
@@ -16,13 +15,10 @@ export const updateProfile = user => {
         if (user.selectedFile) {
           data.append("picture", user.selectedFile)
         }
-        const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjA5MjM5NTA2LCJqdGkiOiI0ZTZmNjQ3ZjViMjE0ZDdjOGEzMmQ1ZDNiOWRhOTBiZSIsInVzZXJfaWQiOjE2fQ.urXNsD83xn53-tzYHQoPVpdXY3tFmhDdwCe1g7D-B5w"
         const res = await axios.patch(
           `${UPDATE_USER_PROFILE_ENDPOINT}${user.id}/`, 
           data, 
           { headers: { 'Authorization': `Bearer ${token}` } })
-        const da = res.data
-        console.log({da})
         dispatch({
           type: "LOGIN_WITH_JWT",
           payload: { ...res.data }

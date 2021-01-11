@@ -35,7 +35,7 @@ import { history } from "../../../../history"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
 import ListQuery from "../../../ui-elements/search/ListQuery";
-
+import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 
 const columnDefs = [
   {
@@ -96,6 +96,11 @@ class UsersList extends React.Component {
   render() {
     return (
       <React.Fragment>
+        <Breadcrumbs
+          breadCrumbTitle="Monitoreo en Linea"
+          breadCrumbParent="Servicios"
+          breadCrumbActive="Monitoreo"
+        />
         <ListQuery columnDefs={columnDefs} dataEndpoint={"api/users/list"}/>
       </React.Fragment>
     )

@@ -1,4 +1,4 @@
-import { RFC_2822 } from 'moment';
+// import { RFC_2822 } from 'moment';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import React from 'react'
 import { connect } from "react-redux"

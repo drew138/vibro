@@ -10,7 +10,6 @@ import {
   Row,
   Col,
   UncontrolledDropdown,
-  UncontrolledButtonDropdown,
   DropdownMenu,
   DropdownItem,
   DropdownToggle,
@@ -21,12 +20,7 @@ import axios from "axios"
 import { ContextLayout } from "../../../../utility/context/Layout"
 import { AgGridReact } from "ag-grid-react"
 import {
-  Edit,
-  Trash2,
   ChevronDown,
-  Clipboard,
-  Printer,
-  Download,
   RotateCw,
   X
 } from "react-feather"
@@ -35,6 +29,18 @@ import { history } from "../../../../history"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+import { GET_USERS_ENDPOINT } from '../../../../config'
+import { connect } from "react-redux"
+import { setUser } from "../../../../redux/actions/users"
+import { displayAlert } from "../../../../redux/actions/alerts"
+
+const UserTypes = {
+  'admin': "Administrativo",
+  'engineer': "Ingeniero",
+  'client': "Cliente",
+  'support': "Soporte",
+  'arduino': "Arduino",
+}
 
 class UsersList extends React.Component {
   state = {
@@ -43,8 +49,8 @@ class UsersList extends React.Component {
     isVisible: true,
     reload: false,
     collapse: true,
-    status: "Opened",
-    role: "All",
+    is_active: "All",
+    userType: "All",
     selectStatus: "All",
     verified: "All",
     department: "All",
@@ -58,12 +64,9 @@ class UsersList extends React.Component {
         field: "id",
         width: 150,
         filter: true,
-        checkboxSelection: true,
-        headerCheckboxSelectionFilteredOnly: true,
-        headerCheckboxSelection: true
       },
       {
-        headerName: "Username",
+        headerName: "Usuario",
         field: "username",
         filter: true,
         width: 250,
@@ -71,19 +74,33 @@ class UsersList extends React.Component {
           return (
             <div
               className="d-flex align-items-center cursor-pointer"
-              onClick={() => history.push("/app/user/edit")}
+              onClick={() => { 
+                this.props.setUser(params.data)
+                history.push("/app/companies/list/user") }}
             >
               <img
                 className="rounded-circle mr-50"
-                src={params.data.avatar}
+                src={params.data.picture}
                 alt="user avatar"
                 height="30"
                 width="30"
               />
-              <span>{params.data.name}</span>
+              <span>{params.data.username}</span>
             </div>
           )
         }
+      },
+      {
+        headerName: "Nombre",
+        field: "first_name",
+        filter: true,
+        width: 200
+      },
+      {
+        headerName: "Apellido",
+        field: "last_name",
+        filter: true,
+        width: 200
       },
       {
         headerName: "Email",
@@ -92,82 +109,27 @@ class UsersList extends React.Component {
         width: 250
       },
       {
-        headerName: "Name",
-        field: "name",
+        headerName: "Tipo",
+        field: "user_type",
         filter: true,
-        width: 200
+        width: 150,
+        cellRendererFramework: params => (
+          <span>{UserTypes[params.data.user_type]}</span>
+        )
       },
       {
-        headerName: "Country",
-        field: "country",
-        filter: true,
-        width: 200
-      },
-      {
-        headerName: "Role",
-        field: "role",
-        filter: true,
-        width: 150
-      },
-      {
-        headerName: "Status",
-        field: "status",
+        headerName: "Estado",
+        field: "is_active",
         filter: true,
         width: 150,
         cellRendererFramework: params => {
-          return params.value === "active" ? (
+          return params.data.is_active ? (
             <div className="badge badge-pill badge-light-success">
-              {params.value}
+              {"Activo"}
             </div>
-          ) : params.value === "blocked" ? (
-            <div className="badge badge-pill badge-light-danger">
-              {params.value}
-            </div>
-          ) : params.value === "deactivated" ? (
+          ) : (
             <div className="badge badge-pill badge-light-warning">
-              {params.value}
-            </div>
-          ) : null
-        }
-      },
-      {
-        headerName: "Verified",
-        field: "is_verified",
-        filter: true,
-        width: 125,
-        cellRendererFramework: params => {
-          return params.value === true ? (
-            <div className="bullet bullet-sm bullet-primary"></div>
-          ) : params.value === false ? (
-            <div className="bullet bullet-sm bullet-secondary"></div>
-          ) : null
-        }
-      },
-      {
-        headerName: "Department",
-        field: "department",
-        filter: true,
-        width: 160
-      },
-      {
-        headerName: "Actions",
-        field: "transactions",
-        width: 150,
-        cellRendererFramework: params => {
-          return (
-            <div className="actions cursor-pointer">
-              <Edit
-                className="mr-50"
-                size={15}
-                onClick={() => history.push("/app/user/edit")}
-              />
-              <Trash2
-                size={15}
-                onClick={() => {
-                  let selectedData = this.gridApi.getSelectedRows()
-                  this.gridApi.updateRowData({ remove: selectedData })
-                }}
-              />
+              {"Inactivo"}
             </div>
           )
         }
@@ -176,10 +138,20 @@ class UsersList extends React.Component {
   }
 
   async componentDidMount() {
-    await axios.get("api/users/list").then(response => {
-      let rowData = response.data
-      this.setState({ rowData })
-    })
+    try {
+      const res = await axios.get(GET_USERS_ENDPOINT, {
+        headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
+      this.setState({ rowData: res.data.results })
+    } catch {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ rowData: [] })
+    }
   }
 
   onGridReady = params => {
@@ -273,7 +245,7 @@ class UsersList extends React.Component {
             })}
           >
             <CardHeader>
-              <CardTitle>Filters</CardTitle>
+              <CardTitle>Filtros</CardTitle>
               <div className="actions">
                 <ChevronDown
                   className="collapse-icon mr-50"
@@ -305,114 +277,60 @@ class UsersList extends React.Component {
                   ""
                 )}
                 <Row>
-                  <Col lg="3" md="6" sm="12">
+                  <Col lg="6" md="6" sm="12">
                     <FormGroup className="mb-0">
-                      <Label for="role">Role</Label>
+                      <Label for="role">Tipo</Label>
                       <Input
                         type="select"
-                        name="role"
-                        id="role"
-                        value={this.state.role}
+                        name="userType"
+                        id="userType"
+                        value={this.state.userType}
                         onChange={e => {
                           this.setState(
                             {
-                              role: e.target.value
+                              userType: e.target.value
                             },
                             () =>
                               this.filterData(
-                                "role",
-                                this.state.role.toLowerCase()
+                                "user_type",
+                                this.state.userType.toLowerCase()
                               )
                           )
                         }}
                       >
-                        <option value="All">All</option>
-                        <option value="User">User</option>
-                        <option value="Staff">Staff</option>
-                        <option value="Admin">Admin</option>
+                        <option value="All">Todos</option>
+                        <option value="admin">Administrativo</option>
+                        <option value="arduino">Arduino</option>
+                        <option value="client">Cliente</option>
+                        <option value="engineer">Ingeniero</option>
+                        <option value="support">Soporte</option>
                       </Input>
                     </FormGroup>
                   </Col>
-                  <Col lg="3" md="6" sm="12">
+                  <Col lg="6" md="6" sm="12">
                     <FormGroup className="mb-0">
-                      <Label for="status">Status</Label>
+                      <Label for="is_active">Estado</Label>
                       <Input
                         type="select"
-                        name="status"
-                        id="status"
-                        value={this.state.selectStatus}
+                        name="is_active"
+                        id="is_active"
+                        value={this.state.is_active}
                         onChange={e => {
+                          
                           this.setState(
                             {
-                              selectStatus: e.target.value
+                              is_active: e.target.value 
                             },
                             () =>
                               this.filterData(
-                                "status",
-                                this.state.selectStatus.toLowerCase()
+                                "is_active",
+                                this.state.is_active === "All" ? "all" : this.state.is_active === "Active" ? true : false
                               )
-                          )
-                        }}
+                          )}}
                       >
-                        <option value="All">All</option>
-                        <option value="Active">Active</option>
-                        <option value="Blocked">Blocked</option>
-                        <option value="Deactivated">Deactivated</option>
-                      </Input>
-                    </FormGroup>
-                  </Col>
-                  <Col lg="3" md="6" sm="12">
-                    <FormGroup className="mb-0">
-                      <Label for="verified">Verified</Label>
-                      <Input
-                        type="select"
-                        name="verified"
-                        id="verified"
-                        value={this.state.verified}
-                        onChange={e => {
-                          this.setState(
-                            {
-                              verified: e.target.value
-                            },
-                            () =>
-                              this.filterData(
-                                "is_verified",
-                                this.state.verified.toLowerCase()
-                              )
-                          )
-                        }}
-                      >
-                        <option value="All">All</option>
-                        <option value="True">True</option>
-                        <option value="False">False</option>
-                      </Input>
-                    </FormGroup>
-                  </Col>
-                  <Col lg="3" md="6" sm="12">
-                    <FormGroup className="mb-0">
-                      <Label for="department">Department</Label>
-                      <Input
-                        type="select"
-                        name="department"
-                        id="department"
-                        value={this.state.department}
-                        onChange={e => {
-                          this.setState(
-                            {
-                              department: e.target.value
-                            },
-                            () =>
-                              this.filterData(
-                                "department",
-                                this.state.department.toLowerCase()
-                              )
-                          )
-                        }}
-                      >
-                        <option value="All">All</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Development">Development</option>
-                        <option value="Management">Management</option>
+                        <option value="All">Todos</option>
+                        <option value="Active">Activo</option>
+                        <option value="Inactive">Inactivo</option>
                       </Input>
                     </FormGroup>
                   </Col>
@@ -426,13 +344,21 @@ class UsersList extends React.Component {
             <CardBody>
               <div className="ag-theme-material ag-grid-table">
                 <div className="ag-grid-actions d-flex justify-content-between flex-wrap mb-1">
+                  <div className="d-flex justify-content-between flex-wrap">
+                  <div className="ml-1 mt-1 mr-1">Paginación</div>
                   <div className="sort-dropdown">
                     <UncontrolledDropdown className="ag-dropdown p-1">
                       <DropdownToggle tag="div">
-                        1 - {pageSize} of 150
+                        {pageSize}
                         <ChevronDown className="ml-50" size={15} />
                       </DropdownToggle>
                       <DropdownMenu right>
+                        <DropdownItem
+                          tag="div"
+                          onClick={() => this.filterSize(10)}
+                        >
+                          10
+                        </DropdownItem>
                         <DropdownItem
                           tag="div"
                           onClick={() => this.filterSize(20)}
@@ -441,59 +367,28 @@ class UsersList extends React.Component {
                         </DropdownItem>
                         <DropdownItem
                           tag="div"
-                          onClick={() => this.filterSize(50)}
+                          onClick={() => this.filterSize(30)}
                         >
-                          50
+                          30
                         </DropdownItem>
                         <DropdownItem
                           tag="div"
-                          onClick={() => this.filterSize(100)}
+                          onClick={() => this.filterSize(40)}
                         >
-                          100
-                        </DropdownItem>
-                        <DropdownItem
-                          tag="div"
-                          onClick={() => this.filterSize(150)}
-                        >
-                          150
+                          40
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   </div>
+                  </div>
                   <div className="filter-actions d-flex">
                     <Input
-                      className="w-50 mr-1 mb-1 mb-sm-0"
+                      className="w-100 mr-1 mb-1 mb-sm-0"
                       type="text"
                       placeholder="search..."
                       onChange={e => this.updateSearchQuery(e.target.value)}
                       value={this.state.searchVal}
                     />
-                    <div className="dropdown actions-dropdown">
-                      <UncontrolledButtonDropdown>
-                        <DropdownToggle className="px-2 py-75" color="white">
-                          Actions
-                          <ChevronDown className="ml-50" size={15} />
-                        </DropdownToggle>
-                        <DropdownMenu right>
-                          <DropdownItem tag="a">
-                            <Trash2 size={15} />
-                            <span className="align-middle ml-50">Delete</span>
-                          </DropdownItem>
-                          <DropdownItem tag="a">
-                            <Clipboard size={15} />
-                            <span className="align-middle ml-50">Archive</span>
-                          </DropdownItem>
-                          <DropdownItem tag="a">
-                            <Printer size={15} />
-                            <span className="align-middle ml-50">Print</span>
-                          </DropdownItem>
-                          <DropdownItem tag="a">
-                            <Download size={15} />
-                            <span className="align-middle ml-50">CSV</span>
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </UncontrolledButtonDropdown>
-                    </div>
                   </div>
                 </div>
                 {this.state.rowData !== null ? (
@@ -528,4 +423,11 @@ class UsersList extends React.Component {
   }
 }
 
-export default UsersList
+const mapStateToProps = state => {
+  return {
+    auth: state.auth,
+    users: state.users
+  }
+}
+
+export default connect(mapStateToProps, { setUser, displayAlert })(UsersList)

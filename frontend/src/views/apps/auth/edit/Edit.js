@@ -29,8 +29,8 @@ class UserEdit extends React.Component {
     return (
       <React.Fragment>
         <Breadcrumbs
-          breadCrumbTitle="Editar Usuario"
-          breadCrumbParent="Lista"
+          breadCrumbTitle="Editar Cuenta"
+          breadCrumbParent="Usuario"
           breadCrumbActive="Editar"
         />
       <Row>
