@@ -49,12 +49,12 @@ class UserAccountTab extends React.Component {
       alertText: ""
     }
     if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
-      alertData.alertText = "El número de celular debe ser ingresado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      alertData.alertText = "El número de celular debe ser entrado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
       this.props.displayAlert(alertData)
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      alertData.alertText = "El número de teléfono debe ser entrado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
       this.props.displayAlert(alertData)
       return
     }

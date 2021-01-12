@@ -48,12 +48,10 @@ class CompanyView(viewsets.ModelViewSet):
 
         id = self.request.query_params.get('id', None)
         name = self.request.query_params.get('name', None)
-        nit = self.request.query_params.get('name', None)
+        nit = self.request.query_params.get('nit', None)
         address = self.request.query_params.get('address', None)
-        rut_address = self.request.query_params.get('rut_address', None)
-        pbx = self.request.query_params.get('pbx', None)
+        phone = self.request.query_params.get('phone', None)
         city = self.request.query_params.get('city', None)
-        rut_city = self.request.query_params.get('rut_city', None)
 
         if self.request.user.is_staff or self.request.user.is_superuser:
             queryset = custom_models.Company.objects.all()
@@ -68,14 +66,10 @@ class CompanyView(viewsets.ModelViewSet):
             queryset = queryset.filter(nit=nit)
         if address:
             queryset = queryset.filter(address=address)
-        if rut_address:
-            queryset = queryset.filter(rut_address=rut_address)
-        if pbx:
-            queryset = queryset.filter(pbx=pbx)
+        if phone:
+            queryset = queryset.filter(phone=phone)
         if city:
             queryset = queryset.filter(city__id=city)
-        if rut_city:
-            queryset = queryset.filter(rut_city__id=rut_city)
         return queryset
 
     def get_serializer_class(self):

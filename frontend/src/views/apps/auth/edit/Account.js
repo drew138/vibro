@@ -7,15 +7,13 @@ import {
   Form,
   Input,
   Label,
-  FormGroup,
-  // Table
+  FormGroup
 } from "reactstrap"
-// import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
-// import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
-// import { Check, Lock } from "react-feather"
+import isValidCelphone from "../../../../validators/celphone"
+import isValidPhone from "../../../../validators/phone"
 import { connect } from "react-redux"
 import { updateProfile } from "../../../../redux/actions/auth/updateActions"
-
+import { displayAlert } from "../../../../redux/actions/alerts"
 
 class UserAccountTab extends React.Component {
 
@@ -37,6 +35,24 @@ class UserAccountTab extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
+    const alertData = {
+      title: "Error de Validación",
+      success: false,
+      show: true,
+      alertText: ""
+    }
+    if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
+      alertData.alertText = "El número de celular debe ser ingresado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      this.props.displayAlert(alertData)
+      return
+    }
+    if (this.state.phone && !isValidPhone(this.state.phone)) {
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      this.props.displayAlert(alertData)
+      return
+    }
+
+
     this.props.updateProfile(this.state, this.props.auth.login.tokens.access)
     
   }
@@ -69,8 +85,6 @@ class UserAccountTab extends React.Component {
 
   render() {
     return (
-      // https://www.youtube.com/watch?v=XeiOnkEI7XI&t=5s
-      // https://youtu.be/b6Oe2puTdMQ?t=1186
       <Row>
         <Col sm="12">
           <Media className="mb-2">
@@ -198,7 +212,7 @@ class UserAccountTab extends React.Component {
                 className="d-flex justify-content-end flex-wrap mt-2"
                 sm="12"
               >
-                <Button.Ripple className="mr-1" color="primary">
+                <Button.Ripple className="mr-1" color="primary" type="submit">
                   Guardar Cambios
                 </Button.Ripple>
                 {/* <Button.Ripple color="flat-warning">Resetear</Button.Ripple> */}
@@ -219,4 +233,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { updateProfile })(UserAccountTab)
+export default connect(mapStateToProps, { updateProfile, displayAlert })(UserAccountTab)

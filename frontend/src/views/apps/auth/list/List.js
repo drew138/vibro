@@ -76,7 +76,7 @@ class UsersList extends React.Component {
               className="d-flex align-items-center cursor-pointer"
               onClick={() => { 
                 this.props.setUser(params.data)
-                history.push("/app/companies/list/user") }}
+                history.push("/app/user/list/edit") }}
             >
               <img
                 className="rounded-circle mr-50"

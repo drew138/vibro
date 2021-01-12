@@ -191,11 +191,6 @@ export const loginWithJWT = user => {
       username: user.username,
       password: user.password
       })
-
-      // res = await axios.get("http://127.0.0.1:8000/api/auth/user",
-      // { headers: { Authorization: `Bearer ${res.data.access}` } })
-      // res = res.data
-      // res["tokens"] = tokens
       localStorage.setItem("access", res.data.access)
       localStorage.setItem("refresh", res.data.refresh)
       const tokens = {
@@ -215,7 +210,16 @@ export const loginWithJWT = user => {
       )
       history.push("/")
     } catch (e) {
-      console.log(e)
+      const alerData = {
+        title: "Error de Validación",
+        success: false,
+        show: true,
+        alertText: Object.entries(e.response.data)[0][1]
+      }
+      dispatch({
+        type: "DISPLAY_SWEET_ALERT",
+        payload: alerData
+      })
     }
     
   }

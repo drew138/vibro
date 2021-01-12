@@ -25,9 +25,14 @@ export const updateUser = (user, token) => {
         try {
             const data = new FormData();
             for (const [key, value] of Object.entries(user)) {
-                if (value && value !== "N/A") {
-                    data.append(key, value)
+              if (value && value !== "N/A") {
+                if (key === "selectedFile") {
+                  data.append("picture", value)
+                } else {
+                  console.log(key)
+                  data.append(key, value)
                 }
+              }  
             }
             const res = await axios.patch(
               `${UPDATE_USER_PROFILE_ENDPOINT}${user.id}/`, 

@@ -160,6 +160,9 @@ const Export = lazy(() => import("./extensions/import-export/Export"))
 const ExportSelected = lazy(() =>
   import("./extensions/import-export/ExportSelected")
 )
+
+
+
 const userList = lazy(() => import("./views/apps/auth/list/List"))
 const accountEdit = lazy(() => import("./views/apps/auth/edit/Edit"))
 const accountView = lazy(() => import("./views/apps/auth/view/View"))
@@ -177,13 +180,16 @@ const register = lazy(() =>
 const accessControl = lazy(() =>
   import("./extensions/access-control/AccessControl")
 )
+
+
 const espectra = lazy(() => import("./views/apps/services/Espectra"))
 const upload = lazy(() => import("./views/apps/services/Upload"))
 const wform = lazy(() => import("./views/apps/services/WizardForm"))
 const llist = lazy(() => import("./views/apps/services/monitoring/List"))
 const companies = lazy(() => import("./views/apps/companies/list/CompaniesList"))
 const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
-
+const companyEdit = lazy(() => import("./views/apps/companies/edit/Edit"))
+const companyAdd = lazy(() => import("./views/apps/companies/add/Add"))
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -262,8 +268,19 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/measurements/espectra" component={espectra} />
           <AppRoute exact path="/measurements/upload" component={upload} />
           <AppRoute exact path="/services/monitoring/list" component={llist} />
+          
           <AppRoute exact path="/app/companies/list" component={companies}/>
-          <AppRoute exact path="/app/companies/list/user" component={userEdit}/>
+          <AppRoute exact path="/app/companies/list/edit" component={companyEdit}/>
+          <AppRoute exact path="/app/companies/add" component={companyAdd}/>
+
+
+
+
+          <AppRoute exact path="/app/user/list" component={userList} />
+          <AppRoute exact path="/app/user/edit" component={accountEdit} />
+          <AppRoute exact path="/app/user/view" component={accountView} />
+          <AppRoute exact path="/app/user/list/edit" component={userEdit}/>
+
 
 
 
@@ -419,9 +436,6 @@ class AppRouter extends React.Component {
             component={maintenance}
             fullLayout
           />
-          <AppRoute path="/app/user/list" component={userList} />
-          <AppRoute path="/app/user/edit" component={accountEdit} />
-          <AppRoute path="/app/user/view" component={accountView} />
           <AppRoute path="/charts/apex" component={apex} />
           <AppRoute path="/charts/chartjs" component={chartjs} />
           <AppRoute path="/charts/recharts" component={extreme} />

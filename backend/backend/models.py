@@ -1,7 +1,11 @@
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from .validators import PHONE_REGEX_VALIDATOR, CELPHONE_REGEX_VALIDATOR
+from .validators import (
+    PHONE_REGEX_VALIDATOR,
+    CELPHONE_REGEX_VALIDATOR,
+    NIT_REGEX_VALIDATOR,
+    ADDRESS_REGEX_VALIDATOR)
 
 
 class City(models.Model):
@@ -22,10 +26,12 @@ class Company(models.Model):
         max_length=50,
         unique=True)
     nit = models.CharField(
+        validators=[NIT_REGEX_VALIDATOR],
         max_length=15,
         unique=True)
-    address = models.CharField(max_length=50)
-    rut_address = models.CharField(max_length=50)
+    address = models.CharField(
+        validators=[ADDRESS_REGEX_VALIDATOR],
+        max_length=50)
     phone = models.CharField(
         validators=[PHONE_REGEX_VALIDATOR],
         max_length=17,
@@ -33,12 +39,6 @@ class Company(models.Model):
     city = models.ForeignKey(
         City,
         related_name='company',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True)
-    rut_city = models.ForeignKey(
-        City,
-        related_name='ruts',
         on_delete=models.SET_NULL,
         blank=True,
         null=True)

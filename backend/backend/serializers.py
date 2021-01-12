@@ -4,6 +4,7 @@ from . import models as custom_models
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
 from django.contrib.auth import password_validation
 from rest_framework.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -175,6 +176,13 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
+
+    default_error_messages = {
+        'no_active_account':
+        _('No se ha encontrado una '
+          'cuenta activa con las '
+          'credenciales proveidas')
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

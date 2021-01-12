@@ -104,29 +104,14 @@ const navigationConfig = [
         permissions: ["admin", "editor"],
         navLink: "/app/companies/list"
       },
-      {
-        id: "view-companies",
-        title: "Perfil",
-        type: "item",
-        icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
-        navLink: "/app/user/view"
-      },
-      // {
-      //   id: "edit-companies",
-      //   title: "Editar",
-      //   type: "item",
-      //   icon: <Icon.Circle size={12} />,
-      //   permissions: ["admin", "editor"],
-      //   navLink: "/app/user/edit"
-      // },
+      
       {
         id: "add-companies",
         title: "Agregar",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
-        navLink: "/app/user/edit"
+        navLink: "/app/companies/add"
       }
     ]
   }

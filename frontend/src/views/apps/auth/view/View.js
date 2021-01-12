@@ -40,6 +40,25 @@ class UserView extends React.Component {
   //   }
   // }
 
+  toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
+  getFullName() {
+    if (this.props.user.login.values.first_name && this.props.user.login.values.last_name) {
+      return `${this.props.user.login.values.first_name} ${this.props.user.login.values.last_name}`
+    } else if (this.props.user.login.values.first_name) {
+      return this.props.user.login.values.first_name
+    } else {
+      return "N/A"
+    }
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -86,10 +105,7 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                 {
-                                !this.props.user.login.values.first_name ? "N/A" 
-                                : 
-                                `${this.props.user.login.values.first_name.toUpperCase()} 
-                                ${this.props.user.login.values.last_name.toUpperCase()}`
+                                this.toTitleCase(this.getFullName())
                                 }
                                 </div>
                               </div>
@@ -136,7 +152,7 @@ class UserView extends React.Component {
                                 <div>
                                   <span>
                                     {!this.props.user.login.values.company ?
-                                     "N/A" : this.props.user.login.values.companytoUpperCase()}
+                                     "N/A" : this.toTitleCase(this.props.user.login.values.company)}
                                   </span>
                                 </div>
                               </div>
@@ -146,12 +162,7 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                   <span>
-                                  {!this.props.user.login.values.phone ? "N/A" : // if not phone
-                                  this.props.user.login.values.ext ? // else if ext and phone
-                                  `(${this.props.user.login.values.ext}) - 
-                                  ${this.props.user.login.values.phone}` : // concat ext with phone
-                                  this.props.user.login.values.phone // else display phone alone
-                                  }
+                                  {this.props.user.login.values.phone ? this.props.user.login.values.phone : "N/A"}
                                   </span>
                                 </div>
                               </div>
