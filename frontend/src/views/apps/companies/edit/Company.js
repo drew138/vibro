@@ -1,5 +1,6 @@
 import React from "react"
 import {
+  Media,
   Row,
   Col,
   Button,
@@ -10,23 +11,33 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { updateUser } from "../../../../redux/actions/users"
-import isValidAddress from "../../../../validators/address"
+import isValidCelphone from "../../../../validators/celphone"
 import isValidPhone from "../../../../validators/phone"
-import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { POST_COMPANY_ENDPOINT } from "../../../../config"
+import { GET_COMPANIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 
-class UserAccountTab extends React.Component {
+class CompanyTab extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.imageInputRef = React.createRef();
+    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+  }
 
   state = {
-    name: "",
-    nit: "",
-    address: "",
-    phone: "",
-    city: "",
-    hierarchy: null,
+    id: this.props.users.user.id,
+    first_name: this.props.users.user.first_name,
+    last_name: this.props.users.user.last_name,
+    email: this.props.users.user.email,
+    phone: this.props.users.user.phone,
+    celphone: this.props.users.user.celphone,
+    selectedFile: null,
+    companyName: this.props.users.user.company ? this.props.users.user.company.name : "N/A",
+    companyId: this.props.users.user.company ? this.props.users.user.company.id : null,
+    companies: [],
+    is_active: this.props.users.user.is_active,
+    user_type: this.props.users.user.user_type
   }
 
   handleSubmit = e => {
@@ -37,18 +48,13 @@ class UserAccountTab extends React.Component {
       show: true,
       alertText: ""
     }
-    if (this.state.nit && !isValidNit(this.state.nit)) {
-      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x" 
+    if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
+      alertData.alertText = "El número de celular debe ser entrado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
       this.props.displayAlert(alertData)
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
-      this.props.displayAlert(alertData)
-      return
-    }
-    if (this.state.address && !isValidAddress(this.state.address)) {
-      alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
+      alertData.alertText = "El número de teléfono debe ser entrado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
       this.props.displayAlert(alertData)
       return
     }
@@ -56,7 +62,22 @@ class UserAccountTab extends React.Component {
     
   }
 
+  fileSelectedHandler = (event) => {
+    this.setState({
+      selectedFile: event.target.files[0]
+    })
+  }
 
+  fileUploadHandler = () => {
+    this.imageInputRef.current.click()
+  }
+
+  removePicture = () => {
+    this.imageInputRef.current.value = null
+    this.setState({
+      selectedFile: null
+    })
+  }
 
   toTitleCase(str) {
     return str.replace(
@@ -81,7 +102,7 @@ class UserAccountTab extends React.Component {
           <Form onSubmit={this.handleSubmit}>
             <Row>
 
-              <Col md="6" sm="12">
+            <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="name">Nombre</Label>
                   <Input
@@ -163,14 +184,13 @@ class UserAccountTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-              
 
               <Col
                 className="d-flex justify-content-end flex-wrap mt-2"
                 sm="12"
               >
                 <Button.Ripple className="mr-1" color="primary">
-                  Registrar Empresa
+                  Guardar Cambios
                 </Button.Ripple>
               </Col>
             </Row>
@@ -188,4 +208,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { updateUser, displayAlert })(UserAccountTab)
+export default connect(mapStateToProps, { updateUser, displayAlert })(CompanyTab)

@@ -7,16 +7,10 @@ import {
   Media,
   Row,
   Col,
-  Button,
-  // Table
+  Button
 } from "reactstrap"
-import { Edit, 
-  // Trash
-  // , Lock, Check 
-} from "react-feather"
+import { Edit } from "react-feather"
 import { Link } from "react-router-dom"
-// import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
-// import userImg from "../../../../assets/img/portrait/small/avatar-s-18.jpg"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { connect } from "react-redux"
@@ -33,12 +27,6 @@ const user_type_map = {
 
 
 class UserView extends React.Component {
-  //  componentWillMount = () => {
-    
-  //   if (!this.props.user.login.values) {
-  //     history.push("/pages/login")
-  //   }
-  // }
 
   toTitleCase(str) {
     return str.replace(
@@ -50,10 +38,10 @@ class UserView extends React.Component {
   }
 
   getFullName() {
-    if (this.props.user.login.values.first_name && this.props.user.login.values.last_name) {
-      return `${this.props.user.login.values.first_name} ${this.props.user.login.values.last_name}`
-    } else if (this.props.user.login.values.first_name) {
-      return this.props.user.login.values.first_name
+    if (this.props.auth.login.values.first_name && this.props.auth.login.values.last_name) {
+      return `${this.props.auth.login.values.first_name} ${this.props.auth.login.values.last_name}`
+    } else if (this.props.auth.login.values.first_name) {
+      return this.props.auth.login.values.first_name
     } else {
       return "N/A"
     }
@@ -82,7 +70,7 @@ class UserView extends React.Component {
                           className="rounded mr-2"
                           object
                           src={
-                            this.props.user.login.values.picture
+                            this.props.auth.login.values.picture
                           }
                           alt="Generic placeholder image"
                           height="112"
@@ -97,7 +85,7 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Usuario
                                 </div>
-                                <div>{this.props.user.login.values.username}</div>
+                                <div>{this.props.auth.login.values.username}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
@@ -114,7 +102,7 @@ class UserView extends React.Component {
                                   Email
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{!this.props.user.login.values.email ? "N/A" : this.props.user.login.values.email}</span>
+                                  <span>{!this.props.auth.login.values.email ? "N/A" : this.props.auth.login.values.email}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -122,7 +110,7 @@ class UserView extends React.Component {
                                   Celular
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{!this.props.user.login.values.celphone ? "N/A" : this.props.user.login.values.celphone}</span>
+                                  <span>{!this.props.auth.login.values.celphone ? "N/A" : this.props.auth.login.values.celphone}</span>
                                 </div>
                               </div>
                             </div>
@@ -135,7 +123,7 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                   {
-                                    this.props.user.login.values.is_active ? "ACTIVO" : "INACTIVO"
+                                    this.props.auth.login.values.is_active ? "ACTIVO" : "INACTIVO"
                                   }
                                   </div>
                               </div>
@@ -143,7 +131,7 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Tipo
                                 </div>
-                                <div>{user_type_map[this.props.user.login.values.user_type].toUpperCase()}</div>
+                                <div>{user_type_map[this.props.auth.login.values.user_type].toUpperCase()}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
@@ -151,8 +139,8 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                   <span>
-                                    {!this.props.user.login.values.company ?
-                                     "N/A" : this.toTitleCase(this.props.user.login.values.company)}
+                                    {!this.props.auth.login.values.company ?
+                                     "N/A" : this.toTitleCase(this.props.auth.login.values.company)}
                                   </span>
                                 </div>
                               </div>
@@ -162,11 +150,10 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                   <span>
-                                  {this.props.user.login.values.phone ? this.props.user.login.values.phone : "N/A"}
+                                  {this.props.auth.login.values.phone ? this.props.auth.login.values.phone : "N/A"}
                                   </span>
                                 </div>
                               </div>
-                             {/* TODO add certifications */}
                             </div>
                           </Col>
                         </Row>
@@ -180,10 +167,6 @@ class UserView extends React.Component {
                         <span className="align-middle ml-50">Editar</span>
                       </Link>
                     </Button.Ripple>
-                    {/* <Button.Ripple color="danger" outline>
-                      <Trash size={15} />
-                      <span className="align-middle ml-50">Borrar</span>
-                    </Button.Ripple> */}
                   </Col>
                 </Row>
               </CardBody>
@@ -196,7 +179,7 @@ class UserView extends React.Component {
 }
 const mapStateToProps = state => {
   return {
-    user: state.auth
+    auth: state.auth
   }
 }
 

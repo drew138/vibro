@@ -7,29 +7,33 @@ import {
   Nav,
   NavItem,
   NavLink,
-  // TabContent,
-  // TabPane
+  TabContent,
+  TabPane
 } from "reactstrap"
 import classnames from "classnames"
-import { User
-  // , Info, Share 
-} from "react-feather"
-import AccountTab from "./Account"
-// import InfoTab from "./Information"
-// import SocialTab from "./Social"
+import { Briefcase, List, Upload } from "react-feather"
+import CompanyTab from "./Company"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+import ListMachines from "./List"
+import AddMachine from "./AddMachine"
 
-class UserEdit extends React.Component {
+class CompanyEdit extends React.Component {
   state = {
     activeTab: "1"
+  }
+
+  toggle = tab => {
+    this.setState({
+      activeTab: tab
+    })
   }
 
   render() {
     return (
       <React.Fragment>
         <Breadcrumbs
-          breadCrumbTitle="Editar Usuario"
+          breadCrumbTitle="Editar Empresa"
           breadCrumbParent="Lista"
           breadCrumbActive="Editar"
         />
@@ -42,13 +46,53 @@ class UserEdit extends React.Component {
                   <NavLink
                     className={classnames({
                       active: this.state.activeTab === "1"
-                    })}>
-                    <User size={16} />
-                    <span className="align-middle ml-50">Cuenta</span>
+                    })}
+                    onClick={() => {
+                      this.toggle("1")
+                    }}
+                    >
+                    <Briefcase size={16} />
+                    <span className="align-middle ml-50">Editar</span>
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({
+                      active: this.state.activeTab === "2"
+                    })}
+                    onClick={() => {
+                      this.toggle("2")
+                    }}
+                    >
+                    <List size={16} />
+                    <span className="align-middle ml-50">Maquinas</span>
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({
+                      active: this.state.activeTab === "3"
+                    })}
+                    onClick={() => {
+                      this.toggle("3")
+                    }}
+                    >
+                    <Upload size={16} />
+                    <span className="align-middle ml-50">Agregar Máquina</span>
                   </NavLink>
                 </NavItem>
               </Nav>
-              <AccountTab />
+              <TabContent activeTab={this.state.activeTab}>
+                <TabPane tabId="1">
+                  <CompanyTab />
+                </TabPane>
+                <TabPane tabId="2">
+                  <ListMachines/>
+                </TabPane>
+                <TabPane tabId="3">
+                  <AddMachine/>
+                </TabPane>
+              </TabContent>
             </CardBody>
           </Card>
         </Col>
@@ -57,4 +101,4 @@ class UserEdit extends React.Component {
     )
   }
 }
-export default UserEdit
+export default CompanyEdit
