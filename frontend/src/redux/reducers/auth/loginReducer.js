@@ -15,11 +15,25 @@ export const login = (state = { userRole: "admin" }, action) => {
     case "LOGIN_WITH_GITHUB": {
       return { ...state, values: action.payload }
     }
-    case "LOGIN_WITH_JWT": {
+    case "GET_USER_WITH_JWT": {
       return { ...state, values: action.payload }
     }
+    case "LOGIN_WITH_JWT": {
+      return { 
+        ...state, 
+        values: action.payload.values,
+        tokens: action.payload.tokens
+      }
+    }
+    case "REFRESH_JWT": {
+      return { ...state, tokens: action.payload }
+    }
     case "LOGOUT_WITH_JWT": {
-      return { ...state, values: action.payload }
+      return { 
+        ...state,
+        values: action.payload,
+        tokens: action.payload
+      }
     }
     case "LOGOUT_WITH_FIREBASE": {
       return { ...state, values: action.payload }

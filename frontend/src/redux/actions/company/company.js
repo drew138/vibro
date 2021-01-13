@@ -1,0 +1,1 @@
+import { POST_COMPANY_ENDPOINT } from "../../../../config"

@@ -2,6 +2,9 @@
 from rest_framework import serializers
 from . import models as custom_models
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
+from django.contrib.auth import password_validation
+from rest_framework.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -43,13 +46,13 @@ class VibroUserSerializer(serializers.ModelSerializer):
             "last_name",
             'celphone',
             'phone',
-            'ext',
             'email',
             'company',
             'user_type',
             'is_staff',
             'is_superuser',
-            'picture'
+            'picture',
+            'is_active'
         ]
 
 
@@ -68,14 +71,22 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
             'company',
             'password',
             'phone',
-            'ext',
             'celphone',
         ]
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
+        extra_kwargs = {'password': {'write_only': True,
+                                     'min_length': 8}
+                        }
 
     def create(self, validated_data):
         user = custom_models.VibroUser.objects.create_user(**validated_data)
         return user
+
+    def validate_password(self, value):
+        try:
+            password_validation.validate_password(value)
+        except ValidationError as exc:
+            raise serializers.ValidationError(str(exc))
+        return value
 
 
 # Register admin Serializer
@@ -94,7 +105,6 @@ class RegisterAdminUserSerializer(serializers.ModelSerializer):
             'company',
             'password',
             'phone',
-            'ext',
             'celphone',
             'user_type',
             'is_staff',
@@ -106,6 +116,13 @@ class RegisterAdminUserSerializer(serializers.ModelSerializer):
         user = custom_models.VibroUser.objects.create_user(
             **validated_data)
         return user
+
+    def validate_password(self, value):
+        try:
+            password_validation.validate_password(value)
+        except ValidationError as exc:
+            raise serializers.ValidationError(str(exc))
+        return value
 
 
 # Rest Password Serializer
@@ -148,16 +165,24 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'phone',
-            'ext',
             'celphone',
+            'email',
             'company',
             'user_type',
             'certifications',
             'picture',
+            'is_active'
         ]
 
 
 class LoginSerializer(TokenObtainPairSerializer):
+
+    default_error_messages = {
+        'no_active_account':
+        _('No se ha encontrado una '
+          'cuenta activa con las '
+          'credenciales proveidas')
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -176,12 +201,12 @@ class LoginSerializer(TokenObtainPairSerializer):
         data["last_name"] = self.user.last_name
         data["celphone"] = self.user.celphone
         data["phone"] = self.user.phone
-        data["ext"] = self.user.ext
         data["email"] = self.user.email
         data["company"] = self.user.company
         data["user_type"] = self.user.user_type
         data["is_staff"] = self.user.is_staff
         data["is_superuser"] = self.user.is_superuser
+        data["is_active"] = self.user.is_active
         request = self.context.get('request')
         data["picture"] = request.build_absolute_uri(self.user.picture.url)
         return data
@@ -294,9 +319,17 @@ class PointSerializer(serializers.ModelSerializer):
 
     # measurement = MeasurementSerializer()
     espectra = serializers.ListField(
-        child=serializers.DecimalField(decimal_places=2, max_digits=4, default=0), required=False)
+        child=serializers.DecimalField(
+            decimal_places=2,
+            max_digits=4,
+            default=0),
+        required=False)
     time_signal = serializers.ListField(
-        child=serializers.DecimalField(decimal_places=2, max_digits=4, default=0), required=False)
+        child=serializers.DecimalField(
+            decimal_places=2,
+            max_digits=4,
+            default=0),
+        required=False)
 
     class Meta:
         model = custom_models.Point

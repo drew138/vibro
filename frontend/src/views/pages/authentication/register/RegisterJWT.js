@@ -1,12 +1,12 @@
 import React from "react"
 import { Form, FormGroup, Input, Label, Button } from "reactstrap"
-// import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
-// import { Check } from "react-feather"
 import { connect } from "react-redux"
 import { signupWithJWT } from "../../../../redux/actions/auth/registerActions"
 import { history } from "../../../../history"
-// import Slider from "../../../../extensions/sweet-alert/SweetAlert"
-import SweetAlert from 'react-bootstrap-sweetalert';
+import isValidCelphone from "../../../../validators/celphone"
+import isValidPassword from "../../../../validators/password"
+import { displayAlert } from "../../../../redux/actions/alerts"
+
 class RegisterJWT extends React.Component {
   state = {
     username: "",
@@ -15,24 +15,40 @@ class RegisterJWT extends React.Component {
     email: "",
     password: "",
     confirmPass: "",
-    celphone: undefined,
-    infoAlert: true
+    celphone: "",
   }
 
   handleRegister = e => {
     e.preventDefault()
-    this.props.signupWithJWT(
-      this.state.username,
-      this.state.first_name,
-      this.state.last_name,
-      this.state.email,
-      this.state.password,
-      this.state.celphone
-    )
-  }
+    const alertProps = {
+      title: "Error de Validación",
+      success: false,
+      show: true,
+      alertText: ""
+    }
+    if (this.state.password !== this.state.confirmPass) {
+      alertProps.alertText = "Las contraseñas no coinciden"
+      this.props.displayAlert(alertProps)
+      return
+    }
+    if (!isValidPassword(this.state.password)) {
+      alertProps.alertText = "La contraseña debe contener por lo menos 8 caracteres, un numero y una mayuscula."
+      this.props.displayAlert(alertProps)
+      return
+    }
+    if (!isValidCelphone(this.state.celphone)) {
+      alertProps.alertText = "El número de celular debe ser entrado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      this.props.displayAlert(alertProps)
+      return
+    }
 
-  handleAlert = (state, value) => {
-    this.setState({ [state] : value })
+    this.props.signupWithJWT({
+      username: this.state.username,
+      first_name: this.state.first_name,
+      last_name:  this.state.last_name,
+      email: this.state.email,
+      password: this.state.password,
+      celphone: this.state.celphone})
   }
 
   render() {
@@ -47,6 +63,28 @@ class RegisterJWT extends React.Component {
             onChange={e => this.setState({ username: e.target.value })}
           />
           <Label>Usuario</Label>
+        </FormGroup>
+
+        <FormGroup className="form-label-group">
+          <Input
+            type="email"
+            placeholder="Email"
+            required
+            value={this.state.email}
+            onChange={e => this.setState({ email: e.target.value })}
+          />
+          <Label>Email</Label>
+        </FormGroup>
+
+        <FormGroup className="form-label-group">
+          <Input
+            type="text"
+            placeholder="Celular"
+            required
+            value={this.state.celphone}
+            onChange={e => this.setState({ celphone: e.target.value })}
+          />
+          <Label>Celular</Label>
         </FormGroup>
 
         <FormGroup className="form-label-group">
@@ -71,16 +109,6 @@ class RegisterJWT extends React.Component {
           <Label>Apellido</Label>
         </FormGroup>
 
-        <FormGroup className="form-label-group">
-          <Input
-            type="email"
-            placeholder="Email"
-            required
-            value={this.state.email}
-            onChange={e => this.setState({ email: e.target.value })}
-          />
-          <Label>Email</Label>
-        </FormGroup>
 
         <FormGroup className="form-label-group">
           <Input
@@ -93,6 +121,7 @@ class RegisterJWT extends React.Component {
           <Label>Contraseña</Label>
         </FormGroup>
 
+
         <FormGroup className="form-label-group">
           <Input
             type="password"
@@ -104,16 +133,6 @@ class RegisterJWT extends React.Component {
           <Label>Confirma Contraseña</Label>
         </FormGroup>
 
-        <FormGroup className="form-label-group">
-          <Input
-            type="number"
-            placeholder="Celular"
-            required
-            value={this.state.celphone}
-            onChange={e => this.setState({ celphone: e.target.value })}
-          />
-          <Label>Celular</Label>
-        </FormGroup>
         
         
         
@@ -131,14 +150,6 @@ class RegisterJWT extends React.Component {
             Registrarse
           </Button.Ripple>
         </div>
-        <SweetAlert info title="Info!"
-          show={this.state.infoAlert} 
-          onConfirm={() => this.handleAlert("infoAlert", false)}
-        >
-            <p className="sweet-alert-text">
-              You clicked the button!
-            </p>
-        </SweetAlert>
       </Form>
     )
   }
@@ -148,4 +159,4 @@ const mapStateToProps = state => {
     values: state.auth.register
   }
 }
-export default connect(mapStateToProps, { signupWithJWT })(RegisterJWT)
+export default connect(mapStateToProps, { signupWithJWT, displayAlert })(RegisterJWT)

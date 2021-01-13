@@ -40,19 +40,18 @@ class CompanyView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on params. For non staff/superusers,
-        companies are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on params.
+        For non staff/superusers, companies are
+        always filtered by user to prevent users
+        from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
         name = self.request.query_params.get('name', None)
-        nit = self.request.query_params.get('name', None)
+        nit = self.request.query_params.get('nit', None)
         address = self.request.query_params.get('address', None)
-        rut_address = self.request.query_params.get('rut_address', None)
-        pbx = self.request.query_params.get('pbx', None)
+        phone = self.request.query_params.get('phone', None)
         city = self.request.query_params.get('city', None)
-        rut_city = self.request.query_params.get('rut_city', None)
 
         if self.request.user.is_staff or self.request.user.is_superuser:
             queryset = custom_models.Company.objects.all()
@@ -67,14 +66,10 @@ class CompanyView(viewsets.ModelViewSet):
             queryset = queryset.filter(nit=nit)
         if address:
             queryset = queryset.filter(address=address)
-        if rut_address:
-            queryset = queryset.filter(rut_address=rut_address)
-        if pbx:
-            queryset = queryset.filter(pbx=pbx)
+        if phone:
+            queryset = queryset.filter(phone=phone)
         if city:
             queryset = queryset.filter(city__id=city)
-        if rut_city:
-            queryset = queryset.filter(rut_city__id=rut_city)
         return queryset
 
     def get_serializer_class(self):
@@ -90,9 +85,10 @@ class MachineView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        machines are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, machines
+        are always filtered by user to prevent
+        users from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -186,8 +182,9 @@ class GearView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        gears are always filtered by user to prevent users from
+        Optionally filter fields based on url params. 
+        For non staff/superusers, gears are always 
+        filtered by user to prevent users from
         seeing unauthorized data.
         """
 
@@ -222,9 +219,10 @@ class AxisView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        axis are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, axis
+        are always filtered by user to prevent
+        users from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -252,9 +250,11 @@ class BearingView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        bearings are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on
+        url params. For non staff/superusers,
+        bearings are always filtered by user
+        to prevent users from seeing unauthorized
+        data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -351,9 +351,11 @@ class MeasurementView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        measurements are always filtered by user to prevent users from 
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers,
+        measurements are always filtered by
+        user to prevent users from seeing
+        unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -409,9 +411,11 @@ class FlawView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        flaws are always filtered by user to prevent users from 
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers,
+        flaws are always filtered by user to
+        prevent users from seeing unauthorized
+        data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -464,9 +468,11 @@ class TermoImageView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        termal images are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, termal
+        images are always filtered by user to
+        prevent users from seeing unauthorized
+        data.
         """
 
         id = self.request.query_params.get('id', None)
@@ -494,9 +500,10 @@ class PointView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally filter fields based on url params. For non staff/superusers,
-        points are always filtered by user to prevent users from
-        seeing unauthorized data.
+        Optionally filter fields based on url
+        params. For non staff/superusers, points
+        are always filtered by user to prevent
+        users from seeing unauthorized data.
         """
 
         id = self.request.query_params.get('id', None)

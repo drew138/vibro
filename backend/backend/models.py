@@ -1,6 +1,11 @@
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from .validators import (
+    PHONE_REGEX_VALIDATOR,
+    CELPHONE_REGEX_VALIDATOR,
+    NIT_REGEX_VALIDATOR,
+    ADDRESS_REGEX_VALIDATOR)
 
 
 class City(models.Model):
@@ -17,20 +22,23 @@ class City(models.Model):
 
 class Company(models.Model):
 
-    name = models.CharField(max_length=50, unique=True)
-    nit = models.CharField(max_length=15, unique=True)
-    address = models.CharField(max_length=50)
-    rut_address = models.CharField(max_length=50)
-    pbx = models.IntegerField(blank=True, null=True)
+    name = models.CharField(
+        max_length=50,
+        unique=True)
+    nit = models.CharField(
+        validators=[NIT_REGEX_VALIDATOR],
+        max_length=15,
+        unique=True)
+    address = models.CharField(
+        validators=[ADDRESS_REGEX_VALIDATOR],
+        max_length=50)
+    phone = models.CharField(
+        validators=[PHONE_REGEX_VALIDATOR],
+        max_length=17,
+        default="")
     city = models.ForeignKey(
         City,
         related_name='company',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True)
-    rut_city = models.ForeignKey(
-        City,
-        related_name='ruts',
         on_delete=models.SET_NULL,
         blank=True,
         null=True)
@@ -56,9 +64,14 @@ class VibroUser(AbstractUser):
     ]
 
     email = models.EmailField(unique=True)
-    phone = models.IntegerField(blank=True, null=True)
-    ext = models.IntegerField(blank=True, null=True)
-    celphone = models.IntegerField(blank=True, null=True)
+    phone = models.CharField(
+        validators=[PHONE_REGEX_VALIDATOR],
+        max_length=17,
+        default="")
+    celphone = models.CharField(
+        validators=[CELPHONE_REGEX_VALIDATOR],
+        max_length=20,
+        default="")
     company = models.ForeignKey(
         Company,
         related_name="user",
@@ -117,23 +130,35 @@ class Machine(models.Model):
         (HP, 'HorsePower'),
     )
 
-    identifier = models.IntegerField(blank=True, null=True)
+    identifier = models.IntegerField(
+        blank=True,
+        null=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
         on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     code = models.CharField(
-        max_length=3, choices=CODE_CHOICES, blank=True, null=True)
+        max_length=3,
+        choices=CODE_CHOICES,
+        blank=True,
+        null=True)
     electric_feed = models.CharField(
-        max_length=3, choices=CODE_CHOICES, blank=True, null=True)
+        max_length=3,
+        choices=CODE_CHOICES,
+        blank=True,
+        null=True)
     brand = models.CharField(max_length=50)
     power = models.IntegerField(default=0)
     power_units = models.CharField(
         max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
-    norm = models.TextField(null=True, blank=True)
+    norm = models.TextField(
+        null=True,
+        blank=True)
     hierarchy = models.IntegerField(default=0)
-    rpm = models.IntegerField(blank=True, null=True)
+    rpm = models.IntegerField(
+        blank=True,
+        null=True)
 
 
 class Sensor(models.Model):
@@ -147,7 +172,9 @@ class Sensor(models.Model):
     )
 
     sensor_type = models.CharField(
-        max_length=9, choices=SENSOR_CHOICES, default=VIBRACION)
+        max_length=9,
+        choices=SENSOR_CHOICES,
+        default=VIBRACION)
     sensitivity = models.IntegerField()
     channel = models.IntegerField()
     arduino = models.ForeignKey(
@@ -227,13 +254,21 @@ class Gear(models.Model):  # equipo
         (RIGIDO, 'Rigido'),
     )
     machine = models.ForeignKey(
-        Machine, related_name='gears', on_delete=models.CASCADE)
+        Machine,
+        related_name='gears',
+        on_delete=models.CASCADE)
     gear_type = models.CharField(
-        max_length=20, choices=GEAR_TYPE_CHOICES, default="N/A")
+        max_length=20,
+        choices=GEAR_TYPE_CHOICES,
+        default="N/A")
     support = models.CharField(
-        max_length=10, choices=SUPPORT_CHOICES, default='N/A')  # TODO contar num ejes
+        max_length=10,
+        choices=SUPPORT_CHOICES,
+        default='N/A')  # TODO contar num ejes
     transmission = models.CharField(
-        max_length=12, choices=TRANSMISSION_CHOICES, default="N/A")  # TODO preguntar transmision entre equipos
+        max_length=12,
+        choices=TRANSMISSION_CHOICES,
+        default="N/A")  # TODO preguntar transmision entre equipos
 
 
 class Axis(models.Model):  # eje
@@ -283,9 +318,13 @@ class Bearing(models.Model):  # cojinetes
 
     reference = models.CharField(max_length=30, default='N/A')
     frequency = models.CharField(
-        max_length=4, choices=FREQUENCY_CHOICES, default='N/A')
+        max_length=4,
+        choices=FREQUENCY_CHOICES,
+        default='N/A')
     axis = models.ForeignKey(
-        Axis, related_name='bearings', on_delete=models.CASCADE)
+        Axis,
+        related_name='bearings',
+        on_delete=models.CASCADE)
 
 
 class Coupling(models.Model):
@@ -403,7 +442,9 @@ class Measurement(models.Model):
     analysis = models.TextField()
     diagnostic = models.TextField()
     severity = models.CharField(
-        max_length=9, choices=SEVERITY_CHOICES, default=BLACK)
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=BLACK)
     engineer_one = models.ForeignKey(
         VibroUser,
         related_name="measurements",
@@ -489,11 +530,17 @@ class Flaw(models.Model):  # falla
     ]
 
     measurement = models.ForeignKey(
-        Measurement, related_name="flaws", on_delete=models.CASCADE)
+        Measurement,
+        related_name="flaws",
+        on_delete=models.CASCADE)
     flaw_type = models.CharField(
-        max_length=3, choices=FLAW_CHOICES, default=OTR)
+        max_length=3,
+        choices=FLAW_CHOICES,
+        default=OTR)
     severity = models.CharField(
-        max_length=9, choices=SEVERITY_CHOICES, default=BLACK)
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=BLACK)
 
 
 class TermoImage(models.Model):
@@ -505,9 +552,13 @@ class TermoImage(models.Model):
         (TERMAL, 'Termal')
     ]
     measurement = models.ForeignKey(
-        Measurement, related_name='termal_image', on_delete=models.CASCADE)
+        Measurement,
+        related_name='termal_image',
+        on_delete=models.CASCADE)
     image_type = models.CharField(
-        max_length=15, choices=IMAGE_CHOICES, default='undefined')
+        max_length=15,
+        choices=IMAGE_CHOICES,
+        default='undefined')
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="termals")
 
@@ -553,21 +604,30 @@ class Point(models.Model):
 
     position = models.IntegerField(choices=POSITION_CHOICES)
     direction = models.CharField(
-        max_length=1, choices=DIRECTION_CHOICES, default='undefined')
+        max_length=1,
+        choices=DIRECTION_CHOICES,
+        default='undefined')
     point_type = models.CharField(
-        max_length=1, choices=TYPE_CHOICES, default='undefined')
+        max_length=1,
+        choices=TYPE_CHOICES,
+        default='undefined')
     measurement = models.ForeignKey(
         Measurement,
         related_name="points",
         on_delete=models.CASCADE)
-    tendency = models.DecimalField(decimal_places=2, max_digits=4, default=0)
+    tendency = models.DecimalField(
+        decimal_places=2,
+        max_digits=4,
+        default=0)
     espectra = ArrayField(
         models.DecimalField(
             decimal_places=2,
             max_digits=4),
         default=list)
     time_signal = ArrayField(models.DecimalField(
-        decimal_places=2, max_digits=4), default=list)
+        decimal_places=2,
+        max_digits=4),
+        default=list)
 
     def __str__(self):
         return f'{self.position}{self.direction}{self.point_type}'

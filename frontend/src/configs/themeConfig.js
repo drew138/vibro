@@ -7,7 +7,7 @@ const themeConfig = {
   sidebarCollapsed: true, // options[Boolean]: true, false(default)
   navbarColor: "info", // options[String]: default / primary / success / danger / info / warning / dark
   navbarType: "floating", // options[String]: floating(default) / static / sticky / hidden
-  footerType: "sticky", // options[String]: static(default) / sticky / hidden
+  footerType: "static", // options[String]: static(default) / sticky / hidden
   disableCustomizer: true, // options[Boolean]: true, false(default)
   hideScrollToTop: true, // options[Boolean]: true, false(default)
   disableThemeTour: true, // options[Boolean]: true, false(default)

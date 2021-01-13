@@ -1,12 +1,12 @@
 import React, { Suspense, lazy } from "react"
-import { Router, Switch, Route } from "react-router-dom"
+import { Router, Switch, Route, Redirect } from "react-router-dom"
 import { history } from "./history"
 import { connect } from "react-redux"
-import { Redirect } from "react-router-dom"
 import Spinner from "./components/@vuexy/spinner/Loading-spinner"
 import knowledgeBaseCategory from "./views/pages/knowledge-base/Category"
 import knowledgeBaseQuestion from "./views/pages/knowledge-base/Questions"
 import { ContextLayout } from "./utility/context/Layout"
+import { getUserWithJWT, refreshJWT } from "./redux/actions/auth/loginActions"
 
 // Route-based code splitting
 const analyticsDashboard = lazy(() =>
@@ -160,9 +160,12 @@ const Export = lazy(() => import("./extensions/import-export/Export"))
 const ExportSelected = lazy(() =>
   import("./extensions/import-export/ExportSelected")
 )
-const userList = lazy(() => import("./views/apps/user/list/List"))
-const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
-const userView = lazy(() => import("./views/apps/user/view/View"))
+
+
+
+const userList = lazy(() => import("./views/apps/auth/list/List"))
+const accountEdit = lazy(() => import("./views/apps/auth/edit/Edit"))
+const accountView = lazy(() => import("./views/apps/auth/view/View"))
 const Login = lazy(() => import("./views/pages/authentication/login/Login"))
 const forgotPassword = lazy(() =>
   import("./views/pages/authentication/ForgotPassword")
@@ -177,10 +180,16 @@ const register = lazy(() =>
 const accessControl = lazy(() =>
   import("./extensions/access-control/AccessControl")
 )
-const espectra = lazy(() => import("./views/apps/measurements/Espectra"))
-const upload = lazy(() => import("./views/apps/measurements/Upload"))
-const wform = lazy(() => import("./views/apps/measurements/WizardForm"))
 
+
+const espectra = lazy(() => import("./views/apps/services/Espectra"))
+const upload = lazy(() => import("./views/apps/services/Upload"))
+const wform = lazy(() => import("./views/apps/services/WizardForm"))
+const llist = lazy(() => import("./views/apps/services/monitoring/List"))
+const companies = lazy(() => import("./views/apps/companies/list/CompaniesList"))
+const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
+const companyEdit = lazy(() => import("./views/apps/companies/edit/Edit"))
+const companyAdd = lazy(() => import("./views/apps/companies/add/Add"))
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -197,7 +206,7 @@ const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
                 ? context.horizontalLayout
                 : context.VerticalLayout
             return (
-              <LayoutTag {...props} permission={props.user}>
+              <LayoutTag {...props} permission={props.permissions}>
                 <Suspense fallback={<Spinner />}>
                   <Component {...props} />
                 </Suspense>
@@ -211,11 +220,41 @@ const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
 )
 const mapStateToProps = state => {
   return {
-    user: state.auth.login.userRole
+    permissions: state.auth.login.userRole, // TODO - change userRole prop to something else
+    user: state.auth.login
   }
 }
 
 const AppRoute = connect(mapStateToProps)(RouteConfig)
+
+
+//   const isExpired = (token) => {
+//     const jwt = JSON.parse(atob(token.split('.')[1]));
+
+//     return jwt.exp < Date.now();
+//   }
+  
+
+// if (!props.user.values && !props.user.tokens) {
+//   const access = localStorage.getItem("access")
+//   if (!access) {
+//     return <Redirect to="/pages/login"/>
+//   }
+//   if (isExpired(access)) {
+//     const refresh = localStorage.getItem("refresh")
+//     props.refreshJWT(refresh)
+//   } else {
+//     props.getUserWithJWT(access)
+//   }
+// } else if (isExpired(props.user.tokens.access) && props.user.values) {
+// try {
+//   props.refreshJWT(props.user.tokens.refresh)
+// } catch (e) {
+//   return <Redirect to="/pages/login"/>
+// }
+// }
+
+// const PrivateAppRoute = connect(mapStateToProps, { getUserWithJWT, refreshJWT })(PrivateRouteConfig)
 
 class AppRouter extends React.Component {
   render() {
@@ -224,8 +263,27 @@ class AppRouter extends React.Component {
       <Router history={history}>
         <Switch>
           <AppRoute exact path="/" component={analyticsDashboard} />
+
+
           <AppRoute exact path="/measurements/espectra" component={espectra} />
           <AppRoute exact path="/measurements/upload" component={upload} />
+          <AppRoute exact path="/services/monitoring/list" component={llist} />
+          
+          <AppRoute exact path="/app/companies/list" component={companies}/>
+          <AppRoute exact path="/app/companies/list/edit" component={companyEdit}/>
+          <AppRoute exact path="/app/companies/add" component={companyAdd}/>
+
+
+
+
+          <AppRoute exact path="/app/user/list" component={userList} />
+          <AppRoute exact path="/app/user/edit" component={accountEdit} />
+          <AppRoute exact path="/app/user/view" component={accountView} />
+          <AppRoute exact path="/app/user/list/edit" component={userEdit}/>
+
+
+
+
           <AppRoute
             path="/ecommerce-dashboard"
             component={ecommerceDashboard}
@@ -378,9 +436,6 @@ class AppRouter extends React.Component {
             component={maintenance}
             fullLayout
           />
-          <AppRoute path="/app/user/list" component={userList} />
-          <AppRoute path="/app/user/edit" component={userEdit} />
-          <AppRoute path="/app/user/view" component={userView} />
           <AppRoute path="/charts/apex" component={apex} />
           <AppRoute path="/charts/chartjs" component={chartjs} />
           <AppRoute path="/charts/recharts" component={extreme} />

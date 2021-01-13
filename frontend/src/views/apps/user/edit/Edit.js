@@ -7,16 +7,16 @@ import {
   Nav,
   NavItem,
   NavLink,
-  TabContent,
-  TabPane
+  // TabContent,
+  // TabPane
 } from "reactstrap"
 import classnames from "classnames"
 import { User
   // , Info, Share 
 } from "react-feather"
 import AccountTab from "./Account"
-import InfoTab from "./Information"
-import SocialTab from "./Social"
+// import InfoTab from "./Information"
+// import SocialTab from "./Social"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 
@@ -25,17 +25,12 @@ class UserEdit extends React.Component {
     activeTab: "1"
   }
 
-  toggle = tab => {
-    this.setState({
-      activeTab: tab
-    })
-  }
   render() {
     return (
       <React.Fragment>
         <Breadcrumbs
           breadCrumbTitle="Editar Usuario"
-          breadCrumbParent="Usuario"
+          breadCrumbParent="Lista"
           breadCrumbActive="Editar"
         />
       <Row>
@@ -47,53 +42,13 @@ class UserEdit extends React.Component {
                   <NavLink
                     className={classnames({
                       active: this.state.activeTab === "1"
-                    })}
-                    onClick={() => {
-                      this.toggle("1")
-                    }}
-                  >
+                    })}>
                     <User size={16} />
-                    <span className="align-middle ml-50">Account</span>
+                    <span className="align-middle ml-50">Cuenta</span>
                   </NavLink>
                 </NavItem>
-                {/* <NavItem>
-                  <NavLink
-                    className={classnames({
-                      active: this.state.activeTab === "2"
-                    })}
-                    onClick={() => {
-                      this.toggle("2")
-                    }}
-                  >
-                    <Info size={16} />
-                    <span className="align-middle ml-50">Information</span>
-                  </NavLink>
-                </NavItem> */}
-                {/* <NavItem>
-                  <NavLink
-                    className={classnames({
-                      active: this.state.activeTab === "3"
-                    })}
-                    onClick={() => {
-                      this.toggle("3")
-                    }}
-                  >
-                    <Share size={16} />
-                    <span className="align-middle ml-50">Social</span>
-                  </NavLink>
-                </NavItem> */}
               </Nav>
-              <TabContent activeTab={this.state.activeTab}>
-                <TabPane tabId="1">
-                  <AccountTab />
-                </TabPane>
-                <TabPane tabId="2">
-                  <InfoTab />
-                </TabPane>
-                <TabPane tabId="3">
-                  <SocialTab />
-                </TabPane>
-              </TabContent>
+              <AccountTab />
             </CardBody>
           </Card>
         </Col>
