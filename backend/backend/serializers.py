@@ -49,8 +49,6 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'email',
             'company',
             'user_type',
-            'is_staff',
-            'is_superuser',
             'picture',
             'is_active'
         ]
@@ -106,9 +104,7 @@ class RegisterAdminUserSerializer(serializers.ModelSerializer):
             'password',
             'phone',
             'celphone',
-            'user_type',
-            'is_staff',
-            'is_superuser'
+            'user_type'
         ]
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
@@ -204,8 +200,6 @@ class LoginSerializer(TokenObtainPairSerializer):
         data["email"] = self.user.email
         data["company"] = self.user.company
         data["user_type"] = self.user.user_type
-        data["is_staff"] = self.user.is_staff
-        data["is_superuser"] = self.user.is_superuser
         data["is_active"] = self.user.is_active
         request = self.context.get('request')
         data["picture"] = request.build_absolute_uri(self.user.picture.url)
@@ -264,24 +258,6 @@ class CouplingSerializer(serializers.ModelSerializer):
     class Meta:
         model = custom_models.Coupling
         feilds = '__all__'
-
-
-class ImageSerializer(serializers.ModelSerializer):
-
-    # machine = MachineSerializer()
-
-    class Meta:
-        model = custom_models.Image
-        fields = '__all__'
-
-
-class DateSerializer(serializers.ModelSerializer):
-
-    # company = DefaultCompanySerializer()
-
-    class Meta:
-        model = custom_models.Date
-        fields = '__all__'
 
 
 class MeasurementSerializer(serializers.ModelSerializer):

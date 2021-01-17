@@ -90,6 +90,7 @@
       align-items: center;
       margin-top: 1.35rem;
       .brand-logo {
+        // TODO change logo and position accordingly
         background: url("../../../img/logo/vuesax-logo.png") no-repeat;
         background-position: -65px -54px;
         height: 24px;
@@ -165,7 +166,6 @@
   &:not(.hide-sidebar) {
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
-
 }
 
 // Main Navigation
@@ -275,7 +275,7 @@
 // Navigation Themes
 
 .horizontal-layout,
-.vertical-layout{
+.vertical-layout {
   &.theme-primary {
     .navbar-container,
     .navbar-header {
@@ -415,8 +415,6 @@ body {
     }
   }
 }
-
-
 
 // for collapsed static layout
 body.menu-collapsed {

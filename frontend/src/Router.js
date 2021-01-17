@@ -3,7 +3,6 @@ import { Router, Switch, Route, Redirect } from "react-router-dom"
 import { history } from "./history"
 import { connect } from "react-redux"
 import Spinner from "./components/@vuexy/spinner/Loading-spinner"
-import knowledgeBaseCategory from "./views/pages/knowledge-base/Category"
 import knowledgeBaseQuestion from "./views/pages/knowledge-base/Questions"
 import { ContextLayout } from "./utility/context/Layout"
 import { getUserWithJWT, refreshJWT } from "./redux/actions/auth/loginActions"
@@ -15,14 +14,8 @@ const analyticsDashboard = lazy(() =>
 const ecommerceDashboard = lazy(() =>
   import("./views/dashboard/ecommerce/EcommerceDashboard")
 )
-const email = lazy(() => import("./views/apps/email/Email"))
-const chat = lazy(() => import("./views/apps/chat/Chat"))
-const todo = lazy(() => import("./views/apps/todo/Todo"))
+
 const calendar = lazy(() => import("./views/apps/calendar/Calendar"))
-const shop = lazy(() => import("./views/apps/ecommerce/shop/Shop"))
-const wishlist = lazy(() => import("./views/apps/ecommerce/wishlist/Wishlist"))
-const checkout = lazy(() => import("./views/apps/ecommerce/cart/Cart"))
-const productDetail = lazy(() => import("./views/apps/ecommerce/detail/Detail"))
 const grid = lazy(() => import("./views/ui-elements/grid/Grid"))
 const typography = lazy(() =>
   import("./views/ui-elements/typography/Typography")
@@ -121,17 +114,14 @@ const ReactTables = lazy(() =>
 )
 const Aggrid = lazy(() => import("./views/tables/aggrid/Aggrid"))
 const DataTable = lazy(() => import("./views/tables/data-tables/DataTables"))
-const profile = lazy(() => import("./views/pages/profile/Profile"))
 const faq = lazy(() => import("./views/pages/faq/FAQ"))
 const knowledgeBase = lazy(() =>
   import("./views/pages/knowledge-base/KnowledgeBase")
 )
-const search = lazy(() => import("./views/pages/search/Search"))
+
 const accountSettings = lazy(() =>
   import("./views/pages/account-settings/AccountSettings")
 )
-const invoice = lazy(() => import("./views/pages/invoice/Invoice"))
-const comingSoon = lazy(() => import("./views/pages/misc/ComingSoon"))
 const error404 = lazy(() => import("./views/pages/misc/error/404"))
 const error500 = lazy(() => import("./views/pages/misc/error/500"))
 const authorized = lazy(() => import("./views/pages/misc/NotAuthorized"))
@@ -152,9 +142,7 @@ const clipboard = lazy(() =>
 )
 const menu = lazy(() => import("./extensions/contexify/Contexify"))
 const swiper = lazy(() => import("./extensions/swiper/Swiper"))
-const i18n = lazy(() => import("./extensions/i18n/I18n"))
 const reactPaginate = lazy(() => import("./extensions/pagination/Pagination"))
-const tree = lazy(() => import("./extensions/treeview/TreeView"))
 const Import = lazy(() => import("./extensions/import-export/Import"))
 const Export = lazy(() => import("./extensions/import-export/Export"))
 const ExportSelected = lazy(() =>
@@ -280,44 +268,26 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/app/user/edit" component={accountEdit} />
           <AppRoute exact path="/app/user/view" component={accountView} />
           <AppRoute exact path="/app/user/list/edit" component={userEdit}/>
+          <AppRoute
+            path="/pages/account-settings"
+            component={accountSettings}
+          />
 
 
 
-
+          <AppRoute path="/charts/chartjs" component={chartjs} />
           <AppRoute
             path="/ecommerce-dashboard"
             component={ecommerceDashboard}
           />
-          <AppRoute
-            path="/email"
-            exact
-            component={() => <Redirect to="/email/inbox" />}
-          />
           <AppRoute path="/measurements/wizard" component={wform}/>
-          <AppRoute path="/email/:filter" component={email} />
-          <AppRoute path="/chat" component={chat} />
-          <AppRoute
-            path="/todo"
-            exact
-            component={() => <Redirect to="/todo/all" />}
-          />
-          <AppRoute path="/todo/:filter" component={todo} />
           <AppRoute path="/calendar" component={calendar} />
-          <AppRoute path="/ecommerce/shop" component={shop} />
-          <AppRoute path="/ecommerce/wishlist" component={wishlist} />
-          <AppRoute
-            path="/ecommerce/product-detail"
-            component={productDetail}
-          />
-          <AppRoute
-            path="/ecommerce/checkout"
-            component={checkout}
-            permission="admin"
-          />
           <AppRoute path="/data-list/list-view" component={listView} />
           <AppRoute path="/data-list/thumb-view" component={thumbView} />
           <AppRoute path="/ui-element/grid" component={grid} />
           <AppRoute path="/ui-element/typography" component={typography} />
+
+
           <AppRoute
             path="/ui-element/textutilities"
             component={textutilities}
@@ -361,52 +331,38 @@ class AppRouter extends React.Component {
           <AppRoute path="/extra-components/chips" component={chips} />
           <AppRoute path="/extra-components/divider" component={divider} />
           <AppRoute path="/forms/wizard" component={vuexyWizard} />
-          <AppRoute path="/forms/elements/select" component={select} />
+          <AppRoute path="/forms/elements/select" component={select} /> {/* TODO check these selects to implement hierarchies */}
           <AppRoute path="/forms/elements/switch" component={switchComponent} />
           <AppRoute path="/forms/elements/checkbox" component={checkbox} />
           <AppRoute path="/forms/elements/radio" component={radio} />
-          <AppRoute path="/forms/elements/input" component={input} />
-          <AppRoute path="/forms/elements/input-group" component={group} />
+          <AppRoute path="/forms/elements/input" component={input} /> {/* TODO check these selects to implement input files */}
+          <AppRoute path="/forms/elements/input-group" component={group} /> {/* TODO check these selects to implement input phone numbers */}
           <AppRoute
             path="/forms/elements/number-input"
             component={numberInput}
           /> 
-          <AppRoute path="/forms/elements/textarea" component={textarea} />
-          <AppRoute path="/forms/elements/pickers" component={pickers} />
-          <AppRoute path="/forms/elements/input-mask" component={inputMask} />
+          <AppRoute path="/forms/elements/textarea" component={textarea} /> {/* TODO check these selects to implement analysis and rec */}
+          <AppRoute path="/forms/elements/pickers" component={pickers} /> {/* TODO check these selects to implement dates pickers */}
+          <AppRoute path="/forms/elements/input-mask" component={inputMask} /> {/* TODO check these selects to implement input phone numbers */}
           <AppRoute path="/forms/layout/form-layout" component={layout} />
-          <AppRoute path="/forms/formik" component={formik} />{" "}
+          <AppRoute path="/forms/formik" component={formik} />
           <AppRoute path="/tables/reactstrap" component={tables} />
-          <AppRoute path="/tables/react-tables" component={ReactTables} />
+          <AppRoute path="/tables/react-tables" component={ReactTables} /> {/* TODO check these selects to implement search lists */}
           <AppRoute path="/tables/agGrid" component={Aggrid} />
           <AppRoute path="/tables/data-tables" component={DataTable} />
-          <AppRoute path="/pages/profile" component={profile} />
+
           <AppRoute path="/pages/faq" component={faq} />
           <AppRoute
             path="/pages/knowledge-base"
             component={knowledgeBase}
             exact
           />
-          <AppRoute
-            path="/pages/knowledge-base/category"
-            component={knowledgeBaseCategory}
-            exact
-          />
+
           <AppRoute
             path="/pages/knowledge-base/category/questions"
             component={knowledgeBaseQuestion}
           />
-          <AppRoute path="/pages/search" component={search} />
-          <AppRoute
-            path="/pages/account-settings"
-            component={accountSettings}
-          />
-          <AppRoute path="/pages/invoice" component={invoice} />
-          <AppRoute
-            path="/misc/coming-soon"
-            component={comingSoon}
-            fullLayout
-          />
+
           <AppRoute path="/misc/error/404" component={error404} fullLayout />
           <AppRoute path="/pages/login" component={Login} fullLayout />
           <AppRoute path="/pages/register" component={register} fullLayout />
@@ -437,7 +393,6 @@ class AppRouter extends React.Component {
             fullLayout
           />
           <AppRoute path="/charts/apex" component={apex} />
-          <AppRoute path="/charts/chartjs" component={chartjs} />
           <AppRoute path="/charts/recharts" component={extreme} />
           <AppRoute path="/maps/leaflet" component={leafletMaps} />
           <AppRoute path="/extensions/sweet-alert" component={sweetAlert} />
@@ -445,7 +400,7 @@ class AppRouter extends React.Component {
           <AppRoute path="/extensions/slider" component={rcSlider} />
           <AppRoute path="/extensions/file-uploader" component={uploader} />
           <AppRoute path="/extensions/wysiwyg-editor" component={editor} />
-          <AppRoute path="/extensions/drag-and-drop" component={drop} />
+          <AppRoute path="/extensions/drag-and-drop" component={drop} /> {/* use for drag n drop hierarchies */}
           <AppRoute path="/extensions/tour" component={tour} />
           <AppRoute path="/extensions/clipboard" component={clipboard} />
           <AppRoute path="/extensions/context-menu" component={menu} />
@@ -454,9 +409,7 @@ class AppRouter extends React.Component {
             path="/extensions/access-control"
             component={accessControl}
           />
-          <AppRoute path="/extensions/i18n" component={i18n} />
-          <AppRoute path="/extensions/tree" component={tree} />
-          <AppRoute path="/extensions/import" component={Import} />
+          <AppRoute path="/extensions/import" component={Import} />  {/* use for drag n drop files */}
           <AppRoute path="/extensions/export" component={Export} />
           <AppRoute
             path="/extensions/export-selected"

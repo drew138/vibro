@@ -141,7 +141,7 @@ class UsersList extends React.Component {
     try {
       const res = await axios.get(GET_USERS_ENDPOINT, {
         headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
-      this.setState({ rowData: res.data.results })
+      this.setState({ rowData: res.data })
     } catch {
       const alertData = {
         title: "Error de Conexión",

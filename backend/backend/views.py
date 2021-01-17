@@ -1,4 +1,4 @@
-from django.db.models import query
+# from django.db.models import query
 from . import permissions as custom_permissions
 from . import serializers as custom_serializers
 from rest_framework.exceptions import NotFound
@@ -7,12 +7,13 @@ from . import models as custom_models
 from rest_framework import viewsets
 from rest_framework import status
 from .tasks import Email
+from .user_groups import STAFF
 
 
 class CityView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CitySerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -36,7 +37,7 @@ class CityView(viewsets.ModelViewSet):
 class CompanyView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.DefaultCompanySerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -53,7 +54,7 @@ class CompanyView(viewsets.ModelViewSet):
         phone = self.request.query_params.get('phone', None)
         city = self.request.query_params.get('city', None)
 
-        if self.request.user.is_staff or self.request.user.is_superuser:
+        if self.request.user.user_type in STAFF:
             queryset = custom_models.Company.objects.all()
         else:
             queryset = custom_models.Company.objects.filter(
@@ -81,7 +82,7 @@ class CompanyView(viewsets.ModelViewSet):
 class MachineView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.MachineSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -105,11 +106,11 @@ class MachineView(viewsets.ModelViewSet):
         hierarchy = self.request.query_params.get('hierarchy', None)
         rpm = self.request.query_params.get('rpm', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Machine.objects.all()
+        else:
             queryset = custom_models.Machine.objects.filter(
                 company__user=self.request.user)
-        else:
-            queryset = custom_models.Machine.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if identifier:
@@ -142,7 +143,7 @@ class MachineView(viewsets.ModelViewSet):
 class SensorView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.SensorSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -157,11 +158,11 @@ class SensorView(viewsets.ModelViewSet):
         arduino = self.request.query_params.get('arduino', None)
         machine_id = self.request.query_params.get('machine_id', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Sensor.objects.all()
+        else:
             queryset = custom_models.Sensor.objects.filter(
                 machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Sensor.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if sensor_type:
@@ -178,7 +179,7 @@ class SensorView(viewsets.ModelViewSet):
 class GearView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.GearSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -194,11 +195,11 @@ class GearView(viewsets.ModelViewSet):
         support = self.request.query_params.get('support', None)
         transmission = self.request.query_params.get('transmission', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Gear.objects.all()
+        else:
             queryset = custom_models.Gear.objects.filter(
                 machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Gear.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if machine_id:
@@ -215,7 +216,7 @@ class GearView(viewsets.ModelViewSet):
 class AxisView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.AxisSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -229,11 +230,11 @@ class AxisView(viewsets.ModelViewSet):
         gear_id = self.request.query_params.get('gear_id', None)
         type_axis = self.request.query_params.get('type_axis', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Axis.objects.all()
+        else:
             queryset = custom_models.Axis.objects.filter(
                 gear__machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Axis.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if gear_id:
@@ -246,7 +247,7 @@ class AxisView(viewsets.ModelViewSet):
 class BearingView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.BearingSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -262,11 +263,11 @@ class BearingView(viewsets.ModelViewSet):
         frequency = self.request.query_params.get('frequency', None)
         axis_id = self.request.query_params.get('axis_id', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Bearing.objects.all()
+        else:
             queryset = custom_models.Bearing.objects.filter(
                 axis__gear__machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Bearing.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if reference:
@@ -281,73 +282,16 @@ class BearingView(viewsets.ModelViewSet):
 class CouplingView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.CouplingSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         pass
 
 
-class ImageView(viewsets.ModelViewSet):
-
-    serializer_class = custom_serializers.ImageSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
-
-    def get_queryset(self):
-        """
-        Optionally filter fields based on url params. For non staff/superusers,
-        images are always filtered by user to prevent users from 
-        seeing unauthorized data.
-        """
-
-        image_id = self.request.query_params.get('id', None)
-        machine = self.request.query_params.get('machine', None)
-
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = custom_models.Image.objects.filter(
-                machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Image.objects.all()
-        if image_id:
-            queryset = queryset.filter(id=image_id)
-        if machine:
-            queryset = queryset.filter(machine__id=machine)
-        return queryset
-
-
-class DateView(viewsets.ModelViewSet):
-
-    serializer_class = custom_serializers.DateSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
-
-    def get_queryset(self):
-        """
-        Optionally filter fields based on url params. For non staff/superusers,
-        dates are always filtered by user to prevent users from 
-        seeing unauthorized data.
-        """
-
-        date_id = self.request.query_params.get('id', None)
-        company = self.request.query_params.get('company', None)
-        date = self.request.query_params.get('date', None)
-
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
-            queryset = custom_models.Date.objects.filter(
-                company__user=self.request.user)
-        else:
-            queryset = custom_models.Date.objects.all()
-        if date_id:
-            queryset = queryset.filter(id=date_id)
-        if company:
-            queryset = queryset.filter(company__id=company)
-        if date:
-            queryset = queryset.filter(date=date)
-        return queryset
-
-
 class MeasurementView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.MeasurementSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -372,7 +316,7 @@ class MeasurementView(viewsets.ModelViewSet):
         revised = self.request.query_params.get('revised', None)
         resolved = self.request.query_params.get('resolved', None)
 
-        if self.request.user.is_staff or self.request.user.is_superuser:
+        if self.request.user.user_type in STAFF:
             queryset = custom_models.Measurement.objects.all()
         else:
             queryset = custom_models.Measurement.objects.filter(
@@ -404,10 +348,27 @@ class MeasurementView(viewsets.ModelViewSet):
         return queryset
 
 
+class MeasurementDatesView(viewsets.ModelViewSet):
+
+    permission_classes = [custom_permissions.IsGetRequest]
+
+    def get(self, request):
+
+        company_id = request.query_params.get('company_id', None)
+        if not company_id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        dates = custom_models.Measurement.objects.filter(
+            machine__company__id=company_id).values_list("date", flat=True).distinct("date")
+        dates = list(dates) if dates else []
+        return Response({
+            "dates": dates
+        }, status=status.HTTP_200_OK)
+
+
 class FlawView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.FlawSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -423,11 +384,11 @@ class FlawView(viewsets.ModelViewSet):
         flaw_type = self.request.query_params.get('flaw_type', None)
         severity = self.request.query_params.get('severity', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Flaw.objects.all()
+        else:
             queryset = custom_models.Flaw.objects.filter(
                 machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.Flaw.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if measurement:
@@ -441,7 +402,7 @@ class FlawView(viewsets.ModelViewSet):
 
 class ReportView(viewsets.ModelViewSet):
 
-    permission_classes = [custom_permissions.CanGenerateReport]
+    permission_classes = [custom_permissions.IsGetRequest]
 
     def get(self, request):
 
@@ -464,7 +425,7 @@ class ReportView(viewsets.ModelViewSet):
 class TermoImageView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.TermoImageSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -479,11 +440,11 @@ class TermoImageView(viewsets.ModelViewSet):
         measurement = self.request.query_params.get('measurement', None)
         image_type = self.request.query_params.get('image_type', None)
 
-        if not (self.request.user.is_staff or self.request.user.is_superuser):
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.TermoImage.objects.all()
+        else:
             queryset = custom_models.TermoImage.objects.filter(
                 measurement__machine__company__user=self.request.user)
-        else:
-            queryset = custom_models.TermoImage.objects.all()
         if id:
             queryset = queryset.filter(id=id)
         if measurement:
@@ -496,7 +457,7 @@ class TermoImageView(viewsets.ModelViewSet):
 class PointView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.PointSerializer
-    permission_classes = [custom_permissions.CanReadOrIsStaffOrSuperUser]
+    permission_classes = [custom_permissions.GeneralPermission]
 
     def get_queryset(self):
         """
@@ -512,7 +473,7 @@ class PointView(viewsets.ModelViewSet):
         point_type = self.request.query_params.get('point_type', None)
         measurement = self.request.query_params.get('measurement', None)
 
-        if self.request.user.is_staff or self.request.user.is_superuser:
+        if self.request.user.user_type in STAFF:
             queryset = custom_models.Point.objects.all()
         else:
             queryset = custom_models.Point.objects.filter(

@@ -3,6 +3,8 @@ import { history } from "../../../../history"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
 import ListQuery from "../../../ui-elements/search/ListQuery";
+import { GET_MACHINES_ENDPOINT } from "../../../../config"
+
 
 const columnDefs = [
   {
@@ -57,16 +59,19 @@ const columnDefs = [
   }
 ]
 
-class UsersList extends React.Component {
+class MachineList extends React.Component {
   
 
   render() {
     return (
       <React.Fragment>
-        <ListQuery columnDefs={columnDefs} dataEndpoint={"api/users/list"}/>
+        <ListQuery 
+        columnDefs={columnDefs} 
+        dataEndpoint={GET_MACHINES_ENDPOINT}
+        />
       </React.Fragment>
     )
   }
 }
 
-export default UsersList
+export default MachineList

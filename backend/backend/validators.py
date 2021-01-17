@@ -64,7 +64,7 @@ NIT_MESSAGE = \
 
 ADDRESS_MESSAGE = \
     "La dirección ingresada " \
-    "" \
+    "debe ser valida para Colombia" \
 
 PHONE_REGEX_VALIDATOR = RegexValidator(
     regex=PHONE_REGEX,

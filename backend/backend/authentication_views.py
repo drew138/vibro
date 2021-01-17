@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics, permissions
 from . import permissions as custom_permissions
@@ -9,12 +10,12 @@ from . import models as custom_models
 from rest_framework import viewsets
 from rest_framework import status
 from .tasks import Email
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from .user_groups import (
+    ENGINEER,
+    STAFF)
+
 
 # Get User API
-
-
 class UserAPI(generics.RetrieveAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
@@ -55,7 +56,7 @@ class RegisterAPI(generics.GenericAPIView):
 # Register Admin
 class RegisterAdminAPI(generics.GenericAPIView):
 
-    permission_classes = [custom_permissions.IsSuperUser]
+    permission_classes = [custom_permissions.IsAdmin]
     serializer_class = custom_serializers.RegisterAdminUserSerializer
 
     def post(self, request, *args, **kwargs):
@@ -127,7 +128,7 @@ class ChangePassAPI(generics.UpdateAPIView):
                 return Response({"error": "Contraseña invalida"}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("new_password"))
             user.save()
-            Email.change_password().delay()
+            Email.change_password(request).delay()
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(
@@ -166,7 +167,9 @@ class ForgotPassAPI(generics.UpdateAPIView):
             try:
                 validate_password(serializer.data.get("new_password"))
             except Exception:
-                return Response({"error": "Contraseña invalida"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    "error": "Contraseña invalida"
+                }, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("password"))
             user.save()
 
@@ -181,7 +184,9 @@ class ForgotPassAPI(generics.UpdateAPIView):
             },
                 status=status.HTTP_200_OK
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)
 
     def get_object(self):
         """
@@ -207,7 +212,7 @@ class VibroUserView(viewsets.ModelViewSet):
         first_name = self.request.query_params.get('first_name', None)
         last_name = self.request.query_params.get('last_name', None)
 
-        if self.request.user.is_superuser or self.request.user.is_staff:
+        if self.request.user.user_type in STAFF:
             queryset = custom_models.VibroUser.objects.all()
         else:
             queryset = custom_models.VibroUser.objects.exclude(
@@ -232,9 +237,9 @@ class VibroUserView(viewsets.ModelViewSet):
             instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data.pop("id", None)
-        if not (request.user.user_type in {"admin", "engineer"}):
+        if not (request.user.user_type in ENGINEER):
             serializer.validated_data.pop('certifications', None)
-        if not (request.user.is_superuser or request.user.is_staff):
+        if not (request.user.user_type in STAFF):
             serializer.validated_data.pop('user_type', None)
             serializer.validated_data.pop('is_active', None)
         self.perform_update(serializer)

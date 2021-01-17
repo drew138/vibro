@@ -5,7 +5,7 @@ const themeConfig = {
   layout: "vertical", // options[String]: "vertical"(default), "horizontal"
   theme: "semi-dark", // options[String]: 'light'(default), 'dark', 'semi-dark'
   sidebarCollapsed: true, // options[Boolean]: true, false(default)
-  navbarColor: "info", // options[String]: default / primary / success / danger / info / warning / dark
+  navbarColor: "default", // options[String]: default / primary / success / danger / info / warning / dark
   navbarType: "floating", // options[String]: floating(default) / static / sticky / hidden
   footerType: "static", // options[String]: static(default) / sticky / hidden
   disableCustomizer: true, // options[Boolean]: true, false(default)
@@ -16,3 +16,13 @@ const themeConfig = {
 };
 
 export default themeConfig;
+
+// configuracion de Maquina
+// rodamientos y inf adicional
+// graficas de tendencias
+// espectros
+// senal en el tiempo y cascada
+// configuracion de alarmas
+// configurar grafica
+
+// agregar a descripcion de maquina

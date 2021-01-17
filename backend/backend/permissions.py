@@ -1,30 +1,36 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from .user_groups import (
+    STAFF,
+    ADMIN,
+    CLIENT
+)
 
 
-class CanReadOrIsStaffOrSuperUser(BasePermission):
+class GeneralPermission(BasePermission):
 
     """
-    Custom permission to allow readonly requests 
-    to non superuser or staff users, or access to non 
-    put requests to authorized users.
+    Permission to allow readonly requests 
+    to non client users, or access to non 
+    put requests to staff users.
     """
 
     def has_permission(self, request, view):
+        is_authenticated = request.user.is_authenticated
         staff_permissions = (
-            request.user.is_staff or request.user.is_superuser) and request.method != "PUT"
-        customer_permissions = (request.method in SAFE_METHODS) and (
-            request.user.is_authenticated)
-        return staff_permissions or customer_permissions
+            request.user.user_type in STAFF) and request.method != "PUT"
+        client_permissions = (
+            request.user.user_type in CLIENT) and (request.method in SAFE_METHODS)
+        return is_authenticated and (staff_permissions or client_permissions)
 
 
-class IsSuperUser(BasePermission):
+class IsAdmin(BasePermission):
 
     """
-    only allow access to superusers.
+    allow access to admins only.
     """
 
     def has_permission(self, request, view):
-        return request.user.is_superuser
+        return request.user.user_type in ADMIN
 
 
 class IsUpdateMethod(BasePermission):
@@ -49,7 +55,7 @@ class HasUserPermissions(BasePermission):
         return is_authenticated and allowed_methdods
 
 
-class CanGenerateReport(BasePermission):
+class IsGetRequest(BasePermission):
 
     """
     allow access to Report endpoint.

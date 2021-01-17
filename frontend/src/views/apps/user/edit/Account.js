@@ -91,7 +91,7 @@ class UserAccountTab extends React.Component {
   async componentDidMount() {
     const res = await axios.get(GET_COMPANIES_ENDPOINT, {
       headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
-    const companies = [{id:"N/A", name:"N/A"}, ...res.data.results]
+    const companies = [{id:"N/A", name:"N/A"}, ...res.data]
     this.setState({ companies })
   }
 
