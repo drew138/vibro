@@ -6,7 +6,6 @@ import {
   REFRESH_JWT_ENDPOINT } from '../../../config'
 
 
-
 export const loginWithJWT = user => {
   return async dispatch => {
 
@@ -21,6 +20,14 @@ export const loginWithJWT = user => {
         access: res.data.access,
         refresh: res.data.refresh
       }
+      dispatch({
+        type: "SET_JWTS",
+        payload: tokens  
+      })
+      dispatch({
+        type: "CHANGE_ROLE",
+        userRole: res.data.user_type  
+      })
       const values = {
         ...res.data
       }
@@ -28,10 +35,8 @@ export const loginWithJWT = user => {
       delete values["refresh"]
       dispatch({
         type: "LOGIN_WITH_JWT",
-        payload: { tokens, values } 
-      }
-      
-      )
+        values  
+      })
       history.push("/")
     } catch (e) {
       const alerData = {
@@ -56,12 +61,47 @@ export const refreshJWT = ( refresh ) => {
     localStorage.setItem("access", res.data.access)
     localStorage.setItem("refresh", res.data.refresh)
     dispatch({
-      type: "REFRESH_JWT",
+      type: "SET_JWTS",
       payload: { ...res.data } 
     })
-    history.push("/pages/login")
+    // history.push("/pages/login")
   }
 }
+
+export const refreshJWTAndLogin = async (refresh) => {
+  return async dispatch => {
+
+    try {
+      // const refresh = localStorage.getItem("refresh")
+      let res = axios.get(REFRESH_JWT_ENDPOINT, { refresh })
+      localStorage.setItem("access", res.data.access)
+      localStorage.setItem("refresh", res.data.refresh)
+      dispatch({
+        type: "SET_JWTS",
+        payload: { ...res.data } 
+      })
+      res = await axios.post(LOGIN_WITH_JWT_ENDPOINT, 
+        { headers: {'Authorization': `Bearer ${res.data.access}`} })
+      const values = {
+        ...res.data
+      }
+      dispatch({
+        type: "CHANGE_ROLE",
+        userRole: res.data.user_type  
+      })
+      delete values["access"]
+      delete values["refresh"]
+      dispatch({
+        type: "LOGIN_WITH_JWT",
+        values
+      })
+    } catch (e) {
+
+      history.push("/pages/login")
+    }
+  }
+}
+
 
 export const getUserWithJWT = ( access ) => {
   return async dispatch => {
@@ -71,26 +111,22 @@ export const getUserWithJWT = ( access ) => {
         GET_USER_WITH_JWT_ENDPOINT, 
         { headers: {'Authorization': `Bearer ${access}`} })
       dispatch({
-          type: "GET_USER_WITH_JWT",
-          payload: { ...res.data } 
+          type: "LOGIN_WITH_JWT",
+          values: { ...res.data } 
+      })
+      dispatch({
+        type: "CHANGE_ROLE",
+        userRole: res.data.user_type  
       })
     } catch (e) {
 
     }
-    
   }
 }
 
 export const logoutWithJWT = () => {
   return dispatch => {
     dispatch({ type: "LOGOUT_WITH_JWT", payload: {} })
-    history.push("/pages/login")
-  }
-}
-
-export const logoutWithFirebase = user => {
-  return dispatch => {
-    dispatch({ type: "LOGOUT_WITH_FIREBASE", payload: {} })
     history.push("/pages/login")
   }
 }

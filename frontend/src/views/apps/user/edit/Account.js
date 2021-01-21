@@ -26,18 +26,18 @@ class UserAccountTab extends React.Component {
   }
 
   state = {
-    id: this.props.users.user.id,
-    first_name: this.props.users.user.first_name,
-    last_name: this.props.users.user.last_name,
-    email: this.props.users.user.email,
-    phone: this.props.users.user.phone,
-    celphone: this.props.users.user.celphone,
+    id: this.props.user.id,
+    first_name: this.props.user.first_name,
+    last_name: this.props.user.last_name,
+    email: this.props.user.email,
+    phone: this.props.user.phone,
+    celphone: this.props.user.celphone,
     selectedFile: null,
-    companyName: this.props.users.user.company ? this.props.users.user.company.name : "N/A",
-    companyId: this.props.users.user.company ? this.props.users.user.company.id : null,
+    companyName: this.props.user.company ? this.props.user.company.name : "N/A",
+    companyId: this.props.user.company ? this.props.user.company.id : null,
     companies: [],
-    is_active: this.props.users.user.is_active,
-    user_type: this.props.users.user.user_type
+    is_active: this.props.user.is_active,
+    user_type: this.props.user.user_type
   }
 
   handleSubmit = e => {
@@ -58,7 +58,7 @@ class UserAccountTab extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-    this.props.updateUser(this.state, this.props.auth.login.tokens.access)
+    this.props.updateUser(this.state, this.props.auth.tokens.access)
     
   }
 
@@ -90,7 +90,7 @@ class UserAccountTab extends React.Component {
 
   async componentDidMount() {
     const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-      headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
+      headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }})
     const companies = [{id:"N/A", name:"N/A"}, ...res.data]
     this.setState({ companies })
   }
@@ -106,7 +106,7 @@ class UserAccountTab extends React.Component {
                 object
                 src={
                   this.state.selectedFile ? URL.createObjectURL(this.state.selectedFile) :
-                  this.props.users.user.picture
+                  this.props.user.picture
                 }
                 alt="user profile image"
                 height="84"
@@ -115,8 +115,8 @@ class UserAccountTab extends React.Component {
             </Media>
             <Media className="mt-2" body>
               <Media className="font-medium-1 text-bold-600" tag="p" heading>
-                {`${this.toTitleCase(this.props.users.user.first_name)} 
-                ${this.toTitleCase(this.props.users.user.last_name)}`}
+                {`${this.toTitleCase(this.props.user.first_name)} 
+                ${this.toTitleCase(this.props.user.last_name)}`}
               </Media>
               <div className="d-flex flex-wrap">
                 <input 
@@ -277,7 +277,7 @@ class UserAccountTab extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    users: state.users,
+    user: state.user,
     auth: state.auth
   }
 }

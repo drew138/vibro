@@ -6,13 +6,13 @@ import {
   CardBody,
   Media,
   Row,
-  Col,
-  Button
+  Col
 } from "reactstrap"
-import { Edit } from "react-feather"
-import { Link } from "react-router-dom"
-import "../../../../assets/scss/pages/users.scss"
-import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+// import { Edit } from "react-feather"
+// import { Link } from "react-router-dom"
+import "../../../assets/scss/pages/users.scss"
+// import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+// import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { connect } from "react-redux"
 
 
@@ -26,7 +26,7 @@ const user_type_map = {
 }
 
 
-class UserView extends React.Component {
+class Profile extends React.Component {
 
   toTitleCase(str) {
     return str.replace(
@@ -38,10 +38,10 @@ class UserView extends React.Component {
   }
 
   getFullName() {
-    if (this.props.auth.login.values.first_name && this.props.auth.login.values.last_name) {
-      return `${this.props.auth.login.values.first_name} ${this.props.auth.login.values.last_name}`
-    } else if (this.props.auth.login.values.first_name) {
-      return this.props.auth.login.values.first_name
+    if (this.props.auth.values.first_name && this.props.auth.values.last_name) {
+      return `${this.props.auth.values.first_name} ${this.props.auth.values.last_name}`
+    } else if (this.props.auth.values.first_name) {
+      return this.props.auth.values.first_name
     } else {
       return "N/A"
     }
@@ -50,11 +50,11 @@ class UserView extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Breadcrumbs
+        {/* <Breadcrumbs
           breadCrumbTitle="Perfil de Usuario"
           breadCrumbParent="Usuario"
           breadCrumbActive="Perfil"
-        />
+        /> */}
         <Row>
           <Col sm="12">
             <Card>
@@ -70,7 +70,7 @@ class UserView extends React.Component {
                           className="rounded mr-2"
                           object
                           src={
-                            this.props.auth.login.values.picture
+                            this.props.auth.values.picture
                           }
                           alt="Generic placeholder image"
                           height="112"
@@ -85,7 +85,7 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Usuario
                                 </div>
-                                <div>{this.props.auth.login.values.username}</div>
+                                <div>{this.props.auth.values.username}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
@@ -93,6 +93,7 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                 {
+                                this.getFullName() === "N/A" ? "N/A" : 
                                 this.toTitleCase(this.getFullName())
                                 }
                                 </div>
@@ -102,7 +103,7 @@ class UserView extends React.Component {
                                   Email
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{!this.props.auth.login.values.email ? "N/A" : this.props.auth.login.values.email}</span>
+                                  <span>{!this.props.auth.values.email ? "N/A" : this.props.auth.values.email}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -110,7 +111,7 @@ class UserView extends React.Component {
                                   Celular
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{!this.props.auth.login.values.celphone ? "N/A" : this.props.auth.login.values.celphone}</span>
+                                  <span>{!this.props.auth.values.celphone ? "N/A" : this.props.auth.values.celphone}</span>
                                 </div>
                               </div>
                             </div>
@@ -119,11 +120,11 @@ class UserView extends React.Component {
                             <div className="users-page-view-table">
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
-                                  Status
+                                  Estado
                                 </div>
                                 <div>
                                   {
-                                    this.props.auth.login.values.is_active ? "ACTIVO" : "INACTIVO"
+                                    this.props.auth.values.is_active ? "ACTIVO" : "INACTIVO"
                                   }
                                   </div>
                               </div>
@@ -131,7 +132,7 @@ class UserView extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Tipo
                                 </div>
-                                <div>{user_type_map[this.props.auth.login.values.user_type].toUpperCase()}</div>
+                                <div>{user_type_map[this.props.auth.values.user_type].toUpperCase()}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
@@ -139,8 +140,8 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                   <span>
-                                    {!this.props.auth.login.values.company ?
-                                     "N/A" : this.toTitleCase(this.props.auth.login.values.company)}
+                                    {!this.props.auth.values.company ?
+                                     "N/A" : this.toTitleCase(this.props.auth.values.company.name)}
                                   </span>
                                 </div>
                               </div>
@@ -150,7 +151,7 @@ class UserView extends React.Component {
                                 </div>
                                 <div>
                                   <span>
-                                  {this.props.auth.login.values.phone ? this.props.auth.login.values.phone : "N/A"}
+                                  {this.props.auth.values.phone ? this.props.auth.values.phone : "N/A"}
                                   </span>
                                 </div>
                               </div>
@@ -160,14 +161,14 @@ class UserView extends React.Component {
                       </Media>
                     </Media>
                   </Col>
-                  <Col className="mt-1 pl-0" sm="12">
+                  {/* <Col className="mt-1 pl-0" sm="12">
                     <Button.Ripple className="mr-1" color="primary" outline>
                       <Link to="/app/user/edit">
                         <Edit size={15} />
                         <span className="align-middle ml-50">Editar</span>
                       </Link>
                     </Button.Ripple>
-                  </Col>
+                  </Col> */}
                 </Row>
               </CardBody>
             </Card>
@@ -183,4 +184,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(UserView)
+export default connect(mapStateToProps)(Profile)

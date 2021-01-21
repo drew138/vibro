@@ -5,36 +5,36 @@ const navigationConfig = [
     type: "groupHeader",
     groupTitle: "Servicios"
   },
-  {
-    id: "Predictivo ",
-    title: "Predictivo ",
-    type: "collapse",
-    icon: <Icon.Activity size={20}/>,
-    permissions: ["admin", "editor"],
-    children: []
-    // navLink: "/services/engineering",
+  // {
+  //   id: "Predictivo ",
+  //   title: "Predictivo ",
+  //   type: "collapse",
+  //   icon: <Icon.Activity size={20}/>,
+  //   permissions: ["admin", "editor"],
+  //   children: []
+  //   // navLink: "/services/engineering",
     
-  },
-  {
-    id: "Correctivo",
-    title: "Correctivo",
-    type: "collapse",
-    icon: <Icon.Tool size={20}/>,
-    permissions: ["admin", "editor"],
-    children: []
-    // navLink: "/services/corrective",
+  // },
+  // {
+  //   id: "Correctivo",
+  //   title: "Correctivo",
+  //   type: "collapse",
+  //   icon: <Icon.Tool size={20}/>,
+  //   permissions: ["admin", "editor"],
+  //   children: []
+  //   // navLink: "/services/corrective",
     
-  },
-  {
-    id: "Ingeniería ",
-    title: "Ingeniería ",
-    type: "collapse",
-    icon: <Icon.Compass size={20}/>,
-    permissions: ["admin", "editor"],
-    children: []
-    // navLink: "/services/engineering",
+  // },
+  // {
+  //   id: "Ingeniería ",
+  //   title: "Ingeniería ",
+  //   type: "collapse",
+  //   icon: <Icon.Compass size={20}/>,
+  //   permissions: ["admin", "editor"],
+  //   children: []
+  //   // navLink: "/services/engineering",
     
-  },
+  // },
   {
     id: "Monitoreo",
     title: "Monitoreo",
@@ -49,6 +49,14 @@ const navigationConfig = [
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
         navLink: "/services/monitoring/list"
+      },
+      {
+        id: "list-monitoring",
+        title: "Máquina",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions: ["admin", "editor"],
+        navLink: "/services/monitoring/machine"
       },
     ]
     // navLink: "/services/monitoring",
@@ -66,27 +74,19 @@ const navigationConfig = [
     children: [
       {
         id: "list-users",
-        title: "List",
+        title: "Lista",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
         navLink: "/app/user/list"
       },
       {
-        id: "view-users",
-        title: "Perfil",
-        type: "item",
-        icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
-        navLink: "/app/user/view"
-      },
-      {
         id: "edit-users",
-        title: "Edit",
+        title: "Cuenta",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
-        navLink: "/app/user/edit"
+        navLink: "/app/user/settings"
       }
     ]
   },
@@ -95,6 +95,7 @@ const navigationConfig = [
     title: "Empresas",
     type: "collapse",
     icon: <Icon.Briefcase size={20} />,
+    permissions: ["admin", "support", "engineer"],
     children: [
       {
         id: "list-companies",

@@ -2,14 +2,51 @@ import React from "react"
 import { Button, FormGroup, Row, Col } from "reactstrap"
 import { Formik, Field, Form } from "formik"
 import * as Yup from "yup"
+import axios from "axios"
+import { connect } from "react-redux"
+import { displayAlert } from "../../../redux/actions/alerts"
+import { CHANGE_PASSWORD_ENDPOINT } from "../../../config"
+
+
 const formSchema = Yup.object().shape({
-  oldpass: Yup.string().required("Required"),
-  newpass: Yup.string().required("Required"),
+  oldpass: Yup.string().required("Este campo es requerido"),
+  newpass: Yup.string().required("Este campo es requerido"),
   confirmpass: Yup.string()
-    .oneOf([Yup.ref("newpass"), null], "Passwords must match")
-    .required("Required")
+    .oneOf([Yup.ref("newpass"), null], "Las contraseñas deben coincidir")
+    .required("Este campo es requerido")
 })
+
 class ChangePassword extends React.Component {
+
+  onSubmit = async (values) => {
+    try {
+      console.log(this.props)
+    const body = {
+      password: values.oldpass,
+      new_password: values.newpass
+    }
+    const headers = { headers: {'Authorization': `Bearer ${this.props.auth.tokens.access}`} }
+    await axios.put(CHANGE_PASSWORD_ENDPOINT, body, headers)
+    const alertData = {
+      title: "Cambio de Contraseña Exitoso",
+      success: true,
+      show: true,
+      alertText: "Su Contraseña Ha Sido Creada Exitosamente"
+    }
+    this.props.displayAlert(alertData)
+    } catch (e) {
+      console.log(e.response.data)
+      const error = Array.isArray(Object.entries(e.response.data)[0][1]) ? Object.entries(e.response.data)[0][1][0] : Object.entries(e.response.data)[0][1]
+      const alertData = {
+        title: "Error al Cambiar su Contraseña",
+        success: false,
+        show: true,
+        alertText: error
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -22,6 +59,7 @@ class ChangePassword extends React.Component {
                 confirmpass: ""
               }}
               validationSchema={formSchema}
+              onSubmit={this.onSubmit}
             >
               {({ errors, touched }) => (
                 <Form>
@@ -29,10 +67,11 @@ class ChangePassword extends React.Component {
                     <Field
                       name="oldpass"
                       id="oldpass"
+                      type="password"
                       className={`form-control ${errors.oldpass &&
                         touched.oldpass &&
                         "is-invalid"}`}
-                      placeholder="Old Password"
+                      placeholder="Ingresa tu Contraseña"
                     />
                     {errors.oldpass && touched.oldpass ? (
                       <div className="text-danger">{errors.oldpass}</div>
@@ -41,8 +80,9 @@ class ChangePassword extends React.Component {
                   <FormGroup>
                     <Field
                       name="newpass"
-                      placeholder="New Password"
+                      placeholder="Nueva Contraseña"
                       id="newpass"
+                      type="password"
                       className={`form-control ${errors.newpass &&
                         touched.newpass &&
                         "is-invalid"}`}
@@ -55,10 +95,11 @@ class ChangePassword extends React.Component {
                     <Field
                       name="confirmpass"
                       id="confirmpass"
+                      type="password"
                       className={`form-control ${errors.confirmpass &&
                         touched.confirmpass &&
                         "is-invalid"}`}
-                      placeholder="Confirm Password"
+                      placeholder="Confirma tu Contraseña"
                     />
                     {errors.confirmpass && touched.confirmpass ? (
                       <div className="text-danger">{errors.confirmpass}</div>
@@ -70,7 +111,7 @@ class ChangePassword extends React.Component {
                       color="primary"
                       type="submit"
                     >
-                      Save Changes
+                      Guardar Cambios
                     </Button.Ripple>
                     <Button.Ripple
                       className="mb-1"
@@ -78,7 +119,7 @@ class ChangePassword extends React.Component {
                       type="reset"
                       outline
                     >
-                      Cancel
+                      Cancelar
                     </Button.Ripple>
                   </div>
                 </Form>
@@ -90,4 +131,11 @@ class ChangePassword extends React.Component {
     )
   }
 }
-export default ChangePassword
+
+const mapStateToProps = state => {
+  return {
+    auth: state.auth
+  }
+}
+
+export default connect(mapStateToProps, {displayAlert})(ChangePassword)

@@ -6,7 +6,7 @@ const initialState = {
     alertText: ""
 }
 
-const alerts = (state = initialState, action) => {
+const alert = (state = initialState, action) => {
     switch(action.type) {
         case "SET_ALERT_SHOW_TO_FALSE":
             return {...initialState}
@@ -18,4 +18,4 @@ const alerts = (state = initialState, action) => {
 }
 
 
-export default alerts 
+export default alert 

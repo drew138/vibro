@@ -124,11 +124,11 @@ class ChangePassAPI(generics.UpdateAPIView):
             user = self.get_object()
             try:
                 validate_password(serializer.data.get("new_password"))
-            except Exception:
-                return Response({"error": "Contraseña invalida"}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(serializer.data.get("new_password"))
             user.save()
-            Email.change_password(request).delay()
+            # Email.change_password(request).delay()
             refresh = RefreshToken.for_user(user)
             return Response({
                 "user": custom_serializers.VibroUserSerializer(

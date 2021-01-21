@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import Spinner from "./components/@vuexy/spinner/Loading-spinner"
 import knowledgeBaseQuestion from "./views/pages/knowledge-base/Questions"
 import { ContextLayout } from "./utility/context/Layout"
-import { getUserWithJWT, refreshJWT } from "./redux/actions/auth/loginActions"
+import { getUserWithJWT, refreshJWTAndLogin } from "./redux/actions/auth/loginActions"
 
 // Route-based code splitting
 const analyticsDashboard = lazy(() =>
@@ -152,8 +152,8 @@ const ExportSelected = lazy(() =>
 
 
 const userList = lazy(() => import("./views/apps/auth/list/List"))
-const accountEdit = lazy(() => import("./views/apps/auth/edit/Edit"))
-const accountView = lazy(() => import("./views/apps/auth/view/View"))
+// const accountEdit = lazy(() => import("./views/apps/auth/edit/Edit"))
+// const accountView = lazy(() => import("./views/apps/auth/view/View"))
 const Login = lazy(() => import("./views/pages/authentication/login/Login"))
 const forgotPassword = lazy(() =>
   import("./views/pages/authentication/ForgotPassword")
@@ -208,41 +208,64 @@ const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
 )
 const mapStateToProps = state => {
   return {
-    permissions: state.auth.login.userRole, // TODO - change userRole prop to something else
-    user: state.auth.login
+    permissions: state.auth.userRole, // TODO - change userRole prop to something else
+    user: state.auth
   }
 }
 
 const AppRoute = connect(mapStateToProps)(RouteConfig)
 
+const PrivateRouteConfig = ({ component: Component, fullLayout, ...rest }) => {
 
-//   const isExpired = (token) => {
-//     const jwt = JSON.parse(atob(token.split('.')[1]));
+  const isValidToken = (token) => {
+    const jwt = JSON.parse(atob(token.split('.')[1]));
+    return jwt.exp * 1000 <= Date.now();
+  }
 
-//     return jwt.exp < Date.now();
-//   }
-  
+  const isAuthenticated = async (props) => {
+    if (props.user.values && props.user.tokens) {
+      return <Component {...props} />
+    }
+    const refresh = localStorage.getItem("refresh")
+    if (refresh && isValidToken(refresh)) {
+      // TODO refresh token and login
+      await props.refreshJWTAndLogin(refresh)
+      return <Component {...props} />
+    } 
+    return <Redirect to="/pages/login"/>
+  }
 
-// if (!props.user.values && !props.user.tokens) {
-//   const access = localStorage.getItem("access")
-//   if (!access) {
-//     return <Redirect to="/pages/login"/>
-//   }
-//   if (isExpired(access)) {
-//     const refresh = localStorage.getItem("refresh")
-//     props.refreshJWT(refresh)
-//   } else {
-//     props.getUserWithJWT(access)
-//   }
-// } else if (isExpired(props.user.tokens.access) && props.user.values) {
-// try {
-//   props.refreshJWT(props.user.tokens.refresh)
-// } catch (e) {
-//   return <Redirect to="/pages/login"/>
-// }
-// }
+  return (<Route
+      {...rest}
+      render={props => {
+        return (
+          <ContextLayout.Consumer>
+            {context => {
+              let LayoutTag =
+                fullLayout === true
+                  ? context.fullLayout
+                  : context.state.activeLayout === "horizontal"
+                  ? context.horizontalLayout
+                  : context.VerticalLayout
+              return (
+                <LayoutTag {...props} permission={props.permissions}>
+                  <Suspense fallback={<Spinner />}>
+                    {isAuthenticated(props)}
+                  </Suspense>
+                </LayoutTag>
+              )
+            }}
+          </ContextLayout.Consumer>
+        )
+      }}
+    />
+  )
+}
 
-// const PrivateAppRoute = connect(mapStateToProps, { getUserWithJWT, refreshJWT })(PrivateRouteConfig)
+const PrivateAppRoute = connect(mapStateToProps, { getUserWithJWT, refreshJWTAndLogin })(PrivateRouteConfig)
+
+
+
 
 class AppRouter extends React.Component {
   render() {
@@ -253,7 +276,7 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/" component={analyticsDashboard} />
 
 
-          <AppRoute exact path="/measurements/espectra" component={espectra} />
+          <AppRoute exact path="/services/monitoring/machine" component={espectra} />
           <AppRoute exact path="/measurements/upload" component={upload} />
           <AppRoute exact path="/services/monitoring/list" component={llist} />
           
@@ -265,13 +288,17 @@ class AppRouter extends React.Component {
 
 
           <AppRoute exact path="/app/user/list" component={userList} />
-          <AppRoute exact path="/app/user/edit" component={accountEdit} />
-          <AppRoute exact path="/app/user/view" component={accountView} />
+          {/* <AppRoute exact path="/app/user/edit" component={accountEdit} /> */}
+          {/* <AppRoute exact path="/app/user/view" component={accountView} /> */}
           <AppRoute exact path="/app/user/list/edit" component={userEdit}/>
           <AppRoute
-            path="/pages/account-settings"
+            path="/app/user/settings"
             component={accountSettings}
           />
+          {/* <AppRoute
+            path="/pages/account-settings"
+            component={accountSettings}
+          /> */}
 
 
 
@@ -282,7 +309,7 @@ class AppRouter extends React.Component {
           />
           <AppRoute path="/measurements/wizard" component={wform}/>
           <AppRoute path="/calendar" component={calendar} />
-          <AppRoute path="/data-list/list-view" component={listView} />
+          <AppRoute path="/data-list/list-view" component={listView} /> {/* TODO use this component for lists */}
           <AppRoute path="/data-list/thumb-view" component={thumbView} />
           <AppRoute path="/ui-element/grid" component={grid} />
           <AppRoute path="/ui-element/typography" component={typography} />

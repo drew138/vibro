@@ -41,7 +41,7 @@ class ListQuery extends React.Component {
   async componentDidMount() {
     try {
       const res = await axios.get(this.props.dataEndpoint, {
-      headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
+      headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }})
       this.setState({ rowData: res.data })
     } catch {
       const alertData = {

@@ -14,10 +14,22 @@ export const signupWithJWT = ( data ) => {
       access: res.data.access,
       refresh: res.data.refresh
     }
-    const values = { ...res.data.user }
+    dispatch({
+      type: "SET_JWTS",
+      payload: tokens  
+    })
+    dispatch({
+      type: "CHANGE_ROLE",
+      userRole: res.data.user_type  
+    })
+    const values = { 
+      ...res.data.user 
+    }
+    delete values["access"]
+    delete values["refresh"]
     dispatch({
       type: "LOGIN_WITH_JWT",
-      payload: { tokens, values }
+      values 
     })
     const alertData = {
       title: "Registro Exitoso",

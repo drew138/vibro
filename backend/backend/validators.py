@@ -1,8 +1,8 @@
 from django.core.validators import RegexValidator
 
-PHONE_REGEX = r"^((\(\+?\d{2,3}\))|(\+?\d{2,3})[\s\-])?\d{3}[\s\-]\d{4}([\s\-]ext[\s\-]\d{1,3})?$"
+PHONE_REGEX = r"^((\(\+?\d{2,3}\))|(\+?\d{2,3})[\s-])?\d{3}[\s-]\d{4}([\s-]ext[\s-]\d{1,3})?$"
 
-CELPHONE_REGEX = r"^(((\(\+?\d{2,3}\))|(\+?\d{2,3}))[\s\-])?\d{3}[\-\s]\d{3}[\-\s]\d{4}$"
+CELPHONE_REGEX = r"^(((\(\+?\d{2,3}\))|(\+?\d{2,3}))[\s-])?\d{3}[\s-]\d{3}[\s-]\d{4}$"
 # https://www.regextester.com/108138
 NIT_REGEX = r"^[0-9]+-{1}[0-9]{1}$"
 # https://www.regextester.com/111017
