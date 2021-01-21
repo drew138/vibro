@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { Badge } from "reactstrap"
 import classnames from "classnames"
 import { ChevronRight } from "react-feather"
-import { FormattedMessage } from "react-intl"
+// import { FormattedMessage } from "react-intl"
 
 class SideMenuGroup extends React.Component {
   constructor(props) {
@@ -124,7 +124,8 @@ class SideMenuGroup extends React.Component {
                       <div className="menu-text">
                         {child.icon}
                         <span className="menu-item menu-title">
-                          <FormattedMessage id={child.title} />
+                          {/* <FormattedMessage id={child.title} /> */}
+                          {child.title}
                         </span>
                       </div>
                       {child.badge ? (

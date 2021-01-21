@@ -19,9 +19,10 @@ export const updateProfile = (user, token) => {
           `${UPDATE_USER_PROFILE_ENDPOINT}${user.id}/`, 
           data, 
           { headers: { 'Authorization': `Bearer ${token}` } })
+        const values = {...res.data}
         dispatch({
           type: "UPDATE_USER_PROFILE",
-          payload: { ...res.data } 
+          values 
         })
         const alertData = {
           title: "Información de Usuario Actualizada Exitosamente",
@@ -29,22 +30,23 @@ export const updateProfile = (user, token) => {
           show: true,
           alertText: "Se Ha Actualizado Exitosamente su Información de Usuario"
         }
+
         dispatch({
             type: "DISPLAY_SWEET_ALERT",
             payload: alertData
         })
       } catch (e) {
         console.log(e)
-        const alerData = {
-          title: "Error de Validación",
-          success: false,
-          show: true,
-          alertText: Object.entries(e.response.data)[0][1][0]
-        }
-        dispatch({
-          type: "DISPLAY_SWEET_ALERT",
-          payload: alerData
-        })
+        // const alerData = {
+        //   title: "Error de Validación",
+        //   success: false,
+        //   show: true,
+        //   alertText: Object.entries(e.response.data)[0][1][0]
+        // }
+        // dispatch({
+        //   type: "DISPLAY_SWEET_ALERT",
+        //   payload: alerData
+        // })
       }
     }
 }

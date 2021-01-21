@@ -1,6 +1,5 @@
 import React from "react"
 import {
-  Alert,
   Button,
   Media,
   Form,
@@ -10,98 +9,204 @@ import {
   Row,
   Col
 } from "reactstrap"
-import img from "../../../assets/img/portrait/small/avatar-s-11.jpg"
+import isValidCelphone from "../../../validators/celphone"
+import isValidPhone from "../../../validators/phone"
+import { connect } from "react-redux"
+import { updateProfile } from "../../../redux/actions/auth/updateActions"
+import { displayAlert } from "../../../redux/actions/alerts"
+
+
 class General extends React.Component {
-  state = {
-    visible: true
+  // state = {
+  //   visible: true
+  // }
+
+  // dismissAlert = () => {
+  //   this.setState({
+  //     visible: false
+  //   })
+  // }
+
+  constructor(props) {
+    super(props)
+    this.imageInputRef = React.createRef();
+    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
   }
 
-  dismissAlert = () => {
+  state = {
+    id: this.props.auth.values.id,
+    first_name: this.props.auth.values.first_name,
+    last_name: this.props.auth.values.last_name,
+    email: this.props.auth.values.email,
+    phone: this.props.auth.values.phone,
+    celphone: this.props.auth.values.celphone,
+    selectedFile: null,
+  }
+
+  handleSubmit = e => {
+    e.preventDefault()
+    const alertData = {
+      title: "Error de Validación",
+      success: false,
+      show: true,
+      alertText: ""
+    }
+    if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
+      alertData.alertText = "El número de celular debe ser ingresado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      this.props.displayAlert(alertData)
+      return
+    }
+    if (this.state.phone && !isValidPhone(this.state.phone)) {
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      this.props.displayAlert(alertData)
+      return
+    }
+
+
+    this.props.updateProfile(this.state, this.props.auth.tokens.access)
+    
+  }
+
+  fileSelectedHandler = (event) => {
     this.setState({
-      visible: false
+      selectedFile: event.target.files[0]
     })
+  }
+
+  fileUploadHandler = () => {
+    this.imageInputRef.current.click()
+  }
+
+  removePicture = () => {
+    this.imageInputRef.current.value = null
+    this.setState({
+      selectedFile: null
+    })
+  }
+
+  toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
   }
 
   render() {
     return (
       <React.Fragment>
         <Media>
-          <Media className="mr-1" left href="#">
+          <Media className="mr-1" left>
             <Media
               className="rounded-circle"
               object
-              src={img}
+              src={
+                this.state.selectedFile ? URL.createObjectURL(this.state.selectedFile) :
+                this.props.auth.values.picture
+              }
               alt="User"
               height="64"
               width="64"
             />
           </Media>
+          
           <Media className="mt-25" body>
+            <Media className="font-medium-1 text-bold-600" tag="p" heading>
+              {`${this.toTitleCase(this.props.auth.values.first_name)} 
+              ${this.toTitleCase(this.props.auth.values.last_name)}`}
+            </Media>
+            
             <div className="d-flex flex-sm-row flex-column justify-content-start px-0">
+                <input 
+                style={{display: "none"}} 
+                type="file" 
+                onChange={this.fileSelectedHandler} 
+                ref={this.imageInputRef}/>
               <Button.Ripple
                 tag="label"
                 className="mr-50 cursor-pointer"
                 color="primary"
                 outline
+                onClick={this.fileUploadHandler}
               >
-                Upload Photo
-                <Input type="file" name="file" id="uploadImg" hidden />
+                Cambiar
               </Button.Ripple>
-              <Button.Ripple color="flat-danger">Remove</Button.Ripple>
+              <Button.Ripple color="flat-danger" onClick={this.removePicture}>Quitar Foto</Button.Ripple>
             </div>
-            <p className="text-muted mt-50">
-              <small>Allowed JPG, GIF or PNG. Max size of 800kB</small>
-            </p>
           </Media>
         </Media>
-        <Form className="mt-2" onSubmit={e => e.preventDefault()}>
+        <Form className="mt-2" onSubmit={this.handleSubmit}>
           <Row>
-            <Col sm="12">
-              <FormGroup>
-                <Label for="userName">Username</Label>
-                <Input id="userName" defaultValue="johny_01" />
-              </FormGroup>
-            </Col>
-            <Col sm="12">
-              <FormGroup>
-                <Label for="name">Name</Label>
-                <Input id="name" defaultValue="John Doe" />
-              </FormGroup>
-            </Col>
-            <Col sm="12">
-              <FormGroup>
-                <Label for="email">Email</Label>
-                <Input id="email" defaultValue="john@admin.com" />
-              </FormGroup>
-            </Col>
-            <Col sm="12">
-              <Alert
-                className="mb-2"
-                color="warning"
-                isOpen={this.state.visible}
-                toggle={this.dismissAlert}
-              >
-                <p className="mb-0">
-                  Your email is not confirmed. Please check your inbox.
-                  <span className="text-primary"> Resend Confirmation</span>
-                </p>
-              </Alert>
-            </Col>
-            <Col sm="12">
-              <FormGroup>
-                <Label for="company">Company</Label>
-                <Input
-                  id="company"
-                  defaultValue="SnowMash Technologies Pvt Ltd"
-                />
-              </FormGroup>
-            </Col>
+            <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="first_name">Nombre</Label>
+                  <Input
+                    type="text"
+                    id="first_name"
+                    placeholder="Nombre"
+                    value={this.state.first_name}
+                    onChange={e => this.setState({ first_name: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+              
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="last_name">Apellido</Label>
+                  <Input
+                    type="text"
+                    id="last_name"
+                    placeholder="Apellido"
+                    value={this.state.last_name}
+                    onChange={e => this.setState({ last_name: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+              
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="phone">Telefono</Label>
+                  <Input
+                    type="text"
+                    id="phone"
+                    placeholder="Telefono"
+                    value={this.state.phone}
+                    onChange={e => this.setState({ phone: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+              
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="celphone">Celular</Label>
+                  <Input
+                    type="text"
+                    id="celphone"
+                    placeholder="Celular"
+                    value={this.state.celphone}
+                    onChange={e => this.setState({ celphone: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+              
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="email">Email</Label>
+                  <Input
+                    type="text"
+                    id="email"
+                    placeholder="Email"
+                    value={this.state.email}
+                    onChange={e => this.setState({ email: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+
+
             <Col className="d-flex justify-content-start flex-wrap" sm="12">
               <Button.Ripple className="mr-50" type="submit" color="primary">
-                Save Changes
-              </Button.Ripple>
-              <Button.Ripple type="submit" color="danger">
-                Cancel
+                Guardar Cambios
               </Button.Ripple>
             </Col>
           </Row>
@@ -110,4 +215,11 @@ class General extends React.Component {
     )
   }
 }
-export default General
+
+const mapStateToProps = state => {
+  return {
+    auth: state.auth
+  }
+}
+
+export default connect(mapStateToProps, { updateProfile, displayAlert })(General)

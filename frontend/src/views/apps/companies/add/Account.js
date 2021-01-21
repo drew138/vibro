@@ -52,7 +52,7 @@ class UserAccountTab extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-    this.props.updateUser(this.state, this.props.auth.login.tokens.access)
+    this.props.updateUser(this.state, this.props.auth.tokens.access)
     
   }
 
@@ -188,4 +188,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { updateUser, displayAlert })(UserAccountTab)
+export default connect(mapStateToProps, { updateUser, displayAlert })(UserAccountTab) // tODO change redux actions

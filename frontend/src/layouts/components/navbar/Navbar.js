@@ -2,25 +2,23 @@ import React from "react"
 import { Navbar } from "reactstrap"
 import { connect } from "react-redux"
 import classnames from "classnames"
-import { useAuth0 } from "../../../authServices/auth0/auth0Service"
 import {
-  logoutWithJWT,
-  logoutWithFirebase
+  logoutWithJWT
 } from "../../../redux/actions/auth/loginActions"
 import NavbarBookmarks from "./NavbarBookmarks"
 import NavbarUser from "./NavbarUser"
 import userImg from "../../../assets/img/portrait/small/avatar-s-11.jpg"
 
 const UserName = props => {
-  if (!props.user.login.values) { // TODO remove condition after development
+  if (!props.auth.values) { // TODO remove condition after development
     return "John doe"
   }
-  return props.user.login.values.username
+  return props.auth.values.username
 
 }
 
 const user_type_map = {
-  'admin': "Admin",
+  'admin': "Administrador",
   'engineer': "Ingeniero",
   'client': "Cliente",
   'support': "Soporte",
@@ -28,10 +26,9 @@ const user_type_map = {
 }
 
 const ThemeNavbar = props => {
-  // const { user } = useAuth0()
   const colorsArr = [ "primary", "danger", "success", "info", "warning", "dark"]
   const navbarTypes = ["floating" , "static" , "sticky" , "hidden"]
-  console.log(props.user)
+  // console.log(props.user)
   return (
     <React.Fragment>
       <div className="content-overlay" />
@@ -88,19 +85,18 @@ const ThemeNavbar = props => {
                 changeCurrentLang={props.changeCurrentLang}
                 userName={<UserName {...props} />}
                 userImg={
-                  !props.user.login.values ? userImg : props.user.login.values.picture
+                  !props.auth.values ? userImg : props.auth.values.picture
                 }
                 loggedInWith={
-                  props.user !== undefined &&
-                  props.user.login.values !== undefined
-                    ? props.user.login.values.loggedInWith
+                  props.auth !== undefined &&
+                  props.auth.values !== undefined
+                    ? props.auth.values.loggedInWith
                     : null
                 }
                 logoutWithJWT={props.logoutWithJWT}
-                logoutWithFirebase={props.logoutWithFirebase}
                 userType={
-                  !props.user.login.values ? "demo" // TODO remove in production
-                  : user_type_map[props.user.login.values.user_type]
+                  !props.auth.values ? "demo" // TODO remove in production
+                  : user_type_map[props.auth.values.user_type]
                 }
               />
             </div>
@@ -113,12 +109,8 @@ const ThemeNavbar = props => {
 
 const mapStateToProps = state => {
   return {
-    user: state.auth
+    auth: state.auth
   }
 }
 
-export default connect(mapStateToProps, {
-  logoutWithJWT,
-  logoutWithFirebase,
-  useAuth0
-})(ThemeNavbar)
+export default connect(mapStateToProps, {logoutWithJWT})(ThemeNavbar)

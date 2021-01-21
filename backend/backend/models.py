@@ -39,9 +39,7 @@ class Company(models.Model):
     city = models.ForeignKey(
         City,
         related_name='company',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True)
+        on_delete=models.CASCADE)
     hierarchy = ArrayField(
         models.CharField(max_length=50),
         default=list)
@@ -76,8 +74,7 @@ class VibroUser(AbstractUser):
         Company,
         related_name="user",
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True)
+        null=True)
     user_type = models.CharField(
         max_length=8,
         choices=USER_CHOICES,
@@ -93,8 +90,8 @@ class VibroUser(AbstractUser):
 
     def blur_email(self):
 
-        indexat = int(self.email.index("@") * 0.4)
-        new_email = self.email[:indexat] + ("*" * (len(self.email) - indexat))
+        index = int(self.email.index("@") * 0.4)
+        new_email = self.email[:index] + ("*" * (len(self.email) - index))
         return new_email
 
     def __str__(self):
@@ -108,15 +105,15 @@ class Machine(models.Model):
 
     # codes
     SAP = 'sap'
-    INTERNO = 'int'
+    INTERNO = 'interno'
     CODE_CHOICES = (
         (SAP, 'Sap'),
         (INTERNO, 'Interno'),
     )
 
     # electric feed
-    DIRECTA = 'dir'
-    VARIADOR = 'var'
+    DIRECTA = 'directa'
+    VARIADOR = 'variador'
     ELECTRIC_FEED_CHOICES = (
         (DIRECTA, 'Directa'),
         (VARIADOR, 'Variador'),
@@ -130,42 +127,44 @@ class Machine(models.Model):
         (HP, 'HorsePower'),
     )
 
-    identifier = models.IntegerField(
-        blank=True,
-        null=True)
+    identifier = models.IntegerField(null=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
         on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     code = models.CharField(
-        max_length=3,
+        max_length=7,
         choices=CODE_CHOICES,
-        blank=True,
         null=True)
     electric_feed = models.CharField(
-        max_length=3,
+        max_length=8,
         choices=CODE_CHOICES,
-        blank=True,
         null=True)
     brand = models.CharField(max_length=50)
     power = models.IntegerField(default=0)
     power_units = models.CharField(
-        max_length=2, choices=POWER_UNIT_CHOICES, default=KW)
+        max_length=2,
+        choices=POWER_UNIT_CHOICES,
+        default=KW)
     norm = models.TextField(
         null=True,
-        blank=True)
+    )
     hierarchy = models.IntegerField(default=0)
-    rpm = models.IntegerField(
-        blank=True,
+    rpm = models.IntegerField(null=True)
+    image = models.ImageField(
+        upload_to="machines/images",
+        null=True)
+    diagram = models.ImageField(
+        upload_to="machines/diagrams",
         null=True)
 
 
 class Sensor(models.Model):
 
     # sensor
-    VIBRACION = 'Vibración'
-    DUAL = 'Dual'
+    VIBRACION = 'vibración'
+    DUAL = 'dual'
     SENSOR_CHOICES = (
         (VIBRACION, 'Vibración'),
         (DUAL, 'Dual'),
@@ -180,31 +179,28 @@ class Sensor(models.Model):
     arduino = models.ForeignKey(
         VibroUser,
         related_name='sensor',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True)
+        on_delete=models.CASCADE)
     machine = models.ForeignKey(
         Machine, related_name="sensor",
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True)
+        null=True)
 
 
 class Gear(models.Model):  # equipo
     # gear type
-    MOTOR_ELECTRICO = 'Motor Eléctrico'
-    MOTOR_DIESEL = 'Motor Diesel'
-    VENTILADOR = 'Ventilador'
-    BOMBA = 'Bombda'
-    COMPRESOR = 'Compresor'
-    GENERADOR = 'Generador'
-    SOPLADOR = 'Soplador'
-    MOLINO = 'Molino'
-    PELET = 'Pelet'
-    ZARANDA = 'Zaranda'
-    ESTRUCTURA = 'Estructura'
-    EXTRUSORA = 'Extrusora'
-    REDUCTORA = 'Reductora'
+    MOTOR_ELECTRICO = 'motor eléctrico'
+    MOTOR_DIESEL = 'motor diesel'
+    VENTILADOR = 'ventilador'
+    BOMBA = 'bomba'
+    COMPRESOR = 'compresor'
+    GENERADOR = 'generador'
+    SOPLADOR = 'soplador'
+    MOLINO = 'molino'
+    PELET = 'pelet'
+    ZARANDA = 'zaranda'
+    ESTRUCTURA = 'estructura'
+    EXTRUSORA = 'extrusora'
+    REDUCTORA = 'reductora'
 
     GEAR_TYPE_CHOICES = (
         (MOTOR_ELECTRICO, 'Motor Eléctrico'),
@@ -223,24 +219,24 @@ class Gear(models.Model):  # equipo
     )
 
     # support types
-    RIGIDO = 'Rigido'
+    RIGIDO = 'rígido'
     FLEXIBLE = 'Flexible'
     SUPPORT_CHOICES = (
-        (RIGIDO, 'Rigido'),
+        (RIGIDO, 'Rígido'),
         (FLEXIBLE, 'Flexible'),
     )
 
     # transmission types
-    FLEXIBLES = 'Flexibles'
-    ENGRANAJE = 'Engranaje'
-    CADENA = 'Cadena'
-    REJILLA = 'Rejilla'
-    MORFLEX = 'Morflex'
-    PARAFLEX = 'Paraflex'
-    ARAÑA = 'Araña'
-    PASADOR = 'Pasador'
-    LAMINILLA = 'Laminilla'
-    RIGIDO = 'Rigido'
+    FLEXIBLES = 'flexibles'
+    ENGRANAJE = 'engranaje'
+    CADENA = 'cadena'
+    REJILLA = 'rejilla'
+    MORFLEX = 'morflex'
+    PARAFLEX = 'paraflex'
+    ARAÑA = 'araña'
+    PASADOR = 'pasador'
+    LAMINILLA = 'laminilla'
+    RIGIDO = 'rígido'
     TRANSMISSION_CHOICES = (
         (FLEXIBLES, 'Flexibles'),
         (ENGRANAJE, 'Engranaje'),
@@ -251,7 +247,7 @@ class Gear(models.Model):  # equipo
         (ARAÑA, 'Araña'),
         (PASADOR, 'Pasador'),
         (LAMINILLA, 'Laminilla'),
-        (RIGIDO, 'Rigido'),
+        (RIGIDO, 'Rígido'),
     )
     machine = models.ForeignKey(
         Machine,
@@ -273,10 +269,10 @@ class Gear(models.Model):  # equipo
 
 class Axis(models.Model):  # eje
 
-    DESLIZAMIENTO = 'Dezlizamiento'
-    RODAMIENTO = 'Rodamiento'
+    DESLIZAMIENTO = 'deslizamiento'
+    RODAMIENTO = 'rodamiento'
     TYPE_CHOICES = (
-        (DESLIZAMIENTO, 'Dezlizamiento'),
+        (DESLIZAMIENTO, 'Deslizamiento'),
         (RODAMIENTO, 'Rodamiento'),
     )
 
@@ -293,7 +289,7 @@ class Axis(models.Model):  # eje
     type_axis = models.CharField(
         max_length=13,
         choices=TYPE_CHOICES,
-        default='Undefined')  # TODO contar num cojinetes
+        default='undefined')  # TODO contar num cojinetes
     velocity = models.IntegerField()
     units = models.CharField(
         max_length=3,
@@ -332,29 +328,61 @@ class Coupling(models.Model):
     FLEX = 'Flexible'
 
 
-class Image(models.Model):
+class Point(models.Model):
 
-    image = models.ImageField(upload_to="machines/images")
-    diagram = models.ImageField(upload_to="machines/diagrams")
-    machine = models.OneToOneField(
+    POSITION_CHOICES = [
+        (num, num) for num in range(1, 13)
+    ]
+
+    # direction
+    VER = 'V'  # Vertical
+    HOR = 'H'  # Horizontal
+    AX = 'A'  # Axial
+    ORT = "O"  # Ortogonal
+    # type
+    ACC = 'A'  # Acceleracion
+    VEL = 'V'  # Velocidad
+    DES = 'D'  # Desplazamiento
+    TEMP = 'T'  # Temperatura
+    ENV = 'E'  # Envolvente
+    HFD = 'H'  # HFD
+    MAN = "M"  # Manual
+    CAL = "C"  # Calculado
+
+    DIRECTION_CHOICES = [
+        (VER, 'Vertical'),
+        (HOR, 'Horizontal'),
+        (AX, 'Axial'),
+        (ORT, 'Ortogonal')
+    ]
+
+    TYPE_CHOICES = [
+        (VEL, 'Velocidad'),
+        (ACC, 'Aceleración'),
+        (DES, 'Desplazamiento'),
+        (TEMP, 'Temperatura'),
+        (ENV, 'Envolvente'),
+        (HFD, 'HFD'),
+        (MAN, "Manual"),
+        (CAL, "Calculado")
+    ]
+
+    position = models.IntegerField(choices=POSITION_CHOICES)
+    direction = models.CharField(
+        max_length=1,
+        choices=DIRECTION_CHOICES,
+        default='undefined')
+    point_type = models.CharField(
+        max_length=1,
+        choices=TYPE_CHOICES,
+        default='undefined')
+    machine = models.ForeignKey(
         Machine,
-        related_name="images",
-        on_delete=models.CASCADE)
-
-
-class Date(models.Model):
-
-    class Meta:
-        unique_together = ['company', 'date']
-
-    date = models.DateField()
-    company = models.ForeignKey(
-        Company,
-        related_name="date",
+        related_name="points",
         on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.company.name} {self.date}'
+        return f'{self.position}{self.direction}{self.point_type}'
 
 
 class Measurement(models.Model):
@@ -369,28 +397,28 @@ class Measurement(models.Model):
     BLACK = 'black'
 
     # service type
-    PRED = 'pred'
-    CORR = 'corr'
-    ENG = 'eng'
-    MON = 'mon'
+    PRED = 'predictivo'
+    CORR = 'correctivo'
+    ENG = 'ingeniería'
+    MON = 'monitoreo en línea'
 
     # measurement type
-    VIB = 'vib'
-    ULT = 'ult'
-    TER = 'ter'
-    POL = 'pol'
-    ACP = 'acp'
-    CRD = 'crd'
-    EGR = 'egr'
-    BAL = 'bal'
-    AYC = 'ayc'
-    ADC = 'adc'
-    TDB = 'tdb'
-    CMP = 'cmp'
-    ADR = 'adr'
-    CME = 'cme'
-    MES = 'mes'
-    SUM = 'sum'
+    ULT = 'ultrasonido'
+    TER = 'termografía'
+    VIB = 'vibración'
+    ADC = 'análisis de aceite'
+    POL = 'alineacion laser polea'
+    TDB = 'tensión de bandas'
+    CMP = 'correción montajes poleas'
+    ACP = 'alineación laser acople'
+    CRD = 'alineación laser cardan'
+    EGR = 'alineación engranes'
+    ADR = 'alineación rodamientos'
+    BAL = 'balanceo'
+    CME = 'chequeo mecánico'
+    MES = 'medición especial'
+    AYC = 'aire y caudal'
+    SUM = 'suministro'
 
     SEVERITY_CHOICES = [
         (RED, 'Red'),
@@ -401,44 +429,37 @@ class Measurement(models.Model):
     SERVICE_CHOICES = [
         (PRED, 'Predictivo'),
         (CORR, 'Correctivo'),
-        (ENG, 'Ingenieria'),
-        (MON, 'Monitoreo en Linea'),
+        (ENG, 'Ingeniería'),
+        (MON, 'Monitoreo en Línea'),
     ]
     MEASUREMENT_CHOICES = [
         (ULT, 'Ultrasonido'),
-        (TER, 'Termografia'),
-        (VIB, 'Vibracion'),
-        (ADC, 'Analisis de Aceite'),
+        (TER, 'Termografía'),
+        (VIB, 'Vibración'),
+        (ADC, 'Análisis de Aceite'),
         (POL, 'Alineacion Laser Polea'),
-        (TDB, 'Tencion de Bandas'),
-        (CMP, 'Correccion Montajes Poleas'),
-        (ACP, 'Alineacion Laser Acople'),
-        (CRD, 'Alineacion Laser Cardan'),
-        (EGR, 'Alineacion Engranes'),
-        (ADR, 'Alineacion Rodamientos'),
+        (TDB, 'Tensión de Bandas'),
+        (CMP, 'Correción Montajes Poleas'),
+        (ACP, 'Alineación Laser Acople'),
+        (CRD, 'Alineación Laser Cardan'),
+        (EGR, 'Alineación Engranes'),
+        (ADR, 'Alineación Rodamientos'),
         (BAL, 'Balanceo'),
-        (CME, 'Chequeo Mecanico'),
-        (MES, 'Medicion Especial'),
+        (CME, 'Chequeo Mecánico'),
+        (MES, 'Medición Especial'),
         (AYC, 'Aire y Caudal'),
         (SUM, 'Suministro')
     ]
 
     service = models.CharField(
-        max_length=4,
+        max_length=18,
         choices=SERVICE_CHOICES,
         default=PRED)
     measurement_type = models.CharField(
-        max_length=3,
+        max_length=25,
         choices=MEASUREMENT_CHOICES,
         default=VIB)
-    machine = models.ForeignKey(
-        Machine,
-        related_name="measurements",
-        on_delete=models.CASCADE)
-    date = models.ForeignKey(
-        Date,
-        related_name="measurements",
-        on_delete=models.CASCADE)
+    date = models.DateField()
     analysis = models.TextField()
     diagnostic = models.TextField()
     severity = models.CharField(
@@ -449,30 +470,56 @@ class Measurement(models.Model):
         VibroUser,
         related_name="measurements",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True)
     engineer_two = models.ForeignKey(
         VibroUser,
         related_name="measurements_two",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True)
     analyst = models.ForeignKey(
         VibroUser,
         related_name="measurements_three",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True)
     certifier = models.ForeignKey(
         VibroUser,
         related_name="measurements_four",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True)
+    machine = models.ForeignKey(
+        Machine,
+        related_name="measurements",
+        on_delete=models.CASCADE)
     revised = models.BooleanField(default=False)
     resolved = models.BooleanField(default=False)
-    prev_changes = models.TextField(null=True, blank=True)
-    prev_changs_date = models.DateField(null=True, blank=True)
+    prev_changes = models.TextField(null=True, )
+    prev_changes_date = models.DateField(null=True)
+
+
+class Values(models.Model):
+
+    point = models.ForeignKey(
+        Point,
+        related_name="values",
+        on_delete=models.CASCADE
+    )
+    measurement = models.ForeignKey(
+        Measurement,
+        related_name="values",
+        on_delete=models.CASCADE)
+    tendency = models.DecimalField(
+        decimal_places=2,
+        max_digits=4,
+        default=0)
+    espectra = ArrayField(
+        models.DecimalField(
+            decimal_places=2,
+            max_digits=4),
+        default=list)
+    time_signal = ArrayField(models.DecimalField(
+        decimal_places=2,
+        max_digits=4),
+        default=list)
 
 
 class Flaw(models.Model):  # falla
@@ -491,38 +538,38 @@ class Flaw(models.Model):  # falla
     ]
 
     # flaw types
-    BN = 'bn'
-    BAL = 'bal'
-    ALI = 'ali'
-    TEN = 'ten'
-    LUB = 'lub'
-    ROD = 'rod'
-    HOL = 'hol'
-    EXC = 'exc'
-    SOL = 'sol'
-    FRA = 'fra'
-    VAC = 'vac'
-    ELE = 'ele'
-    INS = 'ins'
-    OTR = 'otr'
-    EST = 'est'
-    RES = 'res'
-    NOM = 'nom'
+    BN = 'bien'
+    BAL = 'balanceo'
+    ALI = 'alineación'
+    TEN = 'tensión'
+    LUB = 'lubricación'
+    ROD = 'rodamientos'
+    HOL = 'holgura'
+    EXC = 'excentricidad'
+    SOL = 'soltura'
+    FRA = 'fractura'
+    VAC = 'vacío'
+    ELE = 'eléctrico'
+    INS = 'inspección'
+    EST = 'estructural'
+    RES = 'resonancia'
+    NOM = 'no medido'
+    OTR = 'otro'
 
     FLAW_CHOICES = [
         (BN, 'Bien'),
         (BAL, 'Balanceo'),
-        (ALI, 'Alineacion'),
-        (TEN, 'Tension'),
-        (LUB, 'Lubricacion'),
+        (ALI, 'Alineación'),
+        (TEN, 'Tensión'),
+        (LUB, 'Lubricación'),
         (ROD, 'Rodamientos'),
         (HOL, 'Holgura'),
         (EXC, 'Excentricidad'),
         (SOL, 'Soltura'),
         (FRA, 'Fractura'),
-        (VAC, 'Vacio'),
-        (ELE, 'Electrico'),
-        (INS, 'Inspeccion'),
+        (VAC, 'Vacío'),
+        (ELE, 'Eléctrico'),
+        (INS, 'Inspección'),
         (EST, 'Estructural'),
         (RES, 'Resonancia'),
         (NOM, 'No medido'),
@@ -534,11 +581,11 @@ class Flaw(models.Model):  # falla
         related_name="flaws",
         on_delete=models.CASCADE)
     flaw_type = models.CharField(
-        max_length=3,
+        max_length=13,
         choices=FLAW_CHOICES,
         default=OTR)
     severity = models.CharField(
-        max_length=9,
+        max_length=6,
         choices=SEVERITY_CHOICES,
         default=BLACK)
 
@@ -559,75 +606,5 @@ class TermoImage(models.Model):
         max_length=15,
         choices=IMAGE_CHOICES,
         default='undefined')
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(null=True)
     image = models.ImageField(upload_to="termals")
-
-
-class Point(models.Model):
-
-    POSITION_CHOICES = [
-        (num, num) for num in range(1, 13)
-    ]
-
-    # direction
-    VER = 'V'
-    HOR = 'H'
-    AX = 'A'
-    ORT = "O"
-    # type
-    ACC = 'A'
-    VEL = 'V'
-    DES = 'D'  # Desplazamiento
-    TEMP = 'T'  # temperatura
-    ENV = 'E'  # Envolvente
-    HFD = 'H'  # HFD
-    MAN = "M"  # Manual
-    CAL = "C"  # Calculado
-
-    DIRECTION_CHOICES = [
-        (VER, 'Vertical'),
-        (HOR, 'Horizontal'),
-        (AX, 'Axial'),
-        (ORT, 'Ortogonal')
-    ]
-
-    TYPE_CHOICES = [
-        (VEL, 'Velocity'),
-        (ACC, 'Acceleration'),
-        (DES, 'Displacement'),
-        (TEMP, 'Temperature'),
-        (ENV, 'Envol'),
-        (HFD, 'HFD'),
-        (MAN, "Manual"),
-        (CAL, "Calculado")
-    ]
-
-    position = models.IntegerField(choices=POSITION_CHOICES)
-    direction = models.CharField(
-        max_length=1,
-        choices=DIRECTION_CHOICES,
-        default='undefined')
-    point_type = models.CharField(
-        max_length=1,
-        choices=TYPE_CHOICES,
-        default='undefined')
-    measurement = models.ForeignKey(
-        Measurement,
-        related_name="points",
-        on_delete=models.CASCADE)
-    tendency = models.DecimalField(
-        decimal_places=2,
-        max_digits=4,
-        default=0)
-    espectra = ArrayField(
-        models.DecimalField(
-            decimal_places=2,
-            max_digits=4),
-        default=list)
-    time_signal = ArrayField(models.DecimalField(
-        decimal_places=2,
-        max_digits=4),
-        default=list)
-
-    def __str__(self):
-        return f'{self.position}{self.direction}{self.point_type}'

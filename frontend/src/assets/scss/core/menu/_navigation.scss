@@ -90,18 +90,19 @@
       align-items: center;
       margin-top: 1.35rem;
       .brand-logo {
-        background: url("../../../img/logo/vuesax-logo.png") no-repeat;
-        background-position: -65px -54px;
-        height: 24px;
-        width: 35px;
+        background: url("../../../img/logo/vibrologo.png") no-repeat;
+        background-position: -62px -41px;
+        height: 25px;
+        width: 32px;
       }
 
       .brand-text {
-        color: $primary;
+        // color: $primary;
+        color: #424043 !important;
         padding-left: 1rem;
         font-weight: 600;
         letter-spacing: 0.01rem;
-        font-size: 1.57rem;
+        font-size: 1.25rem;
         animation: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) 0s normal forwards 1
           fadein;
       }
@@ -165,7 +166,6 @@
   &:not(.hide-sidebar) {
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
-
 }
 
 // Main Navigation
@@ -275,7 +275,7 @@
 // Navigation Themes
 
 .horizontal-layout,
-.vertical-layout{
+.vertical-layout {
   &.theme-primary {
     .navbar-container,
     .navbar-header {
@@ -415,8 +415,6 @@ body {
     }
   }
 }
-
-
 
 // for collapsed static layout
 body.menu-collapsed {

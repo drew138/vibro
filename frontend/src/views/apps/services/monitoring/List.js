@@ -3,7 +3,7 @@ import React from "react"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 // import ListViewConfig from "./DataListConfig"
 // import queryString from "query-string"
-import Machines from './Machines'
+import MachineList from './Machines'
 
 class MonitoringSearch extends React.Component {
   render() {
@@ -14,7 +14,7 @@ class MonitoringSearch extends React.Component {
           breadCrumbParent="Servicios"
           breadCrumbActive="Monitoreo"
         />
-        <Machines/>
+        <MachineList/>
       </React.Fragment>
     )
   }
