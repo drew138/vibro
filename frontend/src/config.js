@@ -9,5 +9,6 @@ export const GET_USERS_ENDPOINT = `${domain}/api/vibrouser/`
 export const POST_COMPANY_ENDPOINT = `${domain}/api/company/`
 export const GET_MACHINES_ENDPOINT = `${domain}/api/machine/`
 export const CHANGE_PASSWORD_ENDPOINT = `${domain}/api/auth/change`
+export const RESET_PASSWORD_ENDPOINT = `${domain}/api/reset`
 export const FORGOT_PASSWORD_ENDPOINT = `${domain}/api/auth/change/forgot`
 export const CREATE_MACHINE_ENDPOINT = `${domain}/api/machine/`
