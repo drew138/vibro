@@ -7,6 +7,7 @@ import dataList from "./data-list/"
 import user from "./user"
 import alerts from "./alert"
 import machine from "./machine"
+import company from "./company"
 
 const rootReducer = combineReducers({
   calendar: calenderReducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   dataList,
   user,
   alerts,
+  company,
   machine
 })
 

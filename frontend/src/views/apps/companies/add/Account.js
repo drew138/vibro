@@ -26,7 +26,7 @@ class UserAccountTab extends React.Component {
     address: "",
     phone: "",
     city: "",
-    hierarchy: null,
+    hierarchy: "",
   }
 
   handleSubmit = e => {

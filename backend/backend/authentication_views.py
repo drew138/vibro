@@ -92,7 +92,7 @@ class ResetAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = custom_models.VibroUser.objects.filter(
-            email=request.data['email']).first()
+            email=request.data['email'])
         if user.exists():
             Email.reset(request).delay()
         else:

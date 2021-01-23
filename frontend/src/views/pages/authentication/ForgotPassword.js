@@ -100,7 +100,8 @@ class ForgotPassword extends React.Component {
                           className="px-75 btn-block"
                           onClick={e => {
                             e.preventDefault()
-                            history.push("/")
+                            // history.push("/")
+                            this.onSubmit()
                           }}
                         >
                           Recuperar Contraseña

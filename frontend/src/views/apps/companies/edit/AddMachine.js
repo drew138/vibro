@@ -25,20 +25,20 @@ class CompanyTab extends React.Component {
     this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
   }
 
-  state = {
-    id: this.props.users.user.id,
-    first_name: this.props.users.user.first_name,
-    last_name: this.props.users.user.last_name,
-    email: this.props.users.user.email,
-    phone: this.props.users.user.phone,
-    celphone: this.props.users.user.celphone,
-    selectedFile: null,
-    companyName: this.props.users.user.company ? this.props.users.user.company.name : "N/A",
-    companyId: this.props.users.user.company ? this.props.users.user.company.id : null,
-    companies: [],
-    is_active: this.props.users.user.is_active,
-    user_type: this.props.users.user.user_type
-  }
+  // state = {
+  //   id: this.props.users.user.id,
+  //   first_name: this.props.users.user.first_name,
+  //   last_name: this.props.users.user.last_name,
+  //   email: this.props.users.user.email,
+  //   phone: this.props.users.user.phone,
+  //   celphone: this.props.users.user.celphone,
+  //   selectedFile: null,
+  //   companyName: this.props.users.user.company ? this.props.users.user.company.name : "N/A",
+  //   companyId: this.props.users.user.company ? this.props.users.user.company.id : null,
+  //   companies: [],
+  //   is_active: this.props.users.user.is_active,
+  //   user_type: this.props.users.user.user_type
+  // }
 
   handleSubmit = e => {
     e.preventDefault()
@@ -109,8 +109,8 @@ class CompanyTab extends React.Component {
                     type="text"
                     id="name"
                     placeholder="Nombre"
-                    value={this.state.name}
-                    onChange={e => this.setState({ name: e.target.value })}
+                    // value={this.state.name}
+                    // onChange={e => this.setState({ name: e.target.value })}
                   />
                 </FormGroup>
               </Col>
@@ -122,8 +122,8 @@ class CompanyTab extends React.Component {
                     type="text"
                     id="nit"
                     placeholder="Nit"
-                    value={this.state.nit}
-                    onChange={e => this.setState({ nit: e.target.value })}
+                    // value={this.state.nit}
+                    // onChange={e => this.setState({ nit: e.target.value })}
                   />
                 </FormGroup>
               </Col>
@@ -135,8 +135,8 @@ class CompanyTab extends React.Component {
                     type="text"
                     id="address"
                     placeholder="Dirección"
-                    value={this.state.address}
-                    onChange={e => this.setState({ address: e.target.value })}
+                    // value={this.state.address}
+                    // onChange={e => this.setState({ address: e.target.value })}
                   />
                 </FormGroup>
               </Col>
@@ -149,8 +149,8 @@ class CompanyTab extends React.Component {
                     type="text"
                     id="phone"
                     placeholder="Teléfono"
-                    value={this.state.phone}
-                    onChange={e => this.setState({ phone: e.target.value })}
+                    // value={this.state.phone}
+                    // onChange={e => this.setState({ phone: e.target.value })}
                   />
                 </FormGroup>
               </Col>
@@ -162,8 +162,8 @@ class CompanyTab extends React.Component {
                     type="select"
                     id="city"
                     placeholder="Ciudad"
-                    value={this.state.city}
-                    onChange={e => this.setState({ city: e.target.value })}
+                    // value={this.state.city}
+                    // onChange={e => this.setState({ city: e.target.value })}
                   >
                     <option></option>
                   </Input>
@@ -177,8 +177,8 @@ class CompanyTab extends React.Component {
                     type="select"
                     id="hierarchy"
                     placeholder="Empresa"
-                    value={this.state.hierarchy}
-                    onChange={e => this.setState({ hierarchy: e.target.value })}
+                    // value={this.state.hierarchy}
+                    // onChange={e => this.setState({ hierarchy: e.target.value })}
                   >
                     <option></option>
                   </Input>

@@ -25,8 +25,6 @@ class GetCompanySerializer(serializers.ModelSerializer):
 
     city = serializers.StringRelatedField(read_only=True)
 
-    rut_city = serializers.StringRelatedField(read_only=True)
-
     class Meta:
         model = custom_models.Company
         fields = '__all__'
