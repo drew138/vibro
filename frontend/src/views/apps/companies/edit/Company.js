@@ -14,8 +14,8 @@ import { updateUser } from "../../../../redux/actions/users"
 import isValidCelphone from "../../../../validators/celphone"
 import isValidPhone from "../../../../validators/phone"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { GET_COMPANIES_ENDPOINT } from "../../../../config"
-import axios from "axios"
+// import { GET_COMPANIES_ENDPOINT } from "../../../../config"
+// import axios from "axios"
 
 class CompanyTab extends React.Component {
 
@@ -26,18 +26,12 @@ class CompanyTab extends React.Component {
   }
 
   state = {
-    id: this.props.users.user.id,
-    first_name: this.props.users.user.first_name,
-    last_name: this.props.users.user.last_name,
-    email: this.props.users.user.email,
-    phone: this.props.users.user.phone,
-    celphone: this.props.users.user.celphone,
-    selectedFile: null,
-    companyName: this.props.users.user.company ? this.props.users.user.company.name : "N/A",
-    companyId: this.props.users.user.company ? this.props.users.user.company.id : null,
-    companies: [],
-    is_active: this.props.users.user.is_active,
-    user_type: this.props.users.user.user_type
+    name: "",
+    nit: "",
+    address: "",
+    phone: "",
+    city: "",
+    hierarchy: "",
   }
 
   handleSubmit = e => {

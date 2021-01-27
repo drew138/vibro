@@ -15,8 +15,37 @@ import {
 import fgImg from "../../../assets/img/pages/forgot-password.png"
 import { history } from "../../../history"
 import "../../../assets/scss/pages/authentication.scss"
+import { RESET_PASSWORD_ENDPOINT } from "../../../config"
+import axios from "axios"
+import { displayAlert } from "../../../redux/actions/alerts/"
+import { connect } from "react-redux"
 
 class ForgotPassword extends React.Component {
+  state = {
+    email: ""
+  }
+
+  onSubmit = async () => {
+    try {
+      await axios.post(RESET_PASSWORD_ENDPOINT, {email: this.state.email})
+      const alertData = {
+        title: "Solicitud de Cambio de Contraseña Enviada Exitosamente",
+        success: true,
+        show: true,
+        alertText: "Se ha enviado un mensaje a tu correo electronico con instrucciones para cambiar tu contraseña"
+      }
+      this.props.displayAlert(alertData)
+    } catch (e) {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
+
   render() {
     return (
       <Row className="m-0 justify-content-center">
@@ -49,7 +78,9 @@ class ForgotPassword extends React.Component {
                   <CardBody className="pt-1 pb-0">
                     <Form>
                       <FormGroup className="form-label-group">
-                        <Input type="text" placeholder="Email" required />
+                        <Input type="text" placeholder="Email" required onChange={(e) => {
+                          this.setState({email: e.target.value})
+                        }}/>
                         <Label>Email</Label>
                       </FormGroup>
                       <div className="float-md-left d-block mb-1">
@@ -69,7 +100,8 @@ class ForgotPassword extends React.Component {
                           className="px-75 btn-block"
                           onClick={e => {
                             e.preventDefault()
-                            history.push("/")
+                            // history.push("/")
+                            this.onSubmit()
                           }}
                         >
                           Recuperar Contraseña
@@ -86,4 +118,12 @@ class ForgotPassword extends React.Component {
     )
   }
 }
-export default ForgotPassword
+
+// const mapStateToProps = state => {
+//   return {
+//     auth: state.auth
+//   }
+// }
+
+export default connect((state) => (state), { displayAlert })(ForgotPassword)
+

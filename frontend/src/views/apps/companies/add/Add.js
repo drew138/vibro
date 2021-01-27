@@ -10,11 +10,11 @@ import {
 } from "reactstrap"
 import classnames from "classnames"
 import { Briefcase } from "react-feather"
-import AccountTab from "./Account"
+import Company from "./Company"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 
-class UserEdit extends React.Component {
+class AddCompany extends React.Component {
   state = {
     activeTab: "1"
   }
@@ -42,7 +42,7 @@ class UserEdit extends React.Component {
                   </NavLink>
                 </NavItem>
               </Nav>
-              <AccountTab />
+              <Company />
             </CardBody>
           </Card>
         </Col>
@@ -51,4 +51,4 @@ class UserEdit extends React.Component {
     )
   }
 }
-export default UserEdit
+export default AddCompany

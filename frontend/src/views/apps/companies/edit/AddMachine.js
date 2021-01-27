@@ -16,28 +16,30 @@ import isValidPhone from "../../../../validators/phone"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { GET_COMPANIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
+import { CustomInput } from "reactstrap"
+
 
 class CompanyTab extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.imageInputRef = React.createRef();
-    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
-  }
+  // constructor(props) {
+  //   super(props)
+  //   this.imageInputRef = React.createRef();
+  //   this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+  // }
 
   state = {
-    id: this.props.users.user.id,
-    first_name: this.props.users.user.first_name,
-    last_name: this.props.users.user.last_name,
-    email: this.props.users.user.email,
-    phone: this.props.users.user.phone,
-    celphone: this.props.users.user.celphone,
-    selectedFile: null,
-    companyName: this.props.users.user.company ? this.props.users.user.company.name : "N/A",
-    companyId: this.props.users.user.company ? this.props.users.user.company.id : null,
-    companies: [],
-    is_active: this.props.users.user.is_active,
-    user_type: this.props.users.user.user_type
+    id: null,
+    name: "",
+    code: "",
+    electric_feed: "",
+    brand: "",
+    power: "",
+    power_units: "",
+    norm: "",
+    hierarchy: "",
+    rpm: "",
+    image: "",
+    diagram: "",
   }
 
   handleSubmit = e => {
@@ -104,6 +106,19 @@ class CompanyTab extends React.Component {
 
             <Col md="6" sm="12">
                 <FormGroup>
+                  <Label for="id">Identificador</Label>
+                  <Input
+                    type="number"
+                    id="id"
+                    placeholder="Identificador"
+                    value={this.state.id}
+                    onChange={e => this.setState({ id: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+
+            <Col md="6" sm="12">
+                <FormGroup>
                   <Label for="name">Nombre</Label>
                   <Input
                     type="text"
@@ -114,56 +129,98 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
+
+
               
               <Col md="6" sm="12">
                 <FormGroup>
-                  <Label for="nit">Nit</Label>
-                  <Input
-                    type="text"
-                    id="nit"
-                    placeholder="Nit"
-                    value={this.state.nit}
-                    onChange={e => this.setState({ nit: e.target.value })}
-                  />
-                </FormGroup>
-              </Col>
-              
-              <Col md="6" sm="12">
-                <FormGroup>
-                  <Label for="address">Dirección</Label>
-                  <Input
-                    type="text"
-                    id="address"
-                    placeholder="Dirección"
-                    value={this.state.address}
-                    onChange={e => this.setState({ address: e.target.value })}
-                  />
-                </FormGroup>
-              </Col>
-              
-              
-              <Col md="6" sm="12">
-                <FormGroup>
-                  <Label for="phone">Teléfono</Label>
-                  <Input
-                    type="text"
-                    id="phone"
-                    placeholder="Teléfono"
-                    value={this.state.phone}
-                    onChange={e => this.setState({ phone: e.target.value })}
-                  />
-                </FormGroup>
-              </Col>
-              
-              <Col md="6" sm="12">
-                <FormGroup>
-                  <Label for="city">Ciudad</Label>
+                  <Label for="nit">Código</Label>
                   <Input
                     type="select"
-                    id="city"
-                    placeholder="Ciudad"
-                    value={this.state.city}
-                    onChange={e => this.setState({ city: e.target.value })}
+                    id="code"
+                    placeholder="Código"
+                    value={this.state.power_units}
+                    onChange={e => this.setState({ code: e.target.value })}
+                  >
+                    <option value="">Seleccione una opción</option> 
+                    <option value="interno">Interno</option> 
+                    <option value="sap">SAP</option> 
+                  </Input>
+                </FormGroup>
+              </Col>            
+              
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="electric_feed">Alimentación Eléctrica</Label>
+                  <Input
+                    type="select"
+                    id="electric_feed"
+                    placeholder="Alimentación Eléctrica"
+                    value={this.state.electric_feed}
+                    onChange={e => this.setState({ electric_feed: e.target.value })}
+                  >
+                    <option value="">Seleccione una opción</option> 
+                    <option value="directa">Directa</option>
+                    <option value="variador">Variador</option> 
+                  </Input>
+                </FormGroup>
+              </Col>
+              
+              
+              
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="power">Potencia</Label>
+                  <Input
+                    type="number"
+                    id="power"
+                    placeholder="Potencia"
+                    value={this.state.power}
+                    onChange={e => this.setState({ power: e.target.value })}
+                  >
+                  </Input>
+                </FormGroup>
+              </Col>
+
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="power_units">Unidades de Potencia</Label>
+                  <Input
+                    type="select"
+                    id="power_units"
+                    placeholder="Unidades de Potencia"
+                    value={this.state.power_units}
+                    onChange={e => this.setState({ power_units: e.target.value })}
+                  >
+                    <option value="">Seleccione una opción</option> 
+                    <option value="KW">KiloWatts</option>
+                    <option value="HP">HorsePower</option> 
+                  </Input>
+                </FormGroup>
+              </Col>
+
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="brand">Marca</Label>
+                  <Input
+                    type="text"
+                    id="brand"
+                    placeholder="Marca"
+                    value={this.state.brand}
+                    onChange={e => this.setState({ brand: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+
+              <Col md="6" sm="12"> 
+                <FormGroup>
+                  <Label for="norm">Norma</Label>
+                  <Input
+                    type="select"
+                    id="norm"
+                    placeholder="Norma"
+                    value={this.state.norm}
+                    onChange={e => this.setState({ norm: e.target.value })}
                   >
                     <option></option>
                   </Input>
@@ -176,7 +233,7 @@ class CompanyTab extends React.Component {
                   <Input
                     type="select"
                     id="hierarchy"
-                    placeholder="Empresa"
+                    placeholder="Jerarquía"
                     value={this.state.hierarchy}
                     onChange={e => this.setState({ hierarchy: e.target.value })}
                   >
@@ -184,6 +241,47 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
+              
+              <Col md="6" sm="12"> 
+                <FormGroup>
+                  <Label for="rpm">RPM</Label>
+                  <Input
+                    type="select"
+                    id="rpm"
+                    placeholder="RPM"
+                    value={this.state.rpm}
+                    onChange={e => this.setState({ rpm: e.target.value })}
+                  >
+                    <option></option>
+                  </Input>
+                </FormGroup>
+              </Col>
+
+
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="customFile">Imagen</Label>
+                  <CustomInput
+                    type="file"
+                    id="image"
+                    name="Imagen"
+                  />
+                </FormGroup>
+              </Col>
+
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="customFile">Diagrama</Label>
+                  <CustomInput
+                    type="file"
+                    id="diagram"
+                    name="Diagrama"
+                  />
+                </FormGroup>
+              </Col>
+              
+             
+
 
               <Col
                 className="d-flex justify-content-end flex-wrap mt-2"

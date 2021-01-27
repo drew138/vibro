@@ -9,7 +9,7 @@ import {
   FormGroup
 } from "reactstrap"
 import { connect } from "react-redux"
-import { updateUser } from "../../../../redux/actions/users"
+import { createCompany } from "../../../../redux/actions/company"
 import isValidAddress from "../../../../validators/address"
 import isValidPhone from "../../../../validators/phone"
 import isValidNit from "../../../../validators/nit"
@@ -17,7 +17,7 @@ import { displayAlert } from "../../../../redux/actions/alerts"
 import { POST_COMPANY_ENDPOINT } from "../../../../config"
 import axios from "axios"
 
-class UserAccountTab extends React.Component {
+class Company extends React.Component {
 
 
   state = {
@@ -26,7 +26,7 @@ class UserAccountTab extends React.Component {
     address: "",
     phone: "",
     city: "",
-    hierarchy: null,
+    hierarchy: "",
   }
 
   handleSubmit = e => {
@@ -52,7 +52,7 @@ class UserAccountTab extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-    this.props.updateUser(this.state, this.props.auth.tokens.access)
+    this.props.createCompany(this.state, this.props.auth.tokens.access)
     
   }
 
@@ -119,7 +119,6 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
               
               <Col md="6" sm="12">
                 <FormGroup>
@@ -188,4 +187,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { updateUser, displayAlert })(UserAccountTab) // tODO change redux actions
+export default connect(mapStateToProps, { createCompany, displayAlert })(Company) // tODO change redux actions
