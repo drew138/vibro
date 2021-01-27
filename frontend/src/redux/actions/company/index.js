@@ -1,9 +1,9 @@
 import axios from "axios"
 import { POST_COMPANY_ENDPOINT, 
-        PATCH_COMPANY_ENDPOINT } from "../../../../config"
+        PATCH_COMPANY_ENDPOINT } from "../../../config"
 
 export const editCompany = () => {
-    return dispatch => {
+    return async dispatch => {
         try {
             const res = await axios.patch(PATCH_COMPANY_ENDPOINT)
         } catch (e) {
@@ -13,7 +13,7 @@ export const editCompany = () => {
 }
 
 export const createCompany = () => {
-    return dispatch => {
+    return async dispatch => {
         try {
             const res = await axios.post(POST_COMPANY_ENDPOINT)
 

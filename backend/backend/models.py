@@ -127,7 +127,7 @@ class Machine(models.Model):
         (HP, 'HorsePower'),
     )
 
-    identifier = models.IntegerField(null=True)
+    # identifier = models.IntegerField(null=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",

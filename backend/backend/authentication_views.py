@@ -94,10 +94,11 @@ class ResetAPI(generics.GenericAPIView):
         user = custom_models.VibroUser.objects.filter(
             email=request.data['email'])
         if user.exists():
-            Email.reset(request).delay()
+            # Email.reset(request).delay()
+            pass
         else:
             raise NotFound('usuario no encontrado')
-        return Response({"detail": f"un correo de recuperacion ha sido enviado a la cuenta {user.blur_email()}"})
+        return Response({"detail": f"un correo de recuperacion ha sido enviado a la cuenta {user.first().blur_email()}"})
 
 
 # Change Password API
