@@ -165,8 +165,7 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-              
-              
+
               
               <Col md="6" sm="12">
                 <FormGroup>
