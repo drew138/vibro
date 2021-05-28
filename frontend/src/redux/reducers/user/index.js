@@ -1,4 +1,3 @@
-
 const initialState = {
     id: null,
     username: null,
@@ -16,15 +15,14 @@ const initialState = {
 }
 
 const user = (state = initialState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case "SELECT_USER_FOR_UPDATE":
-            return {...action.payload}
+            return { ...action.payload }
         case "UPDATE_USER":
-            return {...action.payload}
+            return { ...action.payload }
         default:
             return state
     }
 }
 
-
-export default user 
+export default user

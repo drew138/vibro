@@ -16,9 +16,9 @@ import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { POST_COMPANY_ENDPOINT } from "../../../../config"
 import axios from "axios"
+import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
 
 class Company extends React.Component {
-
 
   state = {
     name: "",
@@ -27,6 +27,17 @@ class Company extends React.Component {
     phone: "",
     city: "",
     hierarchy: "",
+    suggestions: [
+      { title: "React.js" },
+      { title: "Angular.js" },
+      { title: "Javascript" },
+      { title: "Vue.js" },
+      { title: "HTML" },
+      { title: "CSS" },
+      { title: "SCSS" },
+      { title: "PHP" },
+      { title: "Laravel" }
+    ]
   }
 
   handleSubmit = e => {
@@ -38,12 +49,12 @@ class Company extends React.Component {
       alertText: ""
     }
     if (this.state.nit && !isValidNit(this.state.nit)) {
-      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x" 
+      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
       this.props.displayAlert(alertData)
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
       this.props.displayAlert(alertData)
       return
     }
@@ -53,15 +64,12 @@ class Company extends React.Component {
       return
     }
     this.props.createCompany(this.state, this.props.auth.tokens.access)
-    
   }
-
-
 
   toTitleCase(str) {
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
@@ -89,11 +97,12 @@ class Company extends React.Component {
                     id="name"
                     placeholder="Nombre"
                     value={this.state.name}
-                    onChange={e => this.setState({ name: e.target.value })}
+                    onChange={e => {this.setState({ name: e.target.value })
+                    console.log(this.state)}}
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="nit">Nit</Label>
@@ -106,7 +115,7 @@ class Company extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="address">Dirección</Label>
@@ -119,7 +128,7 @@ class Company extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="phone">Teléfono</Label>
@@ -132,7 +141,7 @@ class Company extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="city">Ciudad</Label>
@@ -148,7 +157,7 @@ class Company extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12"> 
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
@@ -162,7 +171,7 @@ class Company extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-              
+
 
               <Col
                 className="d-flex justify-content-end flex-wrap mt-2"
