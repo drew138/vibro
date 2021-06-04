@@ -26,10 +26,11 @@
     list-style: none;
     padding-left: 0;
     border-radius: 0.5rem;
-    max-height: 450px;
+    max-height: 115px;
+    overflow-y: scroll;
     height: auto;
     width: 100%;
-    position: absolute;
+    // position: absolute;
     margin-top: 0.5rem;
     background-color: $white;
     box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.11),

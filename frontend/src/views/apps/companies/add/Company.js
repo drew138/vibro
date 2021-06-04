@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import {
   Row,
   Col,
@@ -15,6 +15,7 @@ import isValidPhone from "../../../../validators/phone"
 import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { POST_COMPANY_ENDPOINT } from "../../../../config"
+import { GET_CITIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
 
@@ -27,17 +28,7 @@ class Company extends React.Component {
     phone: "",
     city: "",
     hierarchy: "",
-    suggestions: [
-      { title: "React.js" },
-      { title: "Angular.js" },
-      { title: "Javascript" },
-      { title: "Vue.js" },
-      { title: "HTML" },
-      { title: "CSS" },
-      { title: "SCSS" },
-      { title: "PHP" },
-      { title: "Laravel" }
-    ]
+    suggestions: [{ name: "" }],
   }
 
   handleSubmit = e => {
@@ -75,12 +66,25 @@ class Company extends React.Component {
     );
   }
 
-  // async componentDidMount() {
-  //   const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-  //     headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
-  //   const companies = [{id:"N/A", name:"N/A"}, ...res.data.results]
-  //   this.setState({ companies })
-  // }
+  async componentDidMount() {
+    try {
+      const res = await axios.get(GET_CITIES_ENDPOINT, {
+        headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }
+      })
+      const cities = res.data
+      const cityNames = []
+      Object.values(cities).forEach(city => cityNames.push({ name: `${city.name}, ${city.state}` }))
+      this.setState({ suggestions: cityNames })
+    } catch {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
 
   render() {
     return (
@@ -97,8 +101,7 @@ class Company extends React.Component {
                     id="name"
                     placeholder="Nombre"
                     value={this.state.name}
-                    onChange={e => {this.setState({ name: e.target.value })
-                    console.log(this.state)}}
+                    onChange={e => this.setState({ name: e.target.value })}
                   />
                 </FormGroup>
               </Col>
@@ -145,15 +148,13 @@ class Company extends React.Component {
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="city">Ciudad</Label>
-                  <Input
-                    type="select"
-                    id="city"
+                  <AutoComplete
+                    suggestions={this.state.suggestions}
+                    className="form-control"
+                    filterKey="name"
                     placeholder="Ciudad"
-                    value={this.state.city}
-                    onChange={e => this.setState({ city: e.target.value })}
-                  >
-                    <option></option>
-                  </Input>
+                    suggestionLimit={20}
+                  />
                 </FormGroup>
               </Col>
 
