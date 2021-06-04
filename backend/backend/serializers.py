@@ -23,7 +23,7 @@ class DefaultCompanySerializer(serializers.ModelSerializer):
 
 class GetCompanySerializer(serializers.ModelSerializer):
 
-    city = serializers.StringRelatedField(read_only=True)
+    city = serializers.CharField(source="city.name")
 
     class Meta:
         model = custom_models.Company

@@ -10,9 +10,10 @@ import {
   FormGroup
 } from "reactstrap"
 import { connect } from "react-redux"
-import { updateUser } from "../../../../redux/actions/users"
-import isValidCelphone from "../../../../validators/celphone"
+// import { updateCompany } from "../../../../redux/actions/company"
+import isValidAddress from "../../../../validators/address"
 import isValidPhone from "../../../../validators/phone"
+import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
 // import { GET_COMPANIES_ENDPOINT } from "../../../../config"
 // import axios from "axios"
@@ -26,12 +27,12 @@ class CompanyTab extends React.Component {
   }
 
   state = {
-    name: "",
-    nit: "",
-    address: "",
-    phone: "",
-    city: "",
-    hierarchy: "",
+    name: this.props.company.name,
+    nit: this.props.company.nit,
+    address: this.props.company.address,
+    phone: this.props.company.phone,
+    city: this.props.company.city,
+    hierarchy: this.props.company.hierarchy
   }
 
   handleSubmit = e => {
@@ -42,18 +43,22 @@ class CompanyTab extends React.Component {
       show: true,
       alertText: ""
     }
-    if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
-      alertData.alertText = "El número de celular debe ser entrado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+    if (this.state.nit && !isValidNit(this.state.nit)) {
+      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
       this.props.displayAlert(alertData)
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser entrado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
       this.props.displayAlert(alertData)
       return
     }
-    this.props.updateUser(this.state, this.props.auth.login.tokens.access)
-    
+    if (this.state.address && !isValidAddress(this.state.address)) {
+      alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
+      this.props.displayAlert(alertData)
+      return
+    }
+    // this.props.updateCompany(this.state, this.props.auth.login.tokens.access)
   }
 
   fileSelectedHandler = (event) => {
@@ -76,7 +81,7 @@ class CompanyTab extends React.Component {
   toTitleCase(str) {
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
@@ -96,7 +101,7 @@ class CompanyTab extends React.Component {
           <Form onSubmit={this.handleSubmit}>
             <Row>
 
-            <Col md="6" sm="12">
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="name">Nombre</Label>
                   <Input
@@ -108,7 +113,7 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="nit">Nit</Label>
@@ -121,7 +126,7 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="address">Dirección</Label>
@@ -134,8 +139,8 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
-              
+
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="phone">Teléfono</Label>
@@ -148,7 +153,7 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="city">Ciudad</Label>
@@ -164,7 +169,7 @@ class CompanyTab extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12"> 
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
@@ -197,9 +202,10 @@ class CompanyTab extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    users: state.users,
-    auth: state.auth
+    auth: state.auth,
+    company: state.company
   }
 }
 
-export default connect(mapStateToProps, { updateUser, displayAlert })(CompanyTab)
+// export default connect(mapStateToProps, { updateCompany, displayAlert })(CompanyTab)
+export default connect(mapStateToProps, { displayAlert })(CompanyTab)
