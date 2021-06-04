@@ -85,7 +85,7 @@ const navigationConfig = [
         title: "Cuenta",
         type: "item",
         icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
+        permissions: ["admin", "client"],
         navLink: "/app/user/settings"
       }
     ]

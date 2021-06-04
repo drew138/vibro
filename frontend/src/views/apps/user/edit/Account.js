@@ -226,12 +226,12 @@ class UserAccountTab extends React.Component {
               
               <Col md="6" sm="12"> 
                 <FormGroup>
-                  <Label for="company">Tipo</Label>
+                  <Label for="user_type">Tipo</Label>
                   <Input
                     type="select"
-                    id="company"
-                    placeholder="Empresa"
-                    value={this.state.companyName}
+                    id="user_type"
+                    // placeholder="Empresa"
+                    value={this.state.user_type}
                     onChange={e => this.setState({ user_type: e.target.value})}
                   >
                     <option value="admin">Administrativo</option>
@@ -245,12 +245,12 @@ class UserAccountTab extends React.Component {
               
               <Col md="6" sm="12"> 
                 <FormGroup>
-                  <Label for="company">Estado</Label>
+                  <Label for="state">Estado</Label>
                   <Input
                     type="select"
-                    id="company"
-                    placeholder="Empresa"
-                    value={this.state.companyName}
+                    id="state"
+                    // placeholder="Empresa"
+                    value={this.state.is_active}
                     onChange={e => this.setState({ is_active: e.target.value === "activo" })}
                   >
                     <option value="activo">Activo</option>

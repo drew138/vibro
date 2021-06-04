@@ -42,6 +42,4 @@ const isValidAddress = (address) => {
     return regex.test(address)
 }
 
-console.log(isValidAddress("Calle 5 Sur # 29A - 151"))
-
 export default isValidAddress

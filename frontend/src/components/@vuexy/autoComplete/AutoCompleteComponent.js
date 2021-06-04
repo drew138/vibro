@@ -181,13 +181,28 @@ class Autocomplete extends React.Component {
         let startCondition = i[filterKey]
             .toLowerCase()
             .startsWith(userInput.toLowerCase()),
+          startConditionAcent = i[filterKey]
+            .normalize("NFD")
+            .replace(/[\u00C0-\u00FF]/g, '')
+            .toLowerCase()
+            .startsWith(userInput.toLowerCase()),
           includeCondition = i[filterKey]
             .toLowerCase()
-            .includes(userInput.toLowerCase())
+            .includes(userInput.toLowerCase()),
+          includeConditionAcent = i[filterKey]
+          .normalize("NFD")
+          .replace(/[\u00C0-\u00FF]/g, '')
+          .toLowerCase()
+          .startsWith(userInput.toLowerCase())
+
         if (startCondition) {
           return startCondition
-        } else if (!startCondition && includeCondition) {
+        } else if(!startCondition && startConditionAcent){
+          return startConditionAcent
+        } else if (!startCondition && !startConditionAcent && includeCondition) {
           return includeCondition
+        } else if (!startCondition && !startConditionAcent && !includeCondition && includeConditionAcent) {
+          return includeConditionAcent
         } else {
           return null
         }

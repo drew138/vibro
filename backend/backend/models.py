@@ -17,7 +17,7 @@ class City(models.Model):
     state = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.state}'
 
 
 class Company(models.Model):
@@ -39,10 +39,13 @@ class Company(models.Model):
     city = models.ForeignKey(
         City,
         related_name='company',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE, null=True)
     hierarchy = ArrayField(
         models.CharField(max_length=50),
         default=list)
+
+    def __str__(self):
+        return f'{self.name} {self.nit}'
 
 
 class VibroUser(AbstractUser):
