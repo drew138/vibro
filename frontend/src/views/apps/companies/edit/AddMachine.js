@@ -21,14 +21,14 @@ import { CustomInput } from "reactstrap"
 
 class CompanyTab extends React.Component {
 
-  // constructor(props) {
-  //   super(props)
-  //   this.imageInputRef = React.createRef();
-  //   this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
-  // }
+  constructor(props) {
+    super(props)
+    this.imageInputRef = React.createRef();
+    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+  }
 
   state = {
-    id: null,
+    id: undefined,
     name: "",
     code: "",
     electric_feed: "",
@@ -56,12 +56,12 @@ class CompanyTab extends React.Component {
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser entrado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      alertData.alertText = "El número de teléfono debe ser entrado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
       this.props.displayAlert(alertData)
       return
     }
     this.props.updateUser(this.state, this.props.auth.login.tokens.access)
-    
+
   }
 
   fileSelectedHandler = (event) => {
@@ -84,7 +84,7 @@ class CompanyTab extends React.Component {
   toTitleCase(str) {
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
@@ -104,7 +104,7 @@ class CompanyTab extends React.Component {
           <Form onSubmit={this.handleSubmit}>
             <Row>
 
-            <Col md="6" sm="12">
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="id">Identificador</Label>
                   <Input
@@ -117,12 +117,12 @@ class CompanyTab extends React.Component {
                 </FormGroup>
               </Col>
 
-            <Col md="6" sm="12">
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="name">Nombre</Label>
                   <Input
                     type="text"
-                    id="name"
+                    id="machine-name"
                     placeholder="Nombre"
                     value={this.state.name}
                     onChange={e => this.setState({ name: e.target.value })}
@@ -131,7 +131,7 @@ class CompanyTab extends React.Component {
               </Col>
 
 
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="nit">Código</Label>
@@ -142,13 +142,13 @@ class CompanyTab extends React.Component {
                     value={this.state.power_units}
                     onChange={e => this.setState({ code: e.target.value })}
                   >
-                    <option value="">Seleccione una opción</option> 
-                    <option value="interno">Interno</option> 
-                    <option value="sap">SAP</option> 
+                    <option value="">Seleccione una opción</option>
+                    <option value="interno">Interno</option>
+                    <option value="sap">SAP</option>
                   </Input>
                 </FormGroup>
-              </Col>            
-              
+              </Col>
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="electric_feed">Alimentación Eléctrica</Label>
@@ -159,14 +159,14 @@ class CompanyTab extends React.Component {
                     value={this.state.electric_feed}
                     onChange={e => this.setState({ electric_feed: e.target.value })}
                   >
-                    <option value="">Seleccione una opción</option> 
+                    <option value="">Seleccione una opción</option>
                     <option value="directa">Directa</option>
-                    <option value="variador">Variador</option> 
+                    <option value="variador">Variador</option>
                   </Input>
                 </FormGroup>
               </Col>
 
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="power">Potencia</Label>
@@ -191,9 +191,9 @@ class CompanyTab extends React.Component {
                     value={this.state.power_units}
                     onChange={e => this.setState({ power_units: e.target.value })}
                   >
-                    <option value="">Seleccione una opción</option> 
+                    <option value="">Seleccione una opción</option>
                     <option value="KW">KiloWatts</option>
-                    <option value="HP">HorsePower</option> 
+                    <option value="HP">HorsePower</option>
                   </Input>
                 </FormGroup>
               </Col>
@@ -211,7 +211,7 @@ class CompanyTab extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12"> 
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="norm">Norma</Label>
                   <Input
@@ -226,12 +226,12 @@ class CompanyTab extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12"> 
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
                     type="select"
-                    id="hierarchy"
+                    id="machine-hierarchy"
                     placeholder="Jerarquía"
                     value={this.state.hierarchy}
                     onChange={e => this.setState({ hierarchy: e.target.value })}
@@ -240,8 +240,8 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-              
-              <Col md="6" sm="12"> 
+
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="rpm">RPM</Label>
                   <Input
@@ -278,8 +278,8 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
-             
+
+
 
 
               <Col

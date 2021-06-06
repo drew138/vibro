@@ -13,7 +13,7 @@ const navigationConfig = [
   //   permissions: ["admin", "editor"],
   //   children: []
   //   // navLink: "/services/engineering",
-    
+
   // },
   // {
   //   id: "Correctivo",
@@ -23,7 +23,7 @@ const navigationConfig = [
   //   permissions: ["admin", "editor"],
   //   children: []
   //   // navLink: "/services/corrective",
-    
+
   // },
   // {
   //   id: "Ingeniería ",
@@ -33,17 +33,17 @@ const navigationConfig = [
   //   permissions: ["admin", "editor"],
   //   children: []
   //   // navLink: "/services/engineering",
-    
+
   // },
   {
     id: "Monitoreo",
     title: "Monitoreo",
     type: "collapse",
-    icon: <Icon.Wifi size={20}/>,
+    icon: <Icon.Wifi size={20} />,
     permissions: ["admin", "editor"],
     children: [
       {
-        id: "list-monitoring",
+        id: "list-service-monitoring",
         title: "Lista",
         type: "item",
         icon: <Icon.Circle size={12} />,
@@ -51,7 +51,7 @@ const navigationConfig = [
         navLink: "/services/monitoring/list"
       },
       {
-        id: "list-monitoring",
+        id: "list-machine-monitoring",
         title: "Máquina",
         type: "item",
         icon: <Icon.Circle size={12} />,
@@ -60,7 +60,7 @@ const navigationConfig = [
       },
     ]
     // navLink: "/services/monitoring",
-    
+
   },
   {
     type: "groupHeader",
@@ -105,7 +105,7 @@ const navigationConfig = [
         permissions: ["admin", "editor"],
         navLink: "/app/companies/list"
       },
-      
+
       {
         id: "add-companies",
         title: "Agregar",

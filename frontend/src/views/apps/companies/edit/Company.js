@@ -21,9 +21,9 @@ import { displayAlert } from "../../../../redux/actions/alerts"
 class CompanyTab extends React.Component {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.imageInputRef = React.createRef();
-    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+    this.fileSelectedHandler = this.fileSelectedHandler.bind(this);
   }
 
   state = {
@@ -37,27 +37,28 @@ class CompanyTab extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
-    const alertData = {
-      title: "Error de Validación",
-      success: false,
-      show: true,
-      alertText: ""
-    }
-    if (this.state.nit && !isValidNit(this.state.nit)) {
-      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
-      this.props.displayAlert(alertData)
-      return
-    }
-    if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-      this.props.displayAlert(alertData)
-      return
-    }
-    if (this.state.address && !isValidAddress(this.state.address)) {
-      alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
-      this.props.displayAlert(alertData)
-      return
-    }
+    // console.log("here")
+    // const alertData = {
+    //   title: "Error de Validación",
+    //   success: false,
+    //   show: true,
+    //   alertText: ""
+    // }
+    // if (this.state.nit && !isValidNit(this.state.nit)) {
+    //   alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
+    //   this.props.displayAlert(alertData)
+    //   return
+    // }
+    // if (this.state.phone && !isValidPhone(this.state.phone)) {
+    //   alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
+    //   this.props.displayAlert(alertData)
+    //   return
+    // }
+    // if (this.state.address && !isValidAddress(this.state.address)) {
+    //   alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
+    //   this.props.displayAlert(alertData)
+    //   return
+    // }
     // this.props.updateCompany(this.state, this.props.auth.login.tokens.access)
   }
 
@@ -106,7 +107,7 @@ class CompanyTab extends React.Component {
                   <Label for="name">Nombre</Label>
                   <Input
                     type="text"
-                    id="name"
+                    id="company-name"
                     placeholder="Nombre"
                     value={this.state.name}
                     onChange={e => this.setState({ name: e.target.value })}
@@ -174,7 +175,7 @@ class CompanyTab extends React.Component {
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
                     type="select"
-                    id="hierarchy"
+                    id="company-hierarchy"
                     placeholder="Empresa"
                     value={this.state.hierarchy}
                     onChange={e => this.setState({ hierarchy: e.target.value })}

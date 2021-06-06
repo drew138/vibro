@@ -18,6 +18,7 @@ import { POST_COMPANY_ENDPOINT } from "../../../../config"
 import { GET_CITIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
+import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class Company extends React.Component {
 
@@ -68,14 +69,13 @@ class Company extends React.Component {
 
   async componentDidMount() {
     try {
-      const res = await axios.get(GET_CITIES_ENDPOINT, {
-        headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }
-      })
+      const res = await axios.get(GET_CITIES_ENDPOINT)
       const cities = res.data
       const cityNames = []
       Object.values(cities).forEach(city => cityNames.push({ name: `${city.name}, ${city.state}` }))
       this.setState({ suggestions: cityNames })
-    } catch {
+    } catch (e) {
+      console.log(e);
       const alertData = {
         title: "Error de Conexión",
         success: false,
@@ -98,7 +98,7 @@ class Company extends React.Component {
                   <Label for="name">Nombre</Label>
                   <Input
                     type="text"
-                    id="name"
+                    id="company-name"
                     placeholder="Nombre"
                     value={this.state.name}
                     onChange={e => this.setState({ name: e.target.value })}
@@ -163,7 +163,7 @@ class Company extends React.Component {
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
                     type="select"
-                    id="hierarchy"
+                    id="company-hierarchy"
                     placeholder="Empresa"
                     value={this.state.hierarchy}
                     onChange={e => this.setState({ hierarchy: e.target.value })}

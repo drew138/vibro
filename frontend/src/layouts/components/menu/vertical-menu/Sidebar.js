@@ -52,7 +52,7 @@ class Sidebar extends Component {
 
   checkDevice = () => {
     var prefixes = " -webkit- -moz- -o- -ms- ".split(" ")
-    var mq = function(query) {
+    var mq = function (query) {
       return window.matchMedia(query).matches
     }
 
@@ -221,7 +221,7 @@ class Sidebar extends Component {
 
 const mapStateToProps = state => {
   return {
-    currentUser: state.auth.userRole
+    currentUser: state.auth.values.user_type
   }
 }
 

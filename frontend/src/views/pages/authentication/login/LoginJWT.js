@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { CardBody, FormGroup, Form, Input, Button, Label } from "reactstrap"
 import Checkbox from "../../../../components/@vuexy/checkbox/CheckboxesVuexy"
 import { User, Lock, Check } from "react-feather"
-import { loginWithJWT } from "../../../../redux/actions/auth/loginActions"
+import { loginWithUsernameAndPassword } from "../../../../redux/actions/auth/loginActions"
 import { connect } from "react-redux"
 import { history } from "../../../../history"
 
@@ -16,7 +16,7 @@ class LoginJWT extends React.Component {
 
   handleLogin = e => {
     e.preventDefault()
-    this.props.loginWithJWT(this.state)
+    this.props.loginWithUsernameAndPassword(this.state)
   }
   render() {
     return (
@@ -86,4 +86,4 @@ const mapStateToProps = state => {
     values: state.auth.login
   }
 }
-export default connect(mapStateToProps, { loginWithJWT })(LoginJWT)
+export default connect(mapStateToProps, { loginWithUsernameAndPassword })(LoginJWT)

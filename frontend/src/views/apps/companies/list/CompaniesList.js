@@ -33,6 +33,7 @@ import { history } from "../../../../history"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { GET_COMPANIES_ENDPOINT } from '../../../../config'
 import { setCompany } from "../../../../redux/actions/company"
+// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class CompaniesList extends React.Component {
 
@@ -52,12 +53,6 @@ class CompaniesList extends React.Component {
     },
     searchVal: "",
     columnDefs: [
-      {
-        headerName: "ID",
-        field: "id",
-        width: 150,
-        filter: true,
-      },
       {
         headerName: "Nombre",
         field: "name",
@@ -102,9 +97,7 @@ class CompaniesList extends React.Component {
 
   async componentDidMount() {
     try {
-      const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-        headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }
-      })
+      const res = await axios.get(GET_COMPANIES_ENDPOINT)
       this.setState({ rowData: res.data })
     } catch {
       const alertData = {
@@ -188,18 +181,6 @@ class CompaniesList extends React.Component {
     this.setState({ isVisible: false })
   }
 
-  // render() {
-  //   return (
-  //     <React.Fragment>
-  //       <Breadcrumbs
-  //         breadCrumbTitle="Lista de Empresas"
-  //         breadCrumbParent="Empresas"
-  //         breadCrumbActive="Lista"
-  //       />
-  //       <ListQuery columnDefs={columnDefs} dataEndpoint={GET_COMPANIES_ENDPOINT} />
-  //     </React.Fragment>
-  //   )
-  // }
 
   render() {
     const { rowData, columnDefs, defaultColDef, pageSize } = this.state
@@ -212,112 +193,6 @@ class CompaniesList extends React.Component {
         />
 
         <Row className="app-user-list">
-          {/* <Col sm="12">
-            <Card
-              className={classnames("card-action card-reload", {
-                "d-none": this.state.isVisible === false,
-                "card-collapsed": this.state.status === "Closed",
-                closing: this.state.status === "Closing...",
-                opening: this.state.status === "Opening...",
-                refreshing: this.state.reload
-              })}
-            >
-              <CardHeader>
-                <CardTitle>Filtros</CardTitle>
-                <div className="actions">
-                  <ChevronDown
-                    className="collapse-icon mr-50"
-                    size={15}
-                    onClick={this.toggleCollapse}
-                  />
-                  <RotateCw
-                    className="mr-50"
-                    size={15}
-                    onClick={() => {
-                      this.refreshCard()
-                      this.gridApi.setFilterModel(null)
-                    }}
-                  />
-                  <X size={15} onClick={this.removeCard} />
-                </div>
-              </CardHeader>
-              <Collapse
-                isOpen={this.state.collapse}
-                onExited={this.onExited}
-                onEntered={this.onEntered}
-                onExiting={this.onExiting}
-                onEntering={this.onEntering}
-              >
-                <CardBody>
-                  {this.state.reload ? (
-                    <Spinner color="primary" className="reload-spinner" />
-                  ) : (
-                    ""
-                  )}
-                  <Row>
-                    <Col lg="6" md="6" sm="12">
-                      <FormGroup className="mb-0">
-                        <Label for="role">Tipo</Label>
-                        <Input
-                          type="select"
-                          name="userType"
-                          id="userType"
-                          value={this.state.userType}
-                          onChange={e => {
-                            this.setState(
-                              {
-                                userType: e.target.value
-                              },
-                              () =>
-                                this.filterData(
-                                  "user_type",
-                                  this.state.userType.toLowerCase()
-                                )
-                            )
-                          }}
-                        >
-                          <option value="All">Todos</option>
-                          <option value="admin">Administrativo</option>
-                          <option value="arduino">Arduino</option>
-                          <option value="client">Cliente</option>
-                          <option value="engineer">Ingeniero</option>
-                          <option value="support">Soporte</option>
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                    <Col lg="6" md="6" sm="12">
-                      <FormGroup className="mb-0">
-                        <Label for="is_active">Estado</Label>
-                        <Input
-                          type="select"
-                          name="is_active"
-                          id="is_active"
-                          value={this.state.is_active}
-                          onChange={e => {
-
-                            this.setState(
-                              {
-                                is_active: e.target.value
-                              },
-                              () =>
-                                this.filterData(
-                                  "is_active",
-                                  this.state.is_active === "All" ? "all" : this.state.is_active === "Active" ? true : false
-                                )
-                            )
-                          }}
-                        >
-                          <option value="All">Todos</option>
-                          <option value="Active">Activo</option>
-                          <option value="Inactive">Inactivo</option>
-                        </Input>
-                      </FormGroup>
-                    </Col>
-                  </Row>
-                </CardBody>
-              </Collapse>
-            </Card>
-          </Col> */}
           <Col sm="12">
             <Card>
               <CardBody>

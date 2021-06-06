@@ -5,7 +5,8 @@ import { connect } from "react-redux"
 import Spinner from "./components/@vuexy/spinner/Loading-spinner"
 import knowledgeBaseQuestion from "./views/pages/knowledge-base/Questions"
 import { ContextLayout } from "./utility/context/Layout"
-import { getUserWithJWT, refreshJWTAndLogin } from "./redux/actions/auth/loginActions"
+import localStorageService from "./axios/localStorageService"
+
 
 // Route-based code splitting
 const analyticsDashboard = lazy(() =>
@@ -165,9 +166,9 @@ const resetPassword = lazy(() =>
 const register = lazy(() =>
   import("./views/pages/authentication/register/Register")
 )
-const accessControl = lazy(() =>
-  import("./extensions/access-control/AccessControl")
-)
+// const accessControl = lazy(() =>
+//   import("./extensions/access-control/AccessControl")
+// )
 
 
 const espectra = lazy(() => import("./views/apps/services/Espectra"))
@@ -191,8 +192,8 @@ const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
               fullLayout === true
                 ? context.fullLayout
                 : context.state.activeLayout === "horizontal"
-                ? context.horizontalLayout
-                : context.VerticalLayout
+                  ? context.horizontalLayout
+                  : context.VerticalLayout
             return (
               <LayoutTag {...props} permission={props.permissions}>
                 <Suspense fallback={<Spinner />}>
@@ -208,8 +209,7 @@ const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
 )
 const mapStateToProps = state => {
   return {
-    permissions: state.auth.userRole, // TODO - change userRole prop to something else
-    user: state.auth
+    permissions: state.auth.values.user_type,
   }
 }
 
@@ -217,52 +217,39 @@ const AppRoute = connect(mapStateToProps)(RouteConfig)
 
 const PrivateRouteConfig = ({ component: Component, fullLayout, ...rest }) => {
 
-  const isValidToken = (token) => {
-    const jwt = JSON.parse(atob(token.split('.')[1]));
-    return jwt.exp * 1000 <= Date.now();
-  }
+  const accessToken = localStorageService.getAccessToken();
 
-  const isAuthenticated = async (props) => {
-    if (props.user.values && props.user.tokens) {
-      return <Component {...props} />
-    }
-    const refresh = localStorage.getItem("refresh")
-    if (refresh && isValidToken(refresh)) {
-      // TODO refresh token and login
-      await props.refreshJWTAndLogin(refresh)
-      return <Component {...props} />
-    } 
-    return <Redirect to="/pages/login"/>
+  if (!accessToken) {
+    return <Redirect to="/pages/login" />
   }
-
   return (<Route
-      {...rest}
-      render={props => {
-        return (
-          <ContextLayout.Consumer>
-            {context => {
-              let LayoutTag =
-                fullLayout === true
-                  ? context.fullLayout
-                  : context.state.activeLayout === "horizontal"
+    {...rest}
+    render={props => {
+      return (
+        <ContextLayout.Consumer>
+          {context => {
+            let LayoutTag =
+              fullLayout === true
+                ? context.fullLayout
+                : context.state.activeLayout === "horizontal"
                   ? context.horizontalLayout
                   : context.VerticalLayout
-              return (
-                <LayoutTag {...props} permission={props.permissions}>
-                  <Suspense fallback={<Spinner />}>
-                    {isAuthenticated(props)}
-                  </Suspense>
-                </LayoutTag>
-              )
-            }}
-          </ContextLayout.Consumer>
-        )
-      }}
-    />
+            return (
+              <LayoutTag {...props} permission={props.permissions}>
+                <Suspense fallback={<Spinner />}>
+                  {<Component {...props} />}
+                </Suspense>
+              </LayoutTag>
+            )
+          }}
+        </ContextLayout.Consumer>
+      )
+    }}
+  />
   )
 }
 
-const PrivateAppRoute = connect(mapStateToProps, { getUserWithJWT, refreshJWTAndLogin })(PrivateRouteConfig)
+const PrivateAppRoute = connect(mapStateToProps)(PrivateRouteConfig)
 
 
 
@@ -279,10 +266,10 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/services/monitoring/machine" component={espectra} />
           <AppRoute exact path="/measurements/upload" component={upload} />
           <AppRoute exact path="/services/monitoring/list" component={llist} />
-          
-          <AppRoute exact path="/app/companies/list" component={companies}/>
-          <AppRoute exact path="/app/companies/list/edit" component={companyEdit}/>
-          <AppRoute exact path="/app/companies/add" component={companyAdd}/>
+
+          <AppRoute exact path="/app/companies/list" component={companies} />
+          <AppRoute exact path="/app/companies/list/edit" component={companyEdit} />
+          <AppRoute exact path="/app/companies/add" component={companyAdd} />
 
 
 
@@ -290,8 +277,8 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/app/user/list" component={userList} />
           {/* <AppRoute exact path="/app/user/edit" component={accountEdit} /> */}
           {/* <AppRoute exact path="/app/user/view" component={accountView} /> */}
-          <AppRoute exact path="/app/user/list/edit" component={userEdit}/>
-          <AppRoute
+          <AppRoute exact path="/app/user/list/edit" component={userEdit} />
+          <PrivateAppRoute
             path="/app/user/settings"
             component={accountSettings}
           />
@@ -307,7 +294,7 @@ class AppRouter extends React.Component {
             path="/ecommerce-dashboard"
             component={ecommerceDashboard}
           />
-          <AppRoute path="/measurements/wizard" component={wform}/>
+          <AppRoute path="/measurements/wizard" component={wform} />
           <AppRoute path="/calendar" component={calendar} />
           <AppRoute path="/data-list/list-view" component={listView} /> {/* TODO use this component for lists */}
           <AppRoute path="/data-list/thumb-view" component={thumbView} />
@@ -367,7 +354,7 @@ class AppRouter extends React.Component {
           <AppRoute
             path="/forms/elements/number-input"
             component={numberInput}
-          /> 
+          />
           <AppRoute path="/forms/elements/textarea" component={textarea} /> {/* TODO check these selects to implement analysis and rec */}
           <AppRoute path="/forms/elements/pickers" component={pickers} /> {/* TODO check these selects to implement dates pickers */}
           <AppRoute path="/forms/elements/input-mask" component={inputMask} /> {/* TODO check these selects to implement input phone numbers */}
@@ -432,10 +419,10 @@ class AppRouter extends React.Component {
           <AppRoute path="/extensions/clipboard" component={clipboard} />
           <AppRoute path="/extensions/context-menu" component={menu} />
           <AppRoute path="/extensions/swiper" component={swiper} />
-          <AppRoute
+          {/* <AppRoute
             path="/extensions/access-control"
             component={accessControl}
-          />
+          /> */}
           <AppRoute path="/extensions/import" component={Import} />  {/* use for drag n drop files */}
           <AppRoute path="/extensions/export" component={Export} />
           <AppRoute
