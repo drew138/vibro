@@ -176,6 +176,7 @@ const upload = lazy(() => import("./views/apps/services/Upload"))
 const wform = lazy(() => import("./views/apps/services/WizardForm"))
 const llist = lazy(() => import("./views/apps/services/monitoring/List"))
 const companies = lazy(() => import("./views/apps/companies/list/CompaniesList"))
+const hierarchies = lazy(() => import("./views/apps/companies/hierarchies/HierarchiesList"))
 const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
 const companyEdit = lazy(() => import("./views/apps/companies/edit/Edit"))
 const companyAdd = lazy(() => import("./views/apps/companies/add/Add"))
@@ -267,6 +268,7 @@ class AppRouter extends React.Component {
           <AppRoute exact path="/measurements/upload" component={upload} />
           <AppRoute exact path="/services/monitoring/list" component={llist} />
 
+          <AppRoute exact path="/app/companies/hierarchies" component={hierarchies} />
           <AppRoute exact path="/app/companies/list" component={companies} />
           <AppRoute exact path="/app/companies/list/edit" component={companyEdit} />
           <AppRoute exact path="/app/companies/add" component={companyAdd} />

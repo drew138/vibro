@@ -29,6 +29,8 @@ export const responseInterceptor = axios.interceptors.response.use((response) =>
     if (error.response.status === 401 && originalRequest.url ===
         REFRESH_JWT_ENDPOINT) {
         history.push('/pages/login');
+        localStorageService.clearToken();
+        localStorageService.clearUserValues();
         return Promise.reject(error);
     }
 

@@ -16,11 +16,17 @@ import isValidPhone from "../../../../validators/phone"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { GET_COMPANIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
+import { history } from "../../../../history"
 
 class UserAccountTab extends React.Component {
 
   constructor(props) {
     super(props)
+    if (!props.user.id) {
+      history.push("/");
+      return;
+    }
+
     this.imageInputRef = React.createRef();
     this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
   }
@@ -34,7 +40,7 @@ class UserAccountTab extends React.Component {
     celphone: this.props.user.celphone,
     selectedFile: null,
     companyName: this.props.user.company ? this.props.user.company.name : "N/A",
-    companyId: this.props.user.company ? this.props.user.company.id : null,
+    companyId: this.props.user.company ? this.props.user.company.id : 0,
     companies: [],
     is_active: this.props.user.is_active,
     user_type: this.props.user.user_type
@@ -54,12 +60,12 @@ class UserAccountTab extends React.Component {
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales." 
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
       this.props.displayAlert(alertData)
       return
     }
     this.props.updateUser(this.state, this.props.auth.tokens.access)
-    
+
   }
 
   fileSelectedHandler = (event) => {
@@ -82,17 +88,18 @@ class UserAccountTab extends React.Component {
   toTitleCase(str) {
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
   }
 
   async componentDidMount() {
-    const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-      headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }})
-    const companies = [{id:"N/A", name:"N/A"}, ...res.data]
-    this.setState({ companies })
+    if (this.props.user.id) {
+      const res = await axios.get(GET_COMPANIES_ENDPOINT)
+      const companies = [{ id: 0, name: "N/A" }, ...res.data]
+      this.setState({ companies })
+    }
   }
 
   render() {
@@ -106,7 +113,7 @@ class UserAccountTab extends React.Component {
                 object
                 src={
                   this.state.selectedFile ? URL.createObjectURL(this.state.selectedFile) :
-                  this.props.user.picture
+                    this.props.user.picture
                 }
                 alt="user profile image"
                 height="84"
@@ -119,14 +126,14 @@ class UserAccountTab extends React.Component {
                 ${this.toTitleCase(this.props.user.last_name)}`}
               </Media>
               <div className="d-flex flex-wrap">
-                <input 
-                style={{display: "none"}} 
-                type="file" 
-                onChange={this.fileSelectedHandler} 
-                ref={this.imageInputRef}/>
+                <input
+                  style={{ display: "none" }}
+                  type="file"
+                  onChange={this.fileSelectedHandler}
+                  ref={this.imageInputRef} />
                 <Button.Ripple className="mr-1" color="primary" outline
-                 onClick={this.fileUploadHandler}
-                 >
+                  onClick={this.fileUploadHandler}
+                >
                   Cambiar
                 </Button.Ripple>
                 <Button.Ripple color="flat-danger" onClick={this.removePicture}>Quitar Foto</Button.Ripple>
@@ -150,7 +157,7 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="last_name">Apellido</Label>
@@ -163,7 +170,7 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="phone">Telefono</Label>
@@ -176,8 +183,8 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
-              
+
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="celphone">Celular</Label>
@@ -190,7 +197,7 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-              
+
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="email">Email</Label>
@@ -204,7 +211,7 @@ class UserAccountTab extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12"> 
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="company">Empresa</Label>
                   <Input
@@ -212,19 +219,20 @@ class UserAccountTab extends React.Component {
                     id="company"
                     placeholder="Empresa"
                     value={this.state.companyName}
-                    onChange={e => this.setState({ 
-                      companyName: e.target.value, 
-                      companyId: e.target.id}
-                      )}
+                    onChange={e => this.setState({
+                      companyName: e.target.value,
+                      companyId: e.target.id
+                    }
+                    )}
                   >
                     {this.state.companies.map((company) => (
-                        <option key={company.id} id={company.id} value={company.name}>{company.name}</option>
-                      ))}
+                      <option key={company.id} id={company.id} value={company.name}>{company.name}</option>
+                    ))}
                   </Input>
                 </FormGroup>
               </Col>
-              
-              <Col md="6" sm="12"> 
+
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="user_type">Tipo</Label>
                   <Input
@@ -232,7 +240,7 @@ class UserAccountTab extends React.Component {
                     id="user_type"
                     // placeholder="Empresa"
                     value={this.state.user_type}
-                    onChange={e => this.setState({ user_type: e.target.value})}
+                    onChange={e => this.setState({ user_type: e.target.value })}
                   >
                     <option value="admin">Administrativo</option>
                     <option value="engineer">Ingeniero</option>
@@ -242,8 +250,8 @@ class UserAccountTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-              
-              <Col md="6" sm="12"> 
+
+              <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="state">Estado</Label>
                   <Input

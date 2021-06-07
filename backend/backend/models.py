@@ -40,12 +40,19 @@ class Company(models.Model):
         City,
         related_name='company',
         on_delete=models.CASCADE, null=True)
-    hierarchy = ArrayField(
-        models.CharField(max_length=50),
-        default=list)
+    # hierarchy = ArrayField(
+    #     models.CharField(max_length=50),
+    #     default=list)
 
     def __str__(self):
         return f'{self.name} {self.nit}'
+
+
+class Hierarchy(models.Model):
+
+    name = models.CharField(max_length=30)
+    parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
 
 class VibroUser(AbstractUser):
@@ -153,7 +160,10 @@ class Machine(models.Model):
     norm = models.TextField(
         null=True,
     )
-    hierarchy = models.IntegerField(default=0)
+    hierarchy = models.ForeignKey(
+        Hierarchy,
+        null=True,
+        on_delete=models.SET_NULL)
     rpm = models.IntegerField(null=True)
     image = models.ImageField(
         upload_to="machines/images",

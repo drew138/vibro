@@ -11,7 +11,8 @@ import {
   // TabPane
 } from "reactstrap"
 import classnames from "classnames"
-import { User
+import {
+  User
   // , Info, Share 
 } from "react-feather"
 import AccountTab from "./Account"
@@ -33,26 +34,27 @@ class UserEdit extends React.Component {
           breadCrumbParent="Lista"
           breadCrumbActive="Editar"
         />
-      <Row>
-        <Col sm="12">
-          <Card>
-            <CardBody className="pt-2">
-              <Nav tabs>
-                <NavItem>
-                  <NavLink
-                    className={classnames({
-                      active: this.state.activeTab === "1"
-                    })}>
-                    <User size={16} />
-                    <span className="align-middle ml-50">Cuenta</span>
-                  </NavLink>
-                </NavItem>
-              </Nav>
-              <AccountTab />
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+        <Row>
+          <Col sm="12">
+            <Card>
+              <CardBody className="pt-2">
+                <Nav tabs>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({
+                        active: this.state.activeTab === "1"
+                      })}>
+                      <User size={16} />
+                      <span className="align-middle ml-50">Cuenta</span>
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+
+                <AccountTab />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
       </React.Fragment>
     )
   }

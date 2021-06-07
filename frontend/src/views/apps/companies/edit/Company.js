@@ -10,56 +10,79 @@ import {
   FormGroup
 } from "reactstrap"
 import { connect } from "react-redux"
-// import { updateCompany } from "../../../../redux/actions/company"
+import { updateCompany } from "../../../../redux/actions/company"
 import isValidAddress from "../../../../validators/address"
 import isValidPhone from "../../../../validators/phone"
 import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
-// import { GET_COMPANIES_ENDPOINT } from "../../../../config"
-// import axios from "axios"
+import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
+import { GET_CITIES_ENDPOINT } from "../../../../config"
+import axios from "axios"
+import { history } from "../../../../history"
+
 
 class CompanyTab extends React.Component {
 
   constructor(props) {
     super(props);
+    if (!props.company.id) {
+      history.push("/app/companies/list")
+    }
     this.imageInputRef = React.createRef();
     this.fileSelectedHandler = this.fileSelectedHandler.bind(this);
   }
 
   state = {
+    id: this.props.company.id,
     name: this.props.company.name,
     nit: this.props.company.nit,
     address: this.props.company.address,
     phone: this.props.company.phone,
     city: this.props.company.city,
-    hierarchy: this.props.company.hierarchy
+    suggestions: [{ name: "" }],
+    cityMap: {}
+
   }
 
   handleSubmit = e => {
     e.preventDefault()
-    // console.log("here")
-    // const alertData = {
-    //   title: "Error de Validación",
-    //   success: false,
-    //   show: true,
-    //   alertText: ""
-    // }
-    // if (this.state.nit && !isValidNit(this.state.nit)) {
-    //   alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.phone && !isValidPhone(this.state.phone)) {
-    //   alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.address && !isValidAddress(this.state.address)) {
-    //   alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // this.props.updateCompany(this.state, this.props.auth.login.tokens.access)
+    const alertData = {
+      title: "Error de Validación",
+      success: false,
+      show: true,
+      alertText: ""
+    }
+    if (this.state.nit && !isValidNit(this.state.nit)) {
+      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
+      this.props.displayAlert(alertData)
+      return
+    }
+    if (this.state.phone && !isValidPhone(this.state.phone)) {
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
+      this.props.displayAlert(alertData)
+      return
+    }
+    if (this.state.address && !isValidAddress(this.state.address)) {
+      alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
+      this.props.displayAlert(alertData)
+      return
+    }
+    if (!this.state.cityMap[this.state.city]) {
+      console.log(this.state.city)
+      console.log(this.state.cityMap[this.state.city])
+      alertData.alertText = "La ciudad ingresada no es valida."
+      this.props.displayAlert(alertData)
+      return
+    }
+    const data = {
+      id: this.state.id,
+      name: this.state.name,
+      nit: this.state.nit,
+      address: this.state.address,
+      phone: this.state.phone,
+      city: this.state.cityMap[this.state.city]
+    }
+    this.props.updateCompany(data)
   }
 
   fileSelectedHandler = (event) => {
@@ -88,12 +111,33 @@ class CompanyTab extends React.Component {
     );
   }
 
-  // async componentDidMount() {
-  //   const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-  //     headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
-  //   const companies = [{id:"N/A", name:"N/A"}, ...res.data]
-  //   this.setState({ companies })
-  // }
+  async componentDidMount() {
+    if (!this.state.id) {
+      return
+    }
+    try {
+      const res = await axios.get(GET_CITIES_ENDPOINT)
+      const cities = res.data
+      const cityNames = []
+      const cityMap = {}
+      Object.values(cities).forEach(city => {
+        const name = `${city.name}, ${city.state}`
+        cityNames.push({ name })
+        cityMap[name] = city.id
+      })
+      console.log(cityMap)
+      this.setState({ suggestions: cityNames, cityMap })
+    } catch (e) {
+      console.log(e);
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
 
   render() {
     return (
@@ -141,6 +185,30 @@ class CompanyTab extends React.Component {
                 </FormGroup>
               </Col>
 
+              <Col md="6" sm="12" style={{ maxHeight: 80 }} > {
+                /*! inline style needed because dropdown recommendations mess up component height*/
+              }
+                <FormGroup>
+                  <Label for="city">Ciudad</Label>
+                  <AutoComplete
+                    suggestions={this.state.suggestions}
+                    className="form-control"
+                    filterKey="name"
+                    placeholder="Ciudad"
+                    onChange={e => {
+
+                      this.setState({ city: e.target.value })
+                      console.log(e.target.value)
+                    }}
+                    onSuggestionClick={e => {
+
+                      this.setState({ city: e.target.activeSuggestion })
+                      console.log(e.target.activeSuggestion)
+                    }}
+                    suggestionLimit={20}
+                  />
+                </FormGroup>
+              </Col>
 
               <Col md="6" sm="12">
                 <FormGroup>
@@ -155,7 +223,7 @@ class CompanyTab extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12">
+              {/* <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="city">Ciudad</Label>
                   <Input
@@ -168,9 +236,9 @@ class CompanyTab extends React.Component {
                     <option></option>
                   </Input>
                 </FormGroup>
-              </Col>
+              </Col> */}
 
-              <Col md="6" sm="12">
+              {/* <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
@@ -183,7 +251,7 @@ class CompanyTab extends React.Component {
                     <option></option>
                   </Input>
                 </FormGroup>
-              </Col>
+              </Col> */}
 
               <Col
                 className="d-flex justify-content-end flex-wrap mt-2"
@@ -208,5 +276,4 @@ const mapStateToProps = state => {
   }
 }
 
-// export default connect(mapStateToProps, { updateCompany, displayAlert })(CompanyTab)
-export default connect(mapStateToProps, { displayAlert })(CompanyTab)
+export default connect(mapStateToProps, { updateCompany, displayAlert })(CompanyTab)

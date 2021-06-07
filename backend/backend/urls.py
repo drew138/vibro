@@ -22,6 +22,7 @@ auth_views = [
 router = routers.DefaultRouter()
 router.register('city', views.CityView, 'city')
 router.register('company', views.CompanyView, 'company')
+router.register('hierarchy', views.HierarchyView, 'hierarchy')
 router.register('vibrouser', authentication_views.VibroUserView, 'vibrouser')
 router.register('machine', views.MachineView, 'machine')
 router.register('sensor', views.SensorView, 'sensor')

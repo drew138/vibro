@@ -28,8 +28,9 @@ class Company extends React.Component {
     address: "",
     phone: "",
     city: "",
-    hierarchy: "",
+    // hierarchy: "",
     suggestions: [{ name: "" }],
+    cityMap: {}
   }
 
   handleSubmit = e => {
@@ -55,7 +56,19 @@ class Company extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-    this.props.createCompany(this.state, this.props.auth.tokens.access)
+    if (!this.state.cityMap[this.state.city]) {
+      alertData.alertText = "La ciudad ingresada no es valida."
+      this.props.displayAlert(alertData)
+      return
+    }
+    const data = {
+      name: this.state.name,
+      nit: this.state.nit,
+      address: this.state.address,
+      phone: this.state.phone,
+      city: this.state.cityMap[this.state.city]
+    }
+    this.props.createCompany(data)
   }
 
   toTitleCase(str) {
@@ -72,7 +85,11 @@ class Company extends React.Component {
       const res = await axios.get(GET_CITIES_ENDPOINT)
       const cities = res.data
       const cityNames = []
-      Object.values(cities).forEach(city => cityNames.push({ name: `${city.name}, ${city.state}` }))
+      Object.values(cities).forEach(city => {
+        const name = `${city.name}, ${city.state}`
+        cityNames.push({ name })
+        this.state.cityMap[name] = city.id
+      })
       this.setState({ suggestions: cityNames })
     } catch (e) {
       console.log(e);
@@ -119,33 +136,9 @@ class Company extends React.Component {
                 </FormGroup>
               </Col>
 
-              <Col md="6" sm="12">
-                <FormGroup>
-                  <Label for="address">Dirección</Label>
-                  <Input
-                    type="text"
-                    id="address"
-                    placeholder="Dirección"
-                    value={this.state.address}
-                    onChange={e => this.setState({ address: e.target.value })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col md="6" sm="12">
-                <FormGroup>
-                  <Label for="phone">Teléfono</Label>
-                  <Input
-                    type="text"
-                    id="phone"
-                    placeholder="Teléfono"
-                    value={this.state.phone}
-                    onChange={e => this.setState({ phone: e.target.value })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col md="6" sm="12">
+              <Col md="6" sm="12" style={{ maxHeight: 80 }} > {
+                /*! inline style needed because dropdown recommendations mess up component height*/
+              }
                 <FormGroup>
                   <Label for="city">Ciudad</Label>
                   <AutoComplete
@@ -160,6 +153,34 @@ class Company extends React.Component {
 
               <Col md="6" sm="12">
                 <FormGroup>
+                  <Label for="address">Dirección</Label>
+                  <Input
+                    type="text"
+                    id="address"
+                    placeholder="Dirección"
+                    value={this.state.address}
+                    onChange={e => this.setState({ address: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+
+
+              <Col md="6" sm="12">
+                <FormGroup mh="6">
+                  <Label for="phone">Teléfono</Label>
+                  <Input
+                    type="text"
+                    id="phone"
+                    placeholder="Teléfono"
+                    value={this.state.phone}
+                    onChange={e => this.setState({ phone: e.target.value })}
+                  />
+                </FormGroup>
+              </Col>
+
+
+              {/* <Col md="6" sm="12">
+                <FormGroup>
                   <Label for="hierarchy">Jerarquía</Label>
                   <Input
                     type="select"
@@ -171,7 +192,7 @@ class Company extends React.Component {
                     <option></option>
                   </Input>
                 </FormGroup>
-              </Col>
+              </Col> */}
 
 
               <Col

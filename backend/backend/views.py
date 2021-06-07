@@ -79,6 +79,26 @@ class CompanyView(viewsets.ModelViewSet):
         return custom_serializers.DefaultCompanySerializer
 
 
+class HierarchyView(viewsets.ModelViewSet):
+
+    serializer_class = custom_serializers.HierarchySerializer
+    permission_classes = [custom_permissions.GeneralPermission]
+
+    def get_queryset(self):
+
+        companyId = self.request.query_params.get('companyId', None)
+
+        if self.request.user.user_type in STAFF:
+            queryset = custom_models.Hierarchy.objects.all()
+        else:
+            queryset = custom_models.Hierarchy.objects.filter(
+                company__id=self.request.user.company.id)
+            return queryset
+        if companyId:
+            queryset = queryset.filter(company__id=companyId)
+        return queryset
+
+
 class MachineView(viewsets.ModelViewSet):
 
     serializer_class = custom_serializers.MachineSerializer

@@ -77,7 +77,7 @@ const columnDefs = [
 
 class ListMachines extends React.Component {
   state = {
-    rowData: null,
+    rowData: [],
     pageSize: 20,
     isVisible: true,
     reload: false,

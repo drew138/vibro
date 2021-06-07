@@ -21,19 +21,18 @@ class ChangePassword extends React.Component {
   onSubmit = async (values) => {
     try {
       console.log(this.props)
-    const body = {
-      password: values.oldpass,
-      new_password: values.newpass
-    }
-    const headers = { headers: {'Authorization': `Bearer ${this.props.auth.tokens.access}`} }
-    await axios.put(CHANGE_PASSWORD_ENDPOINT, body, headers)
-    const alertData = {
-      title: "Cambio de Contraseña Exitoso",
-      success: true,
-      show: true,
-      alertText: "Su Contraseña Ha Sido Creada Exitosamente"
-    }
-    this.props.displayAlert(alertData)
+      const body = {
+        password: values.oldpass,
+        new_password: values.newpass
+      }
+      await axios.put(CHANGE_PASSWORD_ENDPOINT, body)
+      const alertData = {
+        title: "Cambio de Contraseña Exitoso",
+        success: true,
+        show: true,
+        alertText: "Su Contraseña Ha Sido Creada Exitosamente"
+      }
+      this.props.displayAlert(alertData)
     } catch (e) {
       console.log(e.response.data)
       const error = Array.isArray(Object.entries(e.response.data)[0][1]) ? Object.entries(e.response.data)[0][1][0] : Object.entries(e.response.data)[0][1]
@@ -138,4 +137,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {displayAlert})(ChangePassword)
+export default connect(mapStateToProps, { displayAlert })(ChangePassword)

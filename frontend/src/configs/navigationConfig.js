@@ -99,11 +99,19 @@ const navigationConfig = [
     children: [
       {
         id: "list-companies",
-        title: "Lista",
+        title: "Lista de Empresas",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
         navLink: "/app/companies/list"
+      },
+      {
+        id: "list-hierarchies",
+        title: "Lista de Jerarquías",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions: ["admin", "editor"],
+        navLink: "/app/companies/hierarchies"
       },
 
       {

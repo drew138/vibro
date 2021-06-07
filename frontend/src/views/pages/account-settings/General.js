@@ -64,7 +64,7 @@ class General extends React.Component {
     }
 
 
-    this.props.updateProfile(this.state, this.props.auth.tokens.access)
+    this.props.updateProfile(this.state)
 
   }
 

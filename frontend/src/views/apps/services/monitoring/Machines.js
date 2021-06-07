@@ -31,6 +31,7 @@ import {
 import classnames from "classnames"
 import { ContextLayout } from "../../../../utility/context/Layout"
 import { setMachine } from "../../../../redux/actions/machine"
+import { setCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
@@ -38,7 +39,7 @@ import { requestInterceptor, responseInterceptor } from "../../../../axios/axios
 class MachineList extends React.Component {
 
   state = {
-    rowData: null,
+    rowData: [],
     pageSize: 20,
     isVisible: true,
     reload: false,
@@ -53,18 +54,19 @@ class MachineList extends React.Component {
     },
     searchVal: "",
     companies: [{ id: 0, name: "N/A" }],
-    companyId: this.props.auth.values.company ? this.props.auth.values.company.id : 0,
-    company: this.props.auth.values.company ? this.props.auth.values.company.name : "N/A",
+    companiesMap: {},
+    companyName: this.props.auth.values.company?.name ?? "N/A",
+    company: this.props.auth.values.company?.id,
     columnDefs: [
-      {
-        headerName: "ID",
-        field: "id",
-        width: 150,
-        filter: true,
-        // checkboxSelection: true,
-        // headerCheckboxSelectionFilteredOnly: true,
-        // headerCheckboxSelection: true
-      },
+      // {
+      //   headerName: "ID",
+      //   field: "id",
+      //   width: 150,
+      //   filter: true,
+      //   // checkboxSelection: true,
+      //   // headerCheckboxSelectionFilteredOnly: true,
+      //   // headerCheckboxSelection: true
+      // },
       {
         headerName: "Nombre",
         field: "name",
@@ -75,7 +77,8 @@ class MachineList extends React.Component {
             <div
               className="d-flex align-items-center cursor-pointer"
               onClick={() => {
-                this.props.setMachine(params.data, this.props.auth.tokens.access)
+                this.props.setCompany(this.state.companyMap[this.state.company])
+                this.props.setMachine(params.data)
                 history.push("/services/monitoring/machine")
               }}
             >
@@ -112,29 +115,52 @@ class MachineList extends React.Component {
     ]
   }
 
-
+  async getCompanyMachines(companyId) {
+    if (!companyId) {
+      return
+    }
+    try {
+      const res = await axios.get(GET_MACHINES_ENDPOINT, null, {
+        params: { companyId }
+      })
+      this.setState({ rowData: [{ id: 0, name: "N/A" }, ...res.data] })
+    } catch {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ rowData: [] })
+    }
+  }
 
   async componentDidMount() {
     // if (this.props.auth.values.user_type !== "client" || this.props.auth.values.user_type !== "arduino") {
-    //   try {
-    //     const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-    //       headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }
-    //     })
-    //     if (this.state.company === "N/A") {
-    //       this.setState({ companies: [{ id: 0, name: "N/A" }, ...res.data] })
-    //     } else {
-    //       this.setState({ companies: res.data })
-    //     }
-    //   } catch {
-    //     const alertData = {
-    //       title: "Error de Conexión",
-    //       success: false,
-    //       show: true,
-    //       alertText: "Error al Conectar al Servidor"
-    //     }
-    //     this.props.displayAlert(alertData)
-    //     this.setState({ rowData: [] })
-    //   }
+    try {
+      const res = await axios.get(GET_COMPANIES_ENDPOINT)
+      const companiesMap = {};
+      res.data.forEach(
+        comp => {
+          companiesMap[comp.id] = comp
+        }
+      );
+      this.setState({
+        companies: [{ id: 0, name: "N/A" }, ...res.data],
+        companiesMap
+      })
+
+    } catch {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ rowData: [] })
+    }
     // }
     // if (this.state.companyId !== 0) {
     //   try {
@@ -154,8 +180,8 @@ class MachineList extends React.Component {
     //     this.setState({ rowData: [] })
     //   }
     // } else {
-    console.log(this.state.companies)
-    this.setState({ rowData: [] })
+    // console.log(this.state.companies)
+    // this.setState({ rowData: [] })
     // }
 
   }
@@ -308,13 +334,16 @@ class MachineList extends React.Component {
                           type="select"
                           name="company"
                           id="company"
-                          value={this.state.company}
+                          value={this.state.companyName}
                           onChange={e => {
+                            const idx = e.target.selectedIndex;
+                            const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
+                            this.getCompanyMachines(companyId)
                             this.setState(
                               {
-                                company: e.target.value,
-                                companyId: e.target.id
-                              },
+                                companyName: e.target.value,
+                                company: companyId
+                              }
                               // this.getRowData()
                               // () =>
                               //   this.filterData(
@@ -326,7 +355,7 @@ class MachineList extends React.Component {
                         >
                           {
                             this.state.companies.map((company) => (
-                              <option value={company.name} key={company.id} id={company.id}>{company.name}</option>
+                              <option companyid={company.id} key={company.id}>{company.name}</option>
                             ))
                           }
                         </Input>
@@ -427,5 +456,5 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setMachine, displayAlert })(MachineList)
+export default connect(mapStateToProps, { setMachine, setCompany, displayAlert })(MachineList)
 

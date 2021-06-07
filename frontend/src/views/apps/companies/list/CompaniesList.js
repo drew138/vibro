@@ -189,7 +189,7 @@ class CompaniesList extends React.Component {
         <Breadcrumbs
           breadCrumbTitle="Lista de Empresas"
           breadCrumbParent="Empresas"
-          breadCrumbActive="Lista"
+          breadCrumbActive="Lista de Empresas"
         />
 
         <Row className="app-user-list">
