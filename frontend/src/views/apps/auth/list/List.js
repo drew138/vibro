@@ -2,10 +2,10 @@ import React from "react"
 import {
   Card,
   CardBody,
-  CardHeader,
-  CardTitle,
-  FormGroup,
-  Label,
+  // CardHeader,
+  // CardTitle,
+  // FormGroup,
+  // Label,
   Input,
   Row,
   Col,
@@ -13,18 +13,18 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownToggle,
-  Collapse,
-  Spinner
+  // Collapse,
+  // Spinner
 } from "reactstrap"
 import axios from "axios"
 import { ContextLayout } from "../../../../utility/context/Layout"
 import { AgGridReact } from "ag-grid-react"
 import {
   ChevronDown,
-  RotateCw,
-  X
+  // RotateCw,
+  // X
 } from "react-feather"
-import classnames from "classnames"
+// import classnames from "classnames"
 import { history } from "../../../../history"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
@@ -33,7 +33,7 @@ import { GET_USERS_ENDPOINT } from '../../../../config'
 import { connect } from "react-redux"
 import { setUser } from "../../../../redux/actions/users"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 const UserTypes = {
   'admin': "Administrativo",
@@ -136,7 +136,7 @@ class UsersList extends React.Component {
   async componentDidMount() {
     try {
       const res = await axios.get(GET_USERS_ENDPOINT)
-      console.log(res.data)
+      // console.log(res.data)
       this.setState({ rowData: res.data })
     } catch {
       const alertData = {

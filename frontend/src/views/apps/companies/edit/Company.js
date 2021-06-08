@@ -1,6 +1,6 @@
 import React from "react"
 import {
-  Media,
+  // Media,
   Row,
   Col,
   Button,
@@ -25,9 +25,6 @@ class CompanyTab extends React.Component {
 
   constructor(props) {
     super(props);
-    if (!props.company.id) {
-      history.push("/app/companies/list")
-    }
     this.imageInputRef = React.createRef();
     this.fileSelectedHandler = this.fileSelectedHandler.bind(this);
   }
@@ -112,21 +109,27 @@ class CompanyTab extends React.Component {
   }
 
   async componentDidMount() {
+    // console.log(this.state)
     if (!this.state.id) {
+      history.push("/app/companies/list")
       return
     }
+    // console.log("here")
+    // this._isMounted = true;
     try {
-      const res = await axios.get(GET_CITIES_ENDPOINT)
-      const cities = res.data
-      const cityNames = []
-      const cityMap = {}
-      Object.values(cities).forEach(city => {
-        const name = `${city.name}, ${city.state}`
-        cityNames.push({ name })
-        cityMap[name] = city.id
-      })
-      console.log(cityMap)
-      this.setState({ suggestions: cityNames, cityMap })
+      if (this.state.id) {
+
+        const res = await axios.get(GET_CITIES_ENDPOINT)
+        const cities = res.data
+        const cityNames = []
+        const cityMap = {}
+        Object.values(cities).forEach(city => {
+          const name = `${city.name}, ${city.state}`
+          cityNames.push({ name })
+          cityMap[name] = city.id
+        })
+        this.setState({ suggestions: cityNames, cityMap })
+      }
     } catch (e) {
       console.log(e);
       const alertData = {
@@ -138,6 +141,8 @@ class CompanyTab extends React.Component {
       this.props.displayAlert(alertData)
     }
   }
+
+
 
   render() {
     return (
@@ -198,12 +203,12 @@ class CompanyTab extends React.Component {
                     onChange={e => {
 
                       this.setState({ city: e.target.value })
-                      console.log(e.target.value)
+                      // console.log(e.target.value)
                     }}
                     onSuggestionClick={e => {
 
-                      this.setState({ city: e.target.activeSuggestion })
-                      console.log(e.target.activeSuggestion)
+                      this.setState({ city: e.target.innerText })
+                      // console.log(e.target.innerText)
                     }}
                     suggestionLimit={20}
                   />

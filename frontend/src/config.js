@@ -16,3 +16,4 @@ export const CHANGE_PASSWORD_ENDPOINT = `${domain}/api/auth/change`
 export const RESET_PASSWORD_ENDPOINT = `${domain}/api/auth/reset`
 export const FORGOT_PASSWORD_ENDPOINT = `${domain}/api/auth/change/forgot`
 export const CREATE_MACHINE_ENDPOINT = `${domain}/api/machine/`
+export const PATCH_MACHINE_ENDPOINT = `${domain}/api/machine/`

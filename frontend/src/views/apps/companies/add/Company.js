@@ -14,11 +14,11 @@ import isValidAddress from "../../../../validators/address"
 import isValidPhone from "../../../../validators/phone"
 import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { POST_COMPANY_ENDPOINT } from "../../../../config"
+// import { POST_COMPANY_ENDPOINT } from "../../../../config"
 import { GET_CITIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
-import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class Company extends React.Component {
 
@@ -147,6 +147,16 @@ class Company extends React.Component {
                     filterKey="name"
                     placeholder="Ciudad"
                     suggestionLimit={20}
+                    onChange={e => {
+
+                      this.setState({ city: e.target.value })
+                      console.log(e.target.value)
+                    }}
+                    onSuggestionClick={e => {
+
+                      this.setState({ city: e.target.innerText })
+                      console.log(e.target.innerText)
+                    }}
                   />
                 </FormGroup>
               </Col>

@@ -3,10 +3,10 @@ import axios from "axios"
 import {
   LOGIN_WITH_JWT_ENDPOINT,
   GET_USER_WITH_JWT_ENDPOINT,
-  REFRESH_JWT_ENDPOINT,
+  // REFRESH_JWT_ENDPOINT,
 
 } from '../../../config'
-import { requestInterceptor, responseInterceptordt } from "../../../axios/axiosInstance"
+// import { requestInterceptor, responseInterceptordt } from "../../../axios/axiosInstance"
 import localStorageService from "../../../axios/localStorageService"
 
 export const loginWithUsernameAndPassword = user => {

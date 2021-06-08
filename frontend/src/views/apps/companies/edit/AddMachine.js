@@ -1,6 +1,6 @@
 import React from "react"
 import {
-  Media,
+  // Media,
   Row,
   Col,
   Button,
@@ -10,11 +10,11 @@ import {
   FormGroup
 } from "reactstrap"
 import { connect } from "react-redux"
-import { updateUser } from "../../../../redux/actions/users"
-import isValidCelphone from "../../../../validators/celphone"
-import isValidPhone from "../../../../validators/phone"
+import { createMachine } from "../../../../redux/actions/machine"
+// import isValidCelphone from "../../../../validators/celphone"
+// import isValidPhone from "../../../../validators/phone"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { GET_COMPANIES_ENDPOINT } from "../../../../config"
+import { GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import { CustomInput } from "reactstrap"
 
@@ -28,18 +28,22 @@ class CompanyTab extends React.Component {
   }
 
   state = {
-    id: undefined,
+    // id: 0,
+    identifier: "",
     name: "",
     code: "",
     electric_feed: "",
     brand: "",
     power: "",
-    power_units: "",
+    power_units: "KW",
     norm: "",
-    hierarchy: "",
+    company: this.props.company.id ?? 0,
+    hierarchyName: "Seleccione una opción",
+    hierarchy: 0,
     rpm: "",
     image: "",
     diagram: "",
+    hierarchies: [{ id: 0, name: "Seleccione una opción" }]
   }
 
   handleSubmit = e => {
@@ -50,17 +54,43 @@ class CompanyTab extends React.Component {
       show: true,
       alertText: ""
     }
-    if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
-      alertData.alertText = "El número de celular debe ser entrado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
-      this.props.displayAlert(alertData)
-      return
+    // console.log(this.state)
+    const {
+      identifier,
+      name,
+      code,
+      electric_feed,
+      brand,
+      power,
+      power_units,
+      norm,
+      company,
+      hierarchy,
+      rpm,
+      image,
+      diagram
+    } = this.state
+
+    const machine = {
+      identifier,
+      name,
+      code,
+      electric_feed,
+      brand,
+      power,
+      power_units,
+      norm,
+      company,
+      hierarchy,
+      rpm,
+      image,
+      diagram
     }
-    if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser entrado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-      this.props.displayAlert(alertData)
-      return
+    if (!hierarchy) {
+      delete machine["hierarchy"]
     }
-    this.props.updateUser(this.state, this.props.auth.login.tokens.access)
+    console.log(machine)
+    this.props.createMachine(machine)
 
   }
 
@@ -90,12 +120,18 @@ class CompanyTab extends React.Component {
     );
   }
 
-  // async componentDidMount() {
-  //   const res = await axios.get(GET_COMPANIES_ENDPOINT, {
-  //     headers: { 'Authorization': `Bearer ${this.props.auth.login.tokens.access}` }})
-  //   const companies = [{id:"N/A", name:"N/A"}, ...res.data]
-  //   this.setState({ companies })
-  // }
+  async componentDidMount() {
+    if (!this.state.company) {
+      return
+    }
+    try {
+      const res = await axios.get(GET_HIERARCHIES_ENDPOINT);
+
+      this.setState({ hierarchies: [{ id: 0, name: "Seleccione una opción" }, ...res.data] })
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   render() {
     return (
@@ -111,8 +147,8 @@ class CompanyTab extends React.Component {
                     type="number"
                     id="id"
                     placeholder="Identificador"
-                    value={this.state.id}
-                    onChange={e => this.setState({ id: e.target.value })}
+                    value={this.state.identifier}
+                    onChange={e => this.setState({ identifier: e.target.value })}
                   />
                 </FormGroup>
               </Col>
@@ -134,13 +170,17 @@ class CompanyTab extends React.Component {
 
               <Col md="6" sm="12">
                 <FormGroup>
-                  <Label for="nit">Código</Label>
+                  <Label for="code">Código</Label>
                   <Input
                     type="select"
                     id="code"
                     placeholder="Código"
-                    value={this.state.power_units}
-                    onChange={e => this.setState({ code: e.target.value })}
+                    value={this.state.code}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const value = e.target.childNodes[idx].getAttribute("value");
+                      this.setState({ code: value });
+                    }}
                   >
                     <option value="">Seleccione una opción</option>
                     <option value="interno">Interno</option>
@@ -157,7 +197,11 @@ class CompanyTab extends React.Component {
                     id="electric_feed"
                     placeholder="Alimentación Eléctrica"
                     value={this.state.electric_feed}
-                    onChange={e => this.setState({ electric_feed: e.target.value })}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const value = e.target.childNodes[idx].getAttribute("value");
+                      this.setState({ electric_feed: value })
+                    }}
                   >
                     <option value="">Seleccione una opción</option>
                     <option value="directa">Directa</option>
@@ -189,9 +233,12 @@ class CompanyTab extends React.Component {
                     id="power_units"
                     placeholder="Unidades de Potencia"
                     value={this.state.power_units}
-                    onChange={e => this.setState({ power_units: e.target.value })}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const value = e.target.childNodes[idx].getAttribute("value");
+                      this.setState({ power_units: value })
+                    }}
                   >
-                    <option value="">Seleccione una opción</option>
                     <option value="KW">KiloWatts</option>
                     <option value="HP">HorsePower</option>
                   </Input>
@@ -234,9 +281,21 @@ class CompanyTab extends React.Component {
                     id="machine-hierarchy"
                     placeholder="Jerarquía"
                     value={this.state.hierarchy}
-                    onChange={e => this.setState({ hierarchy: e.target.value })}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const hierarchyId = parseInt(e.target.childNodes[idx].getAttribute("hierarchyid"))
+                      this.setState({
+                        hierarchyName: e.target.value,
+                        hierarchy: hierarchyId
+                      })
+
+                    }}
                   >
-                    <option></option>
+                    {
+                      this.state.hierarchies.map((hierarchy) => (
+                        <option hierarchyid={hierarchy.id} key={hierarchy.id}>{hierarchy.name}</option>
+                      ))
+                    }
                   </Input>
                 </FormGroup>
               </Col>
@@ -245,13 +304,12 @@ class CompanyTab extends React.Component {
                 <FormGroup>
                   <Label for="rpm">RPM</Label>
                   <Input
-                    type="select"
+                    type="text"
                     id="rpm"
                     placeholder="RPM"
                     value={this.state.rpm}
                     onChange={e => this.setState({ rpm: e.target.value })}
                   >
-                    <option></option>
                   </Input>
                 </FormGroup>
               </Col>
@@ -264,6 +322,9 @@ class CompanyTab extends React.Component {
                     type="file"
                     id="image"
                     name="Imagen"
+                    onChange={e => {
+                      this.setState({ image: e.target.files[0] ?? "" })
+                    }}
                   />
                 </FormGroup>
               </Col>
@@ -275,6 +336,9 @@ class CompanyTab extends React.Component {
                     type="file"
                     id="diagram"
                     name="Diagrama"
+                    onChange={e => {
+                      this.setState({ diagram: e.target.files[0] ?? "" })
+                    }}
                   />
                 </FormGroup>
               </Col>
@@ -301,8 +365,9 @@ class CompanyTab extends React.Component {
 const mapStateToProps = state => {
   return {
     users: state.users,
-    auth: state.auth
+    auth: state.auth,
+    company: state.company
   }
 }
 
-export default connect(mapStateToProps, { updateUser, displayAlert })(CompanyTab)
+export default connect(mapStateToProps, { createMachine, displayAlert })(CompanyTab)

@@ -33,7 +33,7 @@ import { ContextLayout } from "../../../../utility/context/Layout"
 import { setMachine } from "../../../../redux/actions/machine"
 import { setCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 
 class MachineList extends React.Component {
@@ -77,7 +77,7 @@ class MachineList extends React.Component {
             <div
               className="d-flex align-items-center cursor-pointer"
               onClick={() => {
-                this.props.setCompany(this.state.companyMap[this.state.company])
+                this.props.setCompany(this.state.companiesMap[this.state.company])
                 this.props.setMachine(params.data)
                 history.push("/services/monitoring/machine")
               }}
@@ -117,13 +117,16 @@ class MachineList extends React.Component {
 
   async getCompanyMachines(companyId) {
     if (!companyId) {
+      this.setState({ rowData: [] })
       return
     }
     try {
-      const res = await axios.get(GET_MACHINES_ENDPOINT, null, {
-        params: { companyId }
+      console.log(companyId)
+      const res = await axios.get(GET_MACHINES_ENDPOINT, {
+        params: { company_id: companyId }
       })
-      this.setState({ rowData: [{ id: 0, name: "N/A" }, ...res.data] })
+      const rowData = [...res.data]
+      this.setState({ rowData })
     } catch {
       const alertData = {
         title: "Error de Conexión",
@@ -137,7 +140,6 @@ class MachineList extends React.Component {
   }
 
   async componentDidMount() {
-    // if (this.props.auth.values.user_type !== "client" || this.props.auth.values.user_type !== "arduino") {
     try {
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
       const companiesMap = {};

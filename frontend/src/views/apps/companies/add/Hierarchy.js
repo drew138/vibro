@@ -16,7 +16,7 @@ import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { GET_COMPANIES_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
-import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class Hierarchy extends React.Component {
 
@@ -78,10 +78,13 @@ class Hierarchy extends React.Component {
     }
 
     async getParents(companyId) {
+        if (!companyId) {
+            return
+        }
         try {
-            const res = await axios.get(GET_HIERARCHIES_ENDPOINT, null, {
+            const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
                 params: {
-                    companyId
+                    company_id: companyId
                 }
             })
             this.setState({ parents: [{ id: 0, name: "N/A" }, ...res.data] })
@@ -140,7 +143,7 @@ class Hierarchy extends React.Component {
                                         value={this.state.parentName}
                                         onChange={e => {
                                             const idx = e.target.selectedIndex;
-                                            const parentId = e.target.childNodes[idx].getAttribute('parentid');
+                                            const parentId = parseInt(e.target.childNodes[idx].getAttribute('parentid'));
                                             this.setState({ parentName: e.target.value, parent: parentId });
                                         }}>
                                         {
@@ -161,7 +164,7 @@ class Hierarchy extends React.Component {
                                         value={this.state.companyName}
                                         onChange={e => {
                                             const idx = e.target.selectedIndex;
-                                            const companyId = e.target.childNodes[idx].getAttribute('companyid');
+                                            const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
                                             this.setState({ company: companyId, companyName: e.target.value });
                                             this.getParents(companyId);
                                         }}

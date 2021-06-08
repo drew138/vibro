@@ -26,7 +26,6 @@ class UserAccountTab extends React.Component {
       history.push("/");
       return;
     }
-
     this.imageInputRef = React.createRef();
     this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
   }
@@ -39,10 +38,11 @@ class UserAccountTab extends React.Component {
     phone: this.props.user.phone,
     celphone: this.props.user.celphone,
     selectedFile: null,
-    companyName: this.props.user.company ? this.props.user.company.name : "N/A",
-    companyId: this.props.user.company ? this.props.user.company.id : 0,
+    companyName: this.props.user.company?.name ?? "N/A",
+    company: this.props.user.company?.id ?? 0,
     companies: [],
     is_active: this.props.user.is_active,
+    isActiveText: this.props.user.is_active ? "Activo" : "Inactivo",
     user_type: this.props.user.user_type
   }
 
@@ -64,7 +64,7 @@ class UserAccountTab extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-    this.props.updateUser(this.state, this.props.auth.tokens.access)
+    this.props.updateUser(this.state)
 
   }
 
@@ -219,14 +219,19 @@ class UserAccountTab extends React.Component {
                     id="company"
                     placeholder="Empresa"
                     value={this.state.companyName}
-                    onChange={e => this.setState({
-                      companyName: e.target.value,
-                      companyId: e.target.id
-                    }
-                    )}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const companyId = e.target.childNodes[idx].getAttribute("companyid");
+
+                      this.setState({
+                        companyName: e.target.value,
+                        company: companyId
+                      }
+                      )
+                    }}
                   >
                     {this.state.companies.map((company) => (
-                      <option key={company.id} id={company.id} value={company.name}>{company.name}</option>
+                      <option key={company.id} companyid={company.id} value={company.name}>{company.name}</option>
                     ))}
                   </Input>
                 </FormGroup>
@@ -258,11 +263,14 @@ class UserAccountTab extends React.Component {
                     type="select"
                     id="state"
                     // placeholder="Empresa"
-                    value={this.state.is_active}
-                    onChange={e => this.setState({ is_active: e.target.value === "activo" })}
+                    value={this.state.isActiveText}
+                    onChange={e => this.setState({
+                      isActiveText: e.target.value,
+                      is_active: e.target.value === "Activo"
+                    })}
                   >
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
+                    <option>Activo</option>
+                    <option>Inactivo</option>
                   </Input>
                 </FormGroup>
               </Col>

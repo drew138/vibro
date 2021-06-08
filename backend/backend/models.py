@@ -130,14 +130,15 @@ class Machine(models.Model):
     )
 
     # power units
-    KW = 'kW'
+    KW = 'KW'
     HP = 'HP'
     POWER_UNIT_CHOICES = (
         (KW, 'KiloWatts'),
         (HP, 'HorsePower'),
     )
 
-    # identifier = models.IntegerField(null=True)
+    # ! TODO remove default, make unique field
+    identifier = models.IntegerField(default=0)
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -149,7 +150,7 @@ class Machine(models.Model):
         null=True)
     electric_feed = models.CharField(
         max_length=8,
-        choices=CODE_CHOICES,
+        choices=ELECTRIC_FEED_CHOICES,
         null=True)
     brand = models.CharField(max_length=50)
     power = models.IntegerField(default=0)

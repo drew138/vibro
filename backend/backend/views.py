@@ -86,7 +86,7 @@ class HierarchyView(viewsets.ModelViewSet):
 
     def get_queryset(self):
 
-        companyId = self.request.query_params.get('companyId', None)
+        company_id = self.request.query_params.get('company_id', None)
 
         if self.request.user.user_type in STAFF:
             queryset = custom_models.Hierarchy.objects.all()
@@ -94,8 +94,8 @@ class HierarchyView(viewsets.ModelViewSet):
             queryset = custom_models.Hierarchy.objects.filter(
                 company__id=self.request.user.company.id)
             return queryset
-        if companyId:
-            queryset = queryset.filter(company__id=companyId)
+        if company_id:
+            queryset = queryset.filter(company__id=company_id)
         return queryset
 
 

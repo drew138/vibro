@@ -6,7 +6,9 @@ import Spinner from "./components/@vuexy/spinner/Loading-spinner"
 import knowledgeBaseQuestion from "./views/pages/knowledge-base/Questions"
 import { ContextLayout } from "./utility/context/Layout"
 import localStorageService from "./axios/localStorageService"
+import { requestInterceptor, responseInterceptor } from "./axios/axiosInstance"
 
+console.log(requestInterceptor, responseInterceptor)
 
 // Route-based code splitting
 const analyticsDashboard = lazy(() =>
@@ -180,6 +182,7 @@ const hierarchies = lazy(() => import("./views/apps/companies/hierarchies/Hierar
 const userEdit = lazy(() => import("./views/apps/user/edit/Edit"))
 const companyEdit = lazy(() => import("./views/apps/companies/edit/Edit"))
 const companyAdd = lazy(() => import("./views/apps/companies/add/Add"))
+const machineEdit = lazy(() => import("./views/apps/machines/edit"))
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -284,10 +287,10 @@ class AppRouter extends React.Component {
             path="/app/user/settings"
             component={accountSettings}
           />
-          {/* <AppRoute
-            path="/pages/account-settings"
-            component={accountSettings}
-          /> */}
+          <AppRoute
+            path="/app/machine/edit"
+            component={machineEdit}
+          />
 
 
 
