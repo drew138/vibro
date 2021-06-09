@@ -54,7 +54,7 @@ class MachineList extends React.Component {
     },
     searchVal: "",
     companies: [{ id: 0, name: "N/A" }],
-    companiesMap: {},
+    // companiesMap: {},
     companyName: this.props.auth.values.company?.name ?? "N/A",
     company: this.props.auth.values.company?.id,
     columnDefs: [
@@ -121,7 +121,7 @@ class MachineList extends React.Component {
       return
     }
     try {
-      console.log(companyId)
+      // console.log(companyId)
       const res = await axios.get(GET_MACHINES_ENDPOINT, {
         params: { company_id: companyId }
       })
@@ -142,15 +142,15 @@ class MachineList extends React.Component {
   async componentDidMount() {
     try {
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
-      const companiesMap = {};
-      res.data.forEach(
-        comp => {
-          companiesMap[comp.id] = comp
-        }
-      );
+      // const companiesMap = {};
+      // res.data.forEach(
+      //   comp => {
+      //     companiesMap[comp.id] = comp
+      //   }
+      // );
       this.setState({
         companies: [{ id: 0, name: "N/A" }, ...res.data],
-        companiesMap
+        // companiesMap
       })
 
     } catch {

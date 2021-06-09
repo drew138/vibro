@@ -98,6 +98,11 @@ class HierarchyView(viewsets.ModelViewSet):
             queryset = queryset.filter(company__id=company_id)
         return queryset
 
+    def get_serializer_class(self):
+        if self.action in {'list', 'retrieve'}:
+            return custom_serializers.ListHierarchySerializer
+        return custom_serializers.HierarchySerializer
+
 
 class MachineView(viewsets.ModelViewSet):
 

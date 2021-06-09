@@ -1,7 +1,7 @@
 const initialState = {
     id: 0,
-    identifier: 0,
-    company: "",
+    identifier: "",
+    company: 0,
     name: "",
     code: "",
     electric_feed: "",
@@ -9,22 +9,22 @@ const initialState = {
     power: "",
     power_units: "",
     norm: "",
-    hierarchy: "",
+    hierarchy: 0,
     rpm: "",
     image: "",
     diagram: ""
 }
 
 const machine = (state = initialState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case "CLEAR_MACHINE_STATE":
-            return {...initialState}
+            return { ...initialState }
         case "SET_MACHINE_STATE":
-            return {...action.payload}
+            return { ...action.payload }
         default:
             return state
     }
 }
 
 
-export default machine 
+export default machine

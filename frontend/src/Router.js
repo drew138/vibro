@@ -264,7 +264,7 @@ class AppRouter extends React.Component {
       // Set the directory path if you are deploying in sub-folder
       <Router history={history}>
         <Switch>
-          <AppRoute exact path="/" component={analyticsDashboard} />
+          <PrivateAppRoute exact path="/" component={analyticsDashboard} />
 
 
           <AppRoute exact path="/services/monitoring/machine" component={espectra} />

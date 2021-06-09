@@ -10,11 +10,11 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { createCompany } from "../../../../redux/actions/company"
-import isValidAddress from "../../../../validators/address"
-import isValidPhone from "../../../../validators/phone"
-import isValidNit from "../../../../validators/nit"
+// import isValidAddress from "../../../../validators/address"
+// import isValidPhone from "../../../../validators/phone"
+// import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { GET_COMPANIES_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
+import { CREATE_HIERARCHY_ENDPOINT, GET_COMPANIES_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 // import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
@@ -30,7 +30,7 @@ class Hierarchy extends React.Component {
         companies: [{ id: 0, name: "N/A" }]
     }
 
-    handleSubmit = e => {
+    handleSubmit = async (e) => {
         e.preventDefault()
         const alertData = {
             title: "Error de Validación",
@@ -38,34 +38,26 @@ class Hierarchy extends React.Component {
             show: true,
             alertText: ""
         }
-        if (this.state.nit && !isValidNit(this.state.nit)) {
-            alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
+        const { parent, name, company } = this.state
+        const body = { name, company }
+        if (parent) {
+            body.parent = parent;
+        }
+        if (!company) {
+            alertData.alertText = "La Jerarquía Ingresada Debe Ser Asignada A Una Empresa"
             this.props.displayAlert(alertData)
             return
         }
-        if (this.state.phone && !isValidPhone(this.state.phone)) {
-            alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
+        if (!name) {
+            alertData.alertText = "La Jerarquía Ingresada Debe Contener Un Nombre Valido"
             this.props.displayAlert(alertData)
             return
         }
-        if (this.state.address && !isValidAddress(this.state.address)) {
-            alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
-            this.props.displayAlert(alertData)
-            return
-        }
-        if (!this.state.cityMap[this.state.city]) {
-            alertData.alertText = "La ciudad ingresada no es valida."
-            this.props.displayAlert(alertData)
-            return
-        }
-        const data = {
-            name: this.state.name,
-            nit: this.state.nit,
-            address: this.state.address,
-            phone: this.state.phone,
-            city: this.state.cityMap[this.state.city]
-        }
-        this.props.createCompany(data)
+
+        const res = await axios.post(CREATE_HIERARCHY_ENDPOINT, body)
+        alertData.alertText = "Jerarquía Creada Exitosamente"
+        alertData.success = true
+        this.props.displayAlert(alertData)
     }
 
     toTitleCase(str) {

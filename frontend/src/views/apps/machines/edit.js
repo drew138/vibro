@@ -33,21 +33,21 @@ class EditMachine extends React.Component {
     }
 
     state = {
-        // id: 0,
-        identifier: "",
-        name: "",
-        code: "",
-        electric_feed: "",
-        brand: "",
-        power: "",
-        power_units: "KW",
-        norm: "",
-        company: this.props.company.id ?? 0,
+        id: this.props.machine.id,
+        identifier: this.props.machine.identifier,
+        name: this.props.machine.name,
+        code: this.props.machine.code,
+        electric_feed: this.props.machine.electric_feed,
+        brand: this.props.machine.brand,
+        power: this.props.machine.power,
+        power_units: this.props.machine.power_units,
+        norm: this.props.machine.norm,
+        company: this.props.machine.company ?? 0,
+        rpm: this.props.machine.rpm,
+        image: this.props.machine.image,
+        diagram: this.props.machine.diagram,
         hierarchyName: "Seleccione una opción",
         hierarchy: 0,
-        rpm: "",
-        image: "",
-        diagram: "",
         hierarchies: [{ id: 0, name: "Seleccione una opción" }]
     }
 
@@ -130,7 +130,11 @@ class EditMachine extends React.Component {
             return
         }
         try {
-            const res = await axios.get(GET_HIERARCHIES_ENDPOINT);
+            const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
+                params: {
+                    company_id: this.state.company
+                }
+            });
 
             this.setState({ hierarchies: [{ id: 0, name: "Seleccione una opción" }, ...res.data] })
         } catch (e) {

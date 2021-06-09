@@ -37,6 +37,16 @@ class HierarchySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ListHierarchySerializer(serializers.ModelSerializer):
+
+    parent = HierarchySerializer()
+    company = DefaultCompanySerializer()
+
+    class Meta:
+        model = custom_models.Hierarchy
+        fields = '__all__'
+
+
 # User Serializer
 class VibroUserSerializer(serializers.ModelSerializer):
 

@@ -2,10 +2,10 @@ import React from 'react'
 import {
     Card,
     CardBody,
-    // CardHeader,
-    // CardTitle,
-    // FormGroup,
-    // Label,
+    CardHeader,
+    CardTitle,
+    FormGroup,
+    Label,
     Input,
     Row,
     Col,
@@ -13,30 +13,30 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownToggle,
-    // Collapse,
-    // Spinner
+    Collapse,
+    Spinner
 } from "reactstrap"
 import axios from "axios"
 import { ContextLayout } from "../../../../utility/context/Layout"
 import { AgGridReact } from "ag-grid-react"
 import {
     ChevronDown,
-    // RotateCw,
-    // X
+    RotateCw,
+    X
 } from "react-feather"
-// import classnames from "classnames"
+import classnames from "classnames"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../../redux/actions/alerts"
 // import { history } from "../../../../history"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
-import { GET_HIERARCHIES_ENDPOINT } from '../../../../config'
+import { GET_HIERARCHIES_ENDPOINT, GET_COMPANIES_ENDPOINT } from '../../../../config'
 import { setCompany } from "../../../../redux/actions/company"
 // import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class HierarchiesList extends React.Component {
-
+    // agregar filtro por empresa
     state = {
         rowData: [],
         pageSize: 20,
@@ -52,6 +52,9 @@ class HierarchiesList extends React.Component {
             sortable: true
         },
         searchVal: "",
+        companies: [{ id: 0, name: "Seleccione una opción" }],
+        companyName: "Seleccione una opción",
+        company: 0,
         columnDefs: [
             {
                 headerName: "Nombre",
@@ -87,7 +90,7 @@ class HierarchiesList extends React.Component {
                 cellRendererFramework: params => {
                     return (
                         <div className="d-flex align-items-center cursor-pointer">
-                            <span>{params.data.parent.name}</span>
+                            <span>{params.data.parent?.name ?? "N/A"}</span>
                         </div>
                     )
                 }
@@ -95,10 +98,17 @@ class HierarchiesList extends React.Component {
         ]
     }
 
-    async componentDidMount() {
+    async getCompanyHierarchies(company_id) {
+        if (!company_id) {
+            this.setState({ rowData: [] })
+            return
+        }
+
         try {
-            const res = await axios.get(GET_HIERARCHIES_ENDPOINT)
-            this.setState({ rowData: res.data })
+            const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
+                params: { company_id }
+            })
+            this.setState({ rowData: [...res.data] })
         } catch {
             const alertData = {
                 title: "Error de Conexión",
@@ -111,9 +121,29 @@ class HierarchiesList extends React.Component {
         }
     }
 
+
     onGridReady = params => {
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
+    }
+
+    async componentDidMount() {
+        try {
+            const res = await axios.get(GET_COMPANIES_ENDPOINT)
+            this.setState({
+                companies: [{ id: 0, name: "Seleccione una opción" }, ...res.data],
+            })
+
+        } catch {
+            const alertData = {
+                title: "Error de Conexión",
+                success: false,
+                show: true,
+                alertText: "Error al Conectar al Servidor"
+            }
+            this.props.displayAlert(alertData)
+            this.setState({ rowData: [] })
+        }
     }
 
     filterData = (column, val) => {
@@ -193,6 +223,92 @@ class HierarchiesList extends React.Component {
                 />
 
                 <Row className="app-user-list">
+
+                    <Col sm="12">
+                        <Card
+                            className={classnames("card-action card-reload", {
+                                "d-none": this.state.isVisible === false,
+                                "card-collapsed": this.state.status === "Closed",
+                                closing: this.state.status === "Closing...",
+                                opening: this.state.status === "Opening...",
+                                refreshing: this.state.reload
+                            })}
+                        >
+                            <CardHeader>
+                                <CardTitle>Filtros</CardTitle>
+                                <div className="actions">
+                                    <ChevronDown
+                                        className="collapse-icon mr-50"
+                                        size={15}
+                                        onClick={this.toggleCollapse}
+                                    />
+                                    <RotateCw
+                                        className="mr-50"
+                                        size={15}
+                                        onClick={() => {
+                                            this.refreshCard()
+                                            this.gridApi.setFilterModel(null)
+                                        }}
+                                    />
+                                    <X size={15} onClick={this.removeCard} />
+                                </div>
+                            </CardHeader>
+                            <Collapse
+                                isOpen={this.state.collapse}
+                                onExited={this.onExited}
+                                onEntered={this.onEntered}
+                                onExiting={this.onExiting}
+                                onEntering={this.onEntering}
+                            >
+                                <CardBody>
+                                    {this.state.reload ? (
+                                        <Spinner color="primary" className="reload-spinner" />
+                                    ) : (
+                                        ""
+                                    )}
+                                    <Row>
+                                        <Col lg="12" md="6" sm="12">
+                                            <FormGroup className="mb-0">
+                                                <Label for="role">Empresa</Label>
+                                                <Input
+                                                    type="select"
+                                                    name="company"
+                                                    id="company"
+                                                    value={this.state.companyName}
+                                                    onChange={e => {
+                                                        const idx = e.target.selectedIndex;
+                                                        const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
+                                                        this.getCompanyHierarchies(companyId)
+                                                        this.setState(
+                                                            {
+                                                                companyName: e.target.value,
+                                                                company: companyId
+                                                            }
+                                                            // this.getRowData()
+                                                            // () =>
+                                                            //   this.filterData(
+                                                            //     "company",
+                                                            //     this.state.company.toLowerCase()
+                                                            //   )
+                                                        )
+                                                    }}
+                                                >
+                                                    {
+                                                        this.state.companies.map((company) => (
+                                                            <option companyid={company.id} key={company.id}>{company.name}</option>
+                                                        ))
+                                                    }
+                                                </Input>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                </CardBody>
+                            </Collapse>
+                        </Card>
+                    </Col>
+
+
+
                     <Col sm="12">
                         <Card>
                             <CardBody>
