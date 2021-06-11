@@ -29,10 +29,11 @@ import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../../assets/scss/pages/users.scss"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../../redux/actions/alerts"
-// import { history } from "../../../../history"
+import { history } from "../../../../history"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { GET_HIERARCHIES_ENDPOINT, GET_COMPANIES_ENDPOINT } from '../../../../config'
 import { setCompany } from "../../../../redux/actions/company"
+import { setHierarchy } from "../../../../redux/actions/hierarchy"
 // import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class HierarchiesList extends React.Component {
@@ -53,6 +54,7 @@ class HierarchiesList extends React.Component {
         },
         searchVal: "",
         companies: [{ id: 0, name: "Seleccione una opción" }],
+        // companiesMap: {},
         companyName: "Seleccione una opción",
         company: 0,
         columnDefs: [
@@ -63,7 +65,16 @@ class HierarchiesList extends React.Component {
                 width: 300,
                 cellRendererFramework: params => {
                     return (
-                        <div className="d-flex align-items-center cursor-pointer">
+                        <div
+                            className="d-flex align-items-center cursor-pointer"
+                            onClick={() => {
+                                this.props.setCompany(params.data.company)
+                                const hierarchy = { ...params.data }
+                                hierarchy.company = hierarchy.company.id
+                                hierarchy.parentName = hierarchy.parent?.name
+                                this.props.setHierarchy(hierarchy)
+                                history.push("/app/companies/hierarchy/edit")
+                            }}>
                             <span>{params.data.name}</span>
                         </div>
                     )
@@ -130,8 +141,15 @@ class HierarchiesList extends React.Component {
     async componentDidMount() {
         try {
             const res = await axios.get(GET_COMPANIES_ENDPOINT)
+            // const companiesMap = {};
+            // res.data.forEach(
+            //     comp => {
+            //         companiesMap[comp.id] = comp
+            //     }
+            // );
             this.setState({
                 companies: [{ id: 0, name: "Seleccione una opción" }, ...res.data],
+                // companiesMap
             })
 
         } catch {
@@ -399,4 +417,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, { setCompany, displayAlert })(HierarchiesList)
+export default connect(mapStateToProps, { setHierarchy, setCompany, displayAlert })(HierarchiesList)

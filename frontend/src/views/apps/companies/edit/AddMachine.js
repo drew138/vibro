@@ -71,7 +71,26 @@ class CompanyTab extends React.Component {
       diagram
     } = this.state
 
-    const machine = {
+    if (!identifier) {
+      alertData.alertText = "Cada Máquina Debe Contar Con Un Identificador Único"
+      this.props.displayAlert(alertData)
+      return
+    }
+
+    if (!name) {
+      alertData.alertText = "Cada Máquina Debe Contar Con Un Nombre"
+      this.props.displayAlert(alertData)
+      return
+    }
+
+    if (!brand) {
+      alertData.alertText = "Cada Máquina Debe Contar Con Una Marca"
+      this.props.displayAlert(alertData)
+      return
+    }
+    // add more validators
+
+    const body = {
       identifier,
       name,
       code,
@@ -87,11 +106,9 @@ class CompanyTab extends React.Component {
       diagram
     }
     if (!hierarchy) {
-      delete machine["hierarchy"]
+      delete body["hierarchy"]
     }
-    console.log(machine)
-    this.props.createMachine(machine)
-
+    this.props.createMachine(body)
   }
 
   fileSelectedHandler = (event) => {
@@ -125,7 +142,11 @@ class CompanyTab extends React.Component {
       return
     }
     try {
-      const res = await axios.get(GET_HIERARCHIES_ENDPOINT);
+      const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
+        params: {
+          company_id: this.state.company
+        }
+      });
 
       this.setState({ hierarchies: [{ id: 0, name: "Seleccione una opción" }, ...res.data] })
     } catch (e) {
@@ -280,7 +301,7 @@ class CompanyTab extends React.Component {
                     type="select"
                     id="machine-hierarchy"
                     placeholder="Jerarquía"
-                    value={this.state.hierarchy}
+                    value={this.state.hierarchyName}
                     onChange={e => {
                       const idx = e.target.selectedIndex;
                       const hierarchyId = parseInt(e.target.childNodes[idx].getAttribute("hierarchyid"))

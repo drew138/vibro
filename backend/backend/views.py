@@ -21,12 +21,9 @@ class CityView(viewsets.ModelViewSet):
         based on url parameter.
         """
 
-        id = self.request.query_params.get('id', None)
         name = self.request.query_params.get('name', None)
         state = self.request.query_params.get('state', None)
         queryset = custom_models.City.objects.all()
-        if id:
-            queryset = queryset.filter(id=id)
         if name:
             queryset = queryset.filter(name=name)
         if state:
@@ -47,7 +44,6 @@ class CompanyView(viewsets.ModelViewSet):
         from seeing unauthorized data.
         """
 
-        id = self.request.query_params.get('id', None)
         name = self.request.query_params.get('name', None)
         nit = self.request.query_params.get('nit', None)
         address = self.request.query_params.get('address', None)
@@ -57,10 +53,12 @@ class CompanyView(viewsets.ModelViewSet):
         if self.request.user.user_type in STAFF:
             queryset = custom_models.Company.objects.all()
         else:
-            queryset = custom_models.Company.objects.filter(
-                id=self.request.user.company.id)
-        if id:
-            queryset = queryset.filter(id=id)
+            if self.request.user.company:
+                queryset = custom_models.Company.objects.filter(
+                    id=self.request.user.company.id)
+            else:
+                queryset = custom_models.Company.objects.filter(
+                    id=0)
         if name:
             queryset = queryset.filter(name=name)
         if nit:
@@ -92,7 +90,7 @@ class HierarchyView(viewsets.ModelViewSet):
             queryset = custom_models.Hierarchy.objects.all()
         else:
             queryset = custom_models.Hierarchy.objects.filter(
-                company__id=self.request.user.company.id)
+                company__user=self.request.user)
             return queryset
         if company_id:
             queryset = queryset.filter(company__id=company_id)
@@ -117,7 +115,6 @@ class MachineView(viewsets.ModelViewSet):
         users from seeing unauthorized data.
         """
 
-        id = self.request.query_params.get('id', None)
         identifier = self.request.query_params.get('identifier', None)
         company_id = self.request.query_params.get('company_id', None)
         name = self.request.query_params.get('name', None)
@@ -136,8 +133,6 @@ class MachineView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Machine.objects.filter(
                 company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if identifier:
             queryset = queryset.filter(identifier=identifier)
         if company_id:
@@ -177,7 +172,6 @@ class SensorView(viewsets.ModelViewSet):
         to prevent users from seeing unauthorized data.
         """
 
-        id = self.request.query_params.get('id', None)
         sensor_type = self.request.query_params.get('sensor_type', None)
         channel = self.request.query_params.get('channel', None)
         arduino = self.request.query_params.get('arduino', None)
@@ -188,8 +182,6 @@ class SensorView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Sensor.objects.filter(
                 machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if sensor_type:
             queryset = queryset.filter(sensor_type=sensor_type)
         if channel:
@@ -214,7 +206,6 @@ class GearView(viewsets.ModelViewSet):
         seeing unauthorized data.
         """
 
-        id = self.request.query_params.get('gear_id', None)
         machine_id = self.request.query_params.get('machine_id', None)
         gear_type = self.request.query_params.get('gear_type', None)
         support = self.request.query_params.get('support', None)
@@ -225,8 +216,6 @@ class GearView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Gear.objects.filter(
                 machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if machine_id:
             queryset = queryset.filter(machine__id=machine_id)
         if gear_type:
@@ -251,7 +240,6 @@ class AxisView(viewsets.ModelViewSet):
         users from seeing unauthorized data.
         """
 
-        id = self.request.query_params.get('id', None)
         gear_id = self.request.query_params.get('gear_id', None)
         type_axis = self.request.query_params.get('type_axis', None)
 
@@ -260,8 +248,6 @@ class AxisView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Axis.objects.filter(
                 gear__machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if gear_id:
             queryset = queryset.filter(gear__id=gear_id)
         if type_axis:
@@ -283,7 +269,6 @@ class BearingView(viewsets.ModelViewSet):
         data.
         """
 
-        id = self.request.query_params.get('id', None)
         reference = self.request.query_params.get('reference', None)
         frequency = self.request.query_params.get('frequency', None)
         axis_id = self.request.query_params.get('axis_id', None)
@@ -293,8 +278,6 @@ class BearingView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Bearing.objects.filter(
                 axis__gear__machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if reference:
             queryset = queryset.filter(reference=reference)
         if frequency:
@@ -327,7 +310,6 @@ class MeasurementView(viewsets.ModelViewSet):
         unauthorized data.
         """
 
-        id = self.request.query_params.get('id', None)
         service = self.request.query_params.get('service', None)
         measurement_type = self.request.query_params.get(
             'measurement_type', None)
@@ -346,8 +328,6 @@ class MeasurementView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Measurement.objects.filter(
                 machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if service:
             queryset = queryset.filter(service=service)
         if measurement_type:
@@ -404,7 +384,6 @@ class FlawView(viewsets.ModelViewSet):
         data.
         """
 
-        id = self.request.query_params.get('id', None)
         measurement = self.request.query_params.get('measurement', None)
         flaw_type = self.request.query_params.get('flaw_type', None)
         severity = self.request.query_params.get('severity', None)
@@ -414,8 +393,6 @@ class FlawView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Flaw.objects.filter(
                 machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if measurement:
             queryset = queryset.filter(measurement__id=measurement)
         if flaw_type:
@@ -461,7 +438,6 @@ class TermoImageView(viewsets.ModelViewSet):
         data.
         """
 
-        id = self.request.query_params.get('id', None)
         measurement = self.request.query_params.get('measurement', None)
         image_type = self.request.query_params.get('image_type', None)
 
@@ -470,8 +446,6 @@ class TermoImageView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.TermoImage.objects.filter(
                 measurement__machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if measurement:
             queryset = queryset.filter(measurement__id=measurement)
         if image_type:
@@ -492,7 +466,6 @@ class PointView(viewsets.ModelViewSet):
         users from seeing unauthorized data.
         """
 
-        id = self.request.query_params.get('id', None)
         position = self.request.query_params.get('position', None)
         direction = self.request.query_params.get('direction', None)
         point_type = self.request.query_params.get('point_type', None)
@@ -503,8 +476,6 @@ class PointView(viewsets.ModelViewSet):
         else:
             queryset = custom_models.Point.objects.filter(
                 measurement__machine__company__user=self.request.user)
-        if id:
-            queryset = queryset.filter(id=id)
         if position:
             queryset = queryset.filter(position=position)
         if direction:

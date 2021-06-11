@@ -10,6 +10,7 @@ import { REFRESH_JWT_ENDPOINT } from "../config"
 export const requestInterceptor = axios.interceptors.request.use(
     config => {
         const token = localStorageService.getAccessToken();
+        // console.log(token)
         if (token) {
             config.headers['Authorization'] = 'Bearer ' + token;
         }
@@ -23,11 +24,10 @@ export const requestInterceptor = axios.interceptors.request.use(
 //Add a response interceptor
 export const responseInterceptor = axios.interceptors.response.use((response) => {
     return response
-}, function (error) {
+}, async function (error) {
     const originalRequest = error.config;
-
-    if (error.response.status === 401 && originalRequest.url ===
-        REFRESH_JWT_ENDPOINT) {
+    if (error.response.status === 401 && originalRequest.url.endsWith(
+        REFRESH_JWT_ENDPOINT)) {
         history.push('/pages/login');
         localStorageService.clearToken();
         localStorageService.clearUserValues();
@@ -38,11 +38,11 @@ export const responseInterceptor = axios.interceptors.response.use((response) =>
 
         originalRequest._retry = true;
         const refreshToken = localStorageService.getRefreshToken();
-        const res = axios.post(REFRESH_JWT_ENDPOINT,
+        const res = await axios.post(REFRESH_JWT_ENDPOINT,
             {
                 "refresh": refreshToken
             })
-        if (res.status === 201) {
+        if (res.status === 200) {
             localStorageService.setToken(res.data);
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorageService.getAccessToken();
             return axios(originalRequest);

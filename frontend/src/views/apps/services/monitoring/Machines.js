@@ -33,7 +33,6 @@ import { ContextLayout } from "../../../../utility/context/Layout"
 import { setMachine } from "../../../../redux/actions/machine"
 import { setCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 
 class MachineList extends React.Component {
@@ -53,10 +52,10 @@ class MachineList extends React.Component {
       sortable: true
     },
     searchVal: "",
-    companies: [{ id: 0, name: "N/A" }],
-    // companiesMap: {},
-    companyName: this.props.auth.values.company?.name ?? "N/A",
-    company: this.props.auth.values.company?.id,
+    companies: [{ id: 0, name: "Seleccione una opción" }],
+    companiesMap: {},
+    companyName: "Seleccione una opción",
+    company: 0,
     columnDefs: [
       // {
       //   headerName: "ID",
@@ -142,15 +141,15 @@ class MachineList extends React.Component {
   async componentDidMount() {
     try {
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
-      // const companiesMap = {};
-      // res.data.forEach(
-      //   comp => {
-      //     companiesMap[comp.id] = comp
-      //   }
-      // );
+      const companiesMap = {};
+      res.data.forEach(
+        comp => {
+          companiesMap[comp.id] = comp
+        }
+      );
       this.setState({
-        companies: [{ id: 0, name: "N/A" }, ...res.data],
-        // companiesMap
+        companies: [{ id: 0, name: "Seleccione una opción" }, ...res.data],
+        companiesMap
       })
 
     } catch {

@@ -6,7 +6,8 @@ import {
   Form,
   Input,
   Label,
-  FormGroup
+  FormGroup,
+  Media
 } from "reactstrap"
 import { connect } from "react-redux"
 import { createCompany } from "../../../../redux/actions/company"
@@ -19,8 +20,15 @@ import { GET_CITIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
 // import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+import userImg from "../../../../assets/img/user/default.png"
 
 class Company extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.imageInputRef = React.createRef();
+    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+  }
 
   state = {
     name: "",
@@ -28,7 +36,7 @@ class Company extends React.Component {
     address: "",
     phone: "",
     city: "",
-    // hierarchy: "",
+    picture: "",
     suggestions: [{ name: "" }],
     cityMap: {}
   }
@@ -68,6 +76,10 @@ class Company extends React.Component {
       phone: this.state.phone,
       city: this.state.cityMap[this.state.city]
     }
+    if (this.state.picture) {
+      data.picture = this.state.picture;
+    }
+    // console.log(data)
     this.props.createCompany(data)
   }
 
@@ -103,10 +115,71 @@ class Company extends React.Component {
     }
   }
 
+  fileSelectedHandler = (event) => {
+    this.setState({
+      picture: event.target.files[0]
+    })
+  }
+
+  fileUploadHandler = () => {
+    this.imageInputRef.current.click()
+  }
+
+  removePicture = () => {
+    this.imageInputRef.current.value = null
+    this.setState({
+      picture: null
+    })
+  }
+
   render() {
     return (
       <Row>
         <Col sm="12">
+          <Media className="mb-2 mt-2">
+            <Media className="mr-1" left>
+              <Media
+                className="rounded-circle"
+                object
+                src={
+                  this.state.picture ? URL.createObjectURL(this.state.picture) : userImg
+                }
+                alt="User"
+                height="64"
+                width="64"
+              />
+            </Media>
+
+            <Media className="mt-25" body>
+              <Media className="font-medium-1 text-bold-600" tag="p" heading>
+                {`${this.toTitleCase(this.props.auth.values?.first_name)} 
+              ${this.toTitleCase(this.props.auth.values?.last_name)}`}
+              </Media>
+
+              <div className="d-flex flex-sm-row flex-column justify-content-start px-0">
+                <input
+                  style={{ display: "none" }}
+                  type="file"
+                  onChange={this.fileSelectedHandler}
+                  ref={this.imageInputRef} />
+                <Button.Ripple
+                  tag="label"
+                  className="mr-50 cursor-pointer"
+                  color="primary"
+                  outline
+                  onClick={this.fileUploadHandler}
+                >
+                  Cambiar
+                </Button.Ripple>
+                <Button.Ripple color="flat-danger" onClick={this.removePicture}>Quitar Foto</Button.Ripple>
+              </div>
+            </Media>
+          </Media>
+
+
+
+
+
           <Form onSubmit={this.handleSubmit}>
             <Row>
 
@@ -150,12 +223,12 @@ class Company extends React.Component {
                     onChange={e => {
 
                       this.setState({ city: e.target.value })
-                      console.log(e.target.value)
+                      // console.log(e.target.value)
                     }}
                     onSuggestionClick={e => {
 
                       this.setState({ city: e.target.innerText })
-                      console.log(e.target.innerText)
+                      // console.log(e.target.innerText)
                     }}
                   />
                 </FormGroup>

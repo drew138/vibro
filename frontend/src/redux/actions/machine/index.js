@@ -34,10 +34,10 @@ export const createMachine = (machine) => {
         payload: res.data
       })
       const alerData = {
-        title: "Máquina Actualizada Exitosamente",
+        title: "Máquina Creada Exitosamente",
         success: true,
         show: true,
-        alertText: `${res.data.name} ha sido actualizada`
+        alertText: `${res.data.name} ha sido agregado a la lista de maquinas de esta empresa`
       }
       dispatch({
         type: "DISPLAY_SWEET_ALERT",
@@ -79,12 +79,15 @@ export const updateMachine = (machine) => {
         type: "SET_MACHINE_STATE",
         payload: res.data
       })
+
       const alerData = {
-        title: "Máquina Creada Exitosamente",
+        title: "Máquina Actualizada Exitosamente",
         success: true,
         show: true,
-        alertText: `${res.data.name} ha sido agregado a la lista de maquinas de esta empresa`
+        alertText: `${res.data.name} ha sido actualizada`
       }
+
+
       dispatch({
         type: "DISPLAY_SWEET_ALERT",
         payload: alerData

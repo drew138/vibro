@@ -67,14 +67,13 @@ class CompaniesList extends React.Component {
                 history.push("/app/companies/list/edit")
               }}
             >
-              {/* Code to show pictures of companies */}
-              {/* <img
+              <img
                 className="rounded-circle mr-50"
                 src={params.data.picture}
                 alt="user avatar"
                 height="30"
                 width="30"
-              /> */}
+              />
               <span>{params.data.name}</span>
             </div>
           )

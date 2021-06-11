@@ -17,7 +17,7 @@ class City(models.Model):
     state = models.CharField(max_length=30)
 
     def __str__(self):
-        return f'{self.name} {self.state}'
+        return f'{self.name}, {self.state}'
 
 
 class Company(models.Model):
@@ -40,9 +40,9 @@ class Company(models.Model):
         City,
         related_name='company',
         on_delete=models.CASCADE, null=True)
-    # hierarchy = ArrayField(
-    #     models.CharField(max_length=50),
-    #     default=list)
+    picture = models.ImageField(
+        upload_to="profile/companies",
+        default='profile/companies/default.png')
 
     def __str__(self):
         return f'{self.name} {self.nit}'
@@ -95,8 +95,8 @@ class VibroUser(AbstractUser):
         default=list,
         max_length=5)
     picture = models.ImageField(
-        upload_to="profile",
-        default='profile/default.png')
+        upload_to="profile/users",
+        default='profile/users/default.png')
 
     def blur_email(self):
 
@@ -165,7 +165,7 @@ class Machine(models.Model):
         Hierarchy,
         null=True,
         on_delete=models.SET_NULL)
-    rpm = models.IntegerField(null=True)
+    rpm = models.IntegerField(null=True)  # !TODO remove null
     image = models.ImageField(
         upload_to="machines/images",
         null=True)
@@ -414,7 +414,7 @@ class Measurement(models.Model):
     PRED = 'predictivo'
     CORR = 'correctivo'
     ENG = 'ingeniería'
-    MON = 'monitoreo en línea'
+    MON = 'monitoreo'
 
     # measurement type
     ULT = 'ultrasonido'

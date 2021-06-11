@@ -12,7 +12,7 @@ class Autocomplete extends React.Component {
     this.state = {
       activeSuggestion: 0,
       showSuggestions: false,
-      userInput: "",
+      userInput: props.userInput ?? "",
       focused: false,
       openUp: false
     }
@@ -179,8 +179,8 @@ class Autocomplete extends React.Component {
     let sortSingleData = suggestions
       .filter(i => {
         let startCondition = i[filterKey]
-            .toLowerCase()
-            .startsWith(userInput.toLowerCase()),
+          .toLowerCase()
+          .startsWith(userInput.toLowerCase()),
           startConditionAcent = i[filterKey]
             .normalize("NFD")
             .replace(/[\u00C0-\u00FF]/g, '')
@@ -190,14 +190,14 @@ class Autocomplete extends React.Component {
             .toLowerCase()
             .includes(userInput.toLowerCase()),
           includeConditionAcent = i[filterKey]
-          .normalize("NFD")
-          .replace(/[\u00C0-\u00FF]/g, '')
-          .toLowerCase()
-          .startsWith(userInput.toLowerCase())
+            .normalize("NFD")
+            .replace(/[\u00C0-\u00FF]/g, '')
+            .toLowerCase()
+            .startsWith(userInput.toLowerCase())
 
         if (startCondition) {
           return startCondition
-        } else if(!startCondition && startConditionAcent){
+        } else if (!startCondition && startConditionAcent) {
           return startConditionAcent
         } else if (!startCondition && !startConditionAcent && includeCondition) {
           return includeCondition
@@ -259,8 +259,8 @@ class Autocomplete extends React.Component {
         let sortData = suggestion.data
           .filter(i => {
             let startCondition = i[filterKey]
-                .toLowerCase()
-                .startsWith(userInput.toLowerCase()),
+              .toLowerCase()
+              .startsWith(userInput.toLowerCase()),
               includeCondition = i[filterKey]
                 .toLowerCase()
                 .includes(userInput.toLowerCase())
@@ -396,9 +396,8 @@ class Autocomplete extends React.Component {
           }}
           onKeyDown={e => onKeyDown(e)}
           value={userInput}
-          className={`vx-autocomplete-search ${
-            this.props.className ? this.props.className : ""
-          }`}
+          className={`vx-autocomplete-search ${this.props.className ? this.props.className : ""
+            }`}
           placeholder={this.props.placeholder}
           onClick={this.onInputClick}
           ref={el => {

@@ -29,25 +29,25 @@ class AccountSettings extends React.Component {
   }
 
   updateWidth = () => {
-    this.setState({ windowWidth  : window.innerWidth })
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   componentDidMount() {
-    if(window !== undefined){
+    if (window !== undefined) {
       this.updateWidth()
       window.addEventListener("resize", this.updateWidth)
     }
   }
-  
+
 
   render() {
-    let {windowWidth} = this.state
+    let { windowWidth } = this.state
     return (
       <React.Fragment>
         <Breadcrumbs
-          breadCrumbTitle="Configuración de Cuenta"
+          breadCrumbTitle="Configuración"
           breadCrumbParent="Usuario"
-          breadCrumbActive="Cuenta"
+          breadCrumbActive="Configuración"
         />
         <div className={`${windowWidth >= 769 ? "nav-vertical" : "account-setting-wrapper"}`}>
           <Nav className="account-settings-tab nav-left mr-0 mr-sm-3" tabs>

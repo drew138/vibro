@@ -40,14 +40,14 @@ const navigationConfig = [
     title: "Monitoreo",
     type: "collapse",
     icon: <Icon.Wifi size={20} />,
-    permissions: ["admin", "editor"],
+    permissions: ["admin", "client"],
     children: [
       {
         id: "list-service-monitoring",
         title: "Lista",
         type: "item",
         icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
+        permissions: ["admin", "client"],
         navLink: "/services/monitoring/list"
       },
       {
@@ -55,7 +55,7 @@ const navigationConfig = [
         title: "Máquina",
         type: "item",
         icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
+        permissions: ["admin", "client"],
         navLink: "/services/monitoring/machine"
       },
     ]

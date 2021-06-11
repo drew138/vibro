@@ -5,7 +5,8 @@ const initialState = {
 	address: "",
 	phone: "",
 	city: "",
-	hierarchy: ""
+	hierarchy: "",
+	picture: ""
 }
 
 const company = (state = initialState, action) => {

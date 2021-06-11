@@ -10,13 +10,9 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { createCompany } from "../../../../redux/actions/company"
-// import isValidAddress from "../../../../validators/address"
-// import isValidPhone from "../../../../validators/phone"
-// import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { CREATE_HIERARCHY_ENDPOINT, GET_COMPANIES_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 
 class Hierarchy extends React.Component {
 

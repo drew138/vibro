@@ -41,7 +41,7 @@ class General extends React.Component {
     email: this.props.auth.values?.email ?? undefined,
     phone: this.props.auth.values?.phone ?? undefined,
     celphone: this.props.auth.values?.celphone ?? undefined,
-    selectedFile: null,
+    picture: undefined
   }
 
   handleSubmit = e => {
@@ -62,15 +62,23 @@ class General extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-
-
-    this.props.updateProfile(this.state)
+    const data = {
+      first_name: this.state.first_name,
+      last_name: this.state.last_name,
+      email: this.state.email,
+      phone: this.state.phone,
+      celphone: this.state.celphone,
+    }
+    if (this.state.picture) {
+      data.picture = this.state.picture
+    }
+    this.props.updateProfile(data)
 
   }
 
   fileSelectedHandler = (event) => {
     this.setState({
-      selectedFile: event.target.files[0]
+      picture: event.target.files[0]
     })
   }
 
@@ -81,7 +89,7 @@ class General extends React.Component {
   removePicture = () => {
     this.imageInputRef.current.value = null
     this.setState({
-      selectedFile: null
+      picture: undefined
     })
   }
 
@@ -115,8 +123,9 @@ class General extends React.Component {
               className="rounded-circle"
               object
               src={
-                this.state.selectedFile ? URL.createObjectURL(this.state.selectedFile) :
-                  this.props.auth.values?.picture
+                this.state.picture ?
+                  URL.createObjectURL(this.state.picture)
+                  : this.props.auth.values?.picture
               }
               alt="User"
               height="64"

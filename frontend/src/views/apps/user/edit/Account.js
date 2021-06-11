@@ -96,6 +96,7 @@ class UserAccountTab extends React.Component {
 
   async componentDidMount() {
     if (this.props.user.id) {
+      // add try catch
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
       const companies = [{ id: 0, name: "N/A" }, ...res.data]
       this.setState({ companies })
