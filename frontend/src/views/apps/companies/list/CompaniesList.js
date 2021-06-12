@@ -33,7 +33,7 @@ import { history } from "../../../../history"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { GET_COMPANIES_ENDPOINT } from '../../../../config'
 import { setCompany } from "../../../../redux/actions/company"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+import { Edit } from "react-feather"
 
 class CompaniesList extends React.Component {
 
@@ -54,6 +54,27 @@ class CompaniesList extends React.Component {
     searchVal: "",
     columnDefs: [
       {
+        width: 100,
+        cellRendererFramework: params => {
+          return (
+            <div
+              className="d-flex align-items-center justify-content-around cursor-pointer"
+            >
+              <span>
+                <Edit className="ml-1 mr-1"
+                  onClick={
+                    () => {
+
+                      this.props.setCompany(params.data)
+                      history.push("/app/companies/list/edit")
+                    }
+                  } />
+              </span>
+            </div>
+          )
+        }
+      },
+      {
         headerName: "Nombre",
         field: "name",
         filter: true,
@@ -62,10 +83,6 @@ class CompaniesList extends React.Component {
           return (
             <div
               className="d-flex align-items-center cursor-pointer"
-              onClick={() => {
-                this.props.setCompany(params.data)
-                history.push("/app/companies/list/edit")
-              }}
             >
               <img
                 className="rounded-circle mr-50"
@@ -217,25 +234,25 @@ class CompaniesList extends React.Component {
                               onClick={() => this.filterSize(10)}
                             >
                               10
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(20)}
                             >
                               20
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(30)}
                             >
                               30
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(40)}
                             >
                               40
-                        </DropdownItem>
+                            </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                       </div>

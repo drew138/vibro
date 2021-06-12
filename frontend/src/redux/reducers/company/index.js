@@ -5,7 +5,7 @@ const initialState = {
 	address: "",
 	phone: "",
 	city: "",
-	hierarchy: "",
+	// hierarchy: "",
 	picture: ""
 }
 

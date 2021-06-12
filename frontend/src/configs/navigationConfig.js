@@ -91,8 +91,8 @@ const navigationConfig = [
     ]
   },
   {
-    id: "companies",
-    title: "Empresas",
+    id: "company",
+    title: "Empresa",
     type: "collapse",
     icon: <Icon.Briefcase size={20} />,
     permissions: ["admin", "support", "engineer"],

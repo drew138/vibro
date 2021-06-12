@@ -22,7 +22,7 @@ import { displayAlert } from "../../../../redux/actions/alerts"
 import { setMachine } from "../../../../redux/actions/machine"
 import axios from "axios"
 import { GET_MACHINES_ENDPOINT } from "../../../../config"
-
+import { Edit, FilePlus } from "react-feather"
 
 
 class ListMachines extends React.Component {
@@ -43,13 +43,38 @@ class ListMachines extends React.Component {
     searchVal: "",
     columnDefs: [
       {
+        width: 100,
+        cellRendererFramework: params => {
+          return (
+            <div
+              className="d-flex align-items-center justify-content-around cursor-pointer"
+            >
+              <span>
+                <Edit className="ml-1 mr-1"
+                  onClick={
+                    () => {
+                      this.props.setMachine(params.data)
+                      history.push("/app/machine/edit")
+                    }
+                  } />
+                <FilePlus className="mr-1" onClick={
+                  () => {
+                    this.props.setMachine(params.data)
+                    history.push("/app/machine/measurements")
+                  }
+                } /> {/* TODO add functionality 
+                to create a new measurements */}
+
+              </span>
+            </div>
+          )
+        }
+      },
+      {
         headerName: "ID",
         field: "identifier",
         width: 150,
         filter: true,
-        // checkboxSelection: true,
-        // headerCheckboxSelectionFilteredOnly: true,
-        // headerCheckboxSelection: true
       },
       {
         headerName: "Nombre",
@@ -59,21 +84,8 @@ class ListMachines extends React.Component {
         cellRendererFramework: params => {
           return (
             <div
-              className="d-flex align-items-center cursor-pointer"
-              onClick={
-                () => {
-                  this.props.setMachine(params.data)
-                  history.push("/app/machine/edit")
-                }
-              }
+              className="d-flex align-items-center justify-content-around cursor-pointer"
             >
-              {/* <img
-            className="rounded-circle mr-50"
-            src={params.data.avatar}
-            alt="user avatar"
-            height="30"
-            width="30"
-          /> */}
               <span>{params.data.name}</span>
             </div>
           )
@@ -91,12 +103,12 @@ class ListMachines extends React.Component {
         filter: true,
         width: 250
       },
-      {
-        headerName: "Marca",
-        field: "brand",
-        filter: true,
-        width: 250
-      }
+      // {
+      //   headerName: "Marca",
+      //   field: "brand",
+      //   filter: true,
+      //   width: 250
+      // }
     ]
 
   }
@@ -198,25 +210,25 @@ class ListMachines extends React.Component {
                               onClick={() => this.filterSize(10)}
                             >
                               10
-                          </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(20)}
                             >
                               20
-                          </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(30)}
                             >
                               30
-                          </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(40)}
                             >
                               40
-                          </DropdownItem>
+                            </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                       </div>

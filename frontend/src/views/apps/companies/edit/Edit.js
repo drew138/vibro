@@ -11,12 +11,11 @@ import {
   TabPane
 } from "reactstrap"
 import classnames from "classnames"
-import { Briefcase, List, Upload } from "react-feather"
+import { Briefcase, List } from "react-feather"
 import CompanyTab from "./Company"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import ListMachines from "./List"
-import AddMachine from "./AddMachine"
 
 class CompanyEdit extends React.Component {
   state = {
@@ -68,19 +67,6 @@ class CompanyEdit extends React.Component {
                       <span className="align-middle ml-50">Maquinas</span>
                     </NavLink>
                   </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className={classnames({
-                        active: this.state.activeTab === "3"
-                      })}
-                      onClick={() => {
-                        this.toggle("3")
-                      }}
-                    >
-                      <Upload size={16} />
-                      <span className="align-middle ml-50">Agregar Máquina</span>
-                    </NavLink>
-                  </NavItem>
                 </Nav>
                 <TabContent activeTab={this.state.activeTab}>
                   <TabPane tabId="1">
@@ -88,9 +74,6 @@ class CompanyEdit extends React.Component {
                   </TabPane>
                   <TabPane tabId="2">
                     <ListMachines />
-                  </TabPane>
-                  <TabPane tabId="3">
-                    <AddMachine />
                   </TabPane>
                 </TabContent>
               </CardBody>

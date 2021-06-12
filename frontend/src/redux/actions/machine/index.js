@@ -28,7 +28,7 @@ export const createMachine = (machine) => {
           }
         }
       }
-      const res = await axios.post(PATCH_MACHINE_ENDPOINT, data)
+      const res = await axios.post(CREATE_MACHINE_ENDPOINT, data)
       dispatch({
         type: "SET_MACHINE_STATE",
         payload: res.data
@@ -60,7 +60,7 @@ export const createMachine = (machine) => {
   }
 }
 
-export const updateMachine = (machine) => {
+export const updateMachine = (machine, id) => {
   return async dispatch => {
     try {
       const data = new FormData();
@@ -74,7 +74,7 @@ export const updateMachine = (machine) => {
           }
         }
       }
-      const res = await axios.post(CREATE_MACHINE_ENDPOINT, data)
+      const res = await axios.patch(`${PATCH_MACHINE_ENDPOINT}${id}`, data)
       dispatch({
         type: "SET_MACHINE_STATE",
         payload: res.data

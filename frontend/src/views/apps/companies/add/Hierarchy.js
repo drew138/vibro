@@ -11,7 +11,7 @@ import {
 import { connect } from "react-redux"
 import { createCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { CREATE_HIERARCHY_ENDPOINT, GET_COMPANIES_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
+import { CREATE_HIERARCHY_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 
 class Hierarchy extends React.Component {
@@ -19,11 +19,10 @@ class Hierarchy extends React.Component {
     state = {
         name: "",
         parent: 0,
-        parentName: "N/A",
-        parents: [{ id: 0, name: "N/A" }],
+        parentName: "Seleccione una opción",
+        parents: [{ id: 0, name: "Seleccione una opción" }],
         company: 0,
-        companyName: "N/A",
-        companies: [{ id: 0, name: "N/A" }]
+        companyName: "Seleccione una opción",
     }
 
     handleSubmit = async (e) => {
@@ -67,6 +66,11 @@ class Hierarchy extends React.Component {
 
     async getParents(companyId) {
         if (!companyId) {
+            this.setState({
+                parents: [{ id: 0, name: "Seleccione una opción" }],
+                parent: 0,
+                parentName: "Seleccione una opción"
+            })
             return
         }
         try {
@@ -75,7 +79,7 @@ class Hierarchy extends React.Component {
                     company_id: companyId
                 }
             })
-            this.setState({ parents: [{ id: 0, name: "N/A" }, ...res.data] })
+            this.setState({ parents: [{ id: 0, name: "Seleccione una opción" }, ...res.data] })
         } catch (e) {
             console.log(e);
             const alertData = {
@@ -88,21 +92,21 @@ class Hierarchy extends React.Component {
         }
     }
 
-    async componentDidMount() {
-        try {
-            const res = await axios.get(GET_COMPANIES_ENDPOINT)
-            this.setState({ companies: [{ id: 0, name: "N/A" }, ...res.data] })
-        } catch (e) {
-            console.log(e);
-            const alertData = {
-                title: "Error de Conexión",
-                success: false,
-                show: true,
-                alertText: "Error al Conectar al Servidor"
-            }
-            this.props.displayAlert(alertData)
-        }
-    }
+    // async componentDidMount() {
+    //     try {
+    //         const res = await axios.get(GET_COMPANIES_ENDPOINT)
+    //         this.setState({ companies: [{ id: 0, name: "N/A" }, ...res.data] })
+    //     } catch (e) {
+    //         console.log(e);
+    //         const alertData = {
+    //             title: "Error de Conexión",
+    //             success: false,
+    //             show: true,
+    //             alertText: "Error al Conectar al Servidor"
+    //         }
+    //         this.props.displayAlert(alertData)
+    //     }
+    // }
 
     render() {
         return (
@@ -159,7 +163,7 @@ class Hierarchy extends React.Component {
 
                                     >
                                         {
-                                            this.state.companies.map((company) => (
+                                            this.props.companies.map((company) => (
 
                                                 <option companyid={company.id} key={company.id}>{company.name}</option>
                                             ))

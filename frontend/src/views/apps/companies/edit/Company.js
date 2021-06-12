@@ -165,10 +165,10 @@ class CompanyTab extends React.Component {
       this.props.displayAlert(alertData)
     } catch (e) {
       const alertData = {
-        title: "Error Al Borrar Jerarquía",
+        title: "Error Al Borrar Empresa",
         success: false,
         show: true,
-        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Jerarquía."
+        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Empresa."
       }
       this.props.displayAlert(alertData)
     }

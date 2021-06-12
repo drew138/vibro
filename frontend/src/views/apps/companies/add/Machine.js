@@ -7,7 +7,11 @@ import {
   Form,
   Input,
   Label,
-  FormGroup
+  FormGroup,
+  Card,
+  CardBody,
+  CardImg,
+
 } from "reactstrap"
 import { connect } from "react-redux"
 import { createMachine } from "../../../../redux/actions/machine"
@@ -16,15 +20,21 @@ import { createMachine } from "../../../../redux/actions/machine"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
-import { CustomInput } from "reactstrap"
+// import { CustomInput } from "reactstrap"
 
 
 class CompanyTab extends React.Component {
 
   constructor(props) {
     super(props)
+    // this.imageInputRef = React.createRef();
+    // this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+
+
+    this.diagramInputRef = React.createRef();
     this.imageInputRef = React.createRef();
-    this.fileSelectedHandler = this.fileSelectedHandler.bind(this)
+    this.imageSelectedHandler = this.imageSelectedHandler.bind(this);
+    this.diagramSelectedHandler = this.diagramSelectedHandler.bind(this);
   }
 
   state = {
@@ -37,13 +47,17 @@ class CompanyTab extends React.Component {
     power: "",
     power_units: "KW",
     norm: "",
-    company: this.props.company.id ?? 0,
-    hierarchyName: "Seleccione una opción",
-    hierarchy: 0,
+    company: 0,
+    companyName: "Seleccione una opción",
     rpm: "",
-    image: "",
-    diagram: "",
-    hierarchies: [{ id: 0, name: "Seleccione una opción" }]
+    image: undefined,
+    diagram: undefined,
+    hierarchy: 0,
+    hierarchyName: "Seleccione una opción",
+    hierarchies: [{ id: 0, name: "Seleccione una opción" }],
+    // parent: 0,
+    // parentName: "N/A",
+    // parents: [{ id: 0, name: "N/A" }],
   }
 
   handleSubmit = e => {
@@ -108,25 +122,65 @@ class CompanyTab extends React.Component {
     if (!hierarchy) {
       delete body["hierarchy"]
     }
+    // console.log(body)
     this.props.createMachine(body)
   }
 
-  fileSelectedHandler = (event) => {
+
+  imageSelectedHandler = (event) => {
     this.setState({
-      selectedFile: event.target.files[0]
+      image: event.target.files[0]
     })
+    // console.log(this.state)
   }
 
-  fileUploadHandler = () => {
+  imageUploadHandler = () => {
     this.imageInputRef.current.click()
   }
 
-  removePicture = () => {
+  removeImage = () => {
     this.imageInputRef.current.value = null
     this.setState({
-      selectedFile: null
+      image: undefined
     })
   }
+
+
+
+
+  diagramSelectedHandler = (event) => {
+    this.setState({
+      diagram: event.target.files[0]
+    })
+  }
+
+  diagramUploadHandler = () => {
+    this.diagramInputRef.current.click()
+  }
+
+  removeDiagram = () => {
+    this.diagramInputRef.current.value = null
+    this.setState({
+      diagram: undefined
+    })
+  }
+
+  // fileSelectedHandler = (event) => {
+  //   this.setState({
+  //     selectedFile: event.target.files[0]
+  //   })
+  // }
+
+  // fileUploadHandler = () => {
+  //   this.imageInputRef.current.click()
+  // }
+
+  // removePicture = () => {
+  //   this.imageInputRef.current.value = null
+  //   this.setState({
+  //     selectedFile: null
+  //   })
+  // }
 
   toTitleCase(str) {
     return str.replace(
@@ -137,26 +191,106 @@ class CompanyTab extends React.Component {
     );
   }
 
-  async componentDidMount() {
-    if (!this.state.company) {
+  async getHierarchies(id) {
+    // if (!companyId) {
+    //   return
+    // }
+    // try {
+    //   const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
+    //     params: {
+    //       company_id: companyId
+    //     }
+    //   })
+    //   this.setState({ parents: [{ id: 0, name: "N/A" }, ...res.data] })
+    // } catch (e) {
+    //   console.log(e);
+    //   const alertData = {
+    //     title: "Error de Conexión",
+    //     success: false,
+    //     show: true,
+    //     alertText: "Error al Conectar al Servidor"
+    //   }
+    //   this.props.displayAlert(alertData)
+    // }
+    if (!id) {
+      this.setState({
+        hierarchies: [{ id: 0, name: "Seleccione una opción" }],
+        hierarchy: 0,
+        hierarchyName: "Seleccione una opción"
+      })
       return
     }
     try {
       const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
         params: {
-          company_id: this.state.company
+          company_id: id
         }
       });
-
       this.setState({ hierarchies: [{ id: 0, name: "Seleccione una opción" }, ...res.data] })
     } catch (e) {
       console.log(e)
     }
   }
+  async componentDidMount() {
+  }
 
   render() {
     return (
       <Row>
+        <Col lg="6" md="6" sm="12">
+          <Card>
+            <CardBody>
+              <CardImg
+                className="img-fluid mb-2"
+                src={this.state.image ? URL.createObjectURL(this.state.image) : ""}
+                alt="card image cap"
+              />
+              <input
+                style={{ display: "none" }}
+                type="file"
+                onChange={this.imageSelectedHandler}
+                ref={this.imageInputRef} />
+              <h3>Imagen De Máquina</h3>
+
+              <hr className="my-1" />
+              <div className="card-btns d-flex justify-content-between mt-2">
+                <Button.Ripple type="button" color="primary" onClick={this.imageUploadHandler}>
+                  Cambiar
+                </Button.Ripple>
+                <Button.Ripple color="danger" outline type="button" onClick={this.removeImage}>
+                  Quitar Foto
+                </Button.Ripple>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+        <Col lg="6" md="6" sm="12">
+          <Card>
+            <CardBody>
+              <CardImg
+                className="img-fluid mb-2"
+                src={this.state.diagram ? URL.createObjectURL(this.state.diagram) : ""}
+                alt="card image cap"
+              />
+              <input
+                style={{ display: "none" }}
+                type="file"
+                onChange={this.diagramSelectedHandler}
+                ref={this.diagramInputRef} />
+              <h3>Diagrama Esquematico</h3>
+
+              <hr className="my-1" />
+              <div className="card-btns d-flex justify-content-between mt-2">
+                <Button.Ripple type="button" color="primary" onClick={this.diagramUploadHandler}>
+                  Cambiar
+                </Button.Ripple>
+                <Button.Ripple color="danger" type="button" outline onClick={this.removeDiagram}>
+                  Quitar Foto
+                </Button.Ripple>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
         <Col sm="12">
           <Form onSubmit={this.handleSubmit}>
             <Row>
@@ -336,35 +470,59 @@ class CompanyTab extends React.Component {
               </Col>
 
 
-              <Col md="6" sm="12">
+              {/* <Col md="6" sm="12">
                 <FormGroup>
-                  <Label for="customFile">Imagen</Label>
-                  <CustomInput
-                    type="file"
+                <Label for="customFile">Imagen</Label>
+                <CustomInput
+                type="file"
                     id="image"
                     name="Imagen"
                     onChange={e => {
                       this.setState({ image: e.target.files[0] ?? "" })
                     }}
                   />
-                </FormGroup>
-              </Col>
-
-              <Col md="6" sm="12">
-                <FormGroup>
+                  </FormGroup>
+                  </Col>
+                  
+                  <Col md="6" sm="12">
+                  <FormGroup>
                   <Label for="customFile">Diagrama</Label>
                   <CustomInput
-                    type="file"
-                    id="diagram"
+                  type="file"
+                  id="diagram"
                     name="Diagrama"
                     onChange={e => {
                       this.setState({ diagram: e.target.files[0] ?? "" })
                     }}
-                  />
+                    />
+                    </FormGroup>
+                  </Col> */}
+
+
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="company-hierarchy">Empresa</Label>
+                  <Input
+                    type="select"
+                    id="company-hierarchy"
+                    value={this.state.companyName}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
+                      this.getHierarchies(companyId);
+                      this.setState({ company: companyId, companyName: e.target.value });
+                    }}
+
+                  >
+                    {
+                      this.props.companies.map((company) => (
+
+                        <option companyid={company.id} key={company.id}>{company.name}</option>
+                      ))
+                    }
+                  </Input>
                 </FormGroup>
               </Col>
-
-
 
 
               <Col
@@ -372,7 +530,7 @@ class CompanyTab extends React.Component {
                 sm="12"
               >
                 <Button.Ripple className="mr-1" color="primary">
-                  Guardar Cambios
+                  Crear Máquina
                 </Button.Ripple>
               </Col>
             </Row>

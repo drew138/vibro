@@ -33,7 +33,8 @@ import { GET_USERS_ENDPOINT } from '../../../../config'
 import { connect } from "react-redux"
 import { setUser } from "../../../../redux/actions/users"
 import { displayAlert } from "../../../../redux/actions/alerts"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+import { Edit } from "react-feather";
+
 
 const UserTypes = {
   'admin': "Administrativo",
@@ -61,6 +62,30 @@ class UsersList extends React.Component {
     searchVal: "",
     columnDefs: [
       {
+        width: 100,
+        cellRendererFramework: params => {
+          return (
+            <div
+              className="d-flex align-items-center cursor-pointer"
+            >
+              <span>
+                <Edit className="ml-1 mr-1"
+                  onClick={() => {
+                    this.props.setUser(params.data)
+                    history.push("/app/user/list/edit")
+                  }}
+                // onClick={
+                //   () => {
+                //     this.props.setMachine(params.data)
+                //     history.push("/app/machine/edit")
+                //   }
+                />
+              </span>
+            </div>
+          )
+        }
+      },
+      {
         headerName: "Nombre",
         field: "first_name",
         filter: true,
@@ -81,10 +106,10 @@ class UsersList extends React.Component {
           return (
             <div
               className="d-flex align-items-center cursor-pointer"
-              onClick={() => {
-                this.props.setUser(params.data)
-                history.push("/app/user/list/edit")
-              }}
+            // onClick={() => {
+            //   this.props.setUser(params.data)
+            //   history.push("/app/user/list/edit")
+            // }}
             >
               <img
                 className="rounded-circle mr-50"
@@ -248,25 +273,25 @@ class UsersList extends React.Component {
                               onClick={() => this.filterSize(10)}
                             >
                               10
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(20)}
                             >
                               20
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(30)}
                             >
                               30
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(40)}
                             >
                               40
-                        </DropdownItem>
+                            </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                       </div>

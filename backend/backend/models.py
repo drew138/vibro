@@ -168,10 +168,10 @@ class Machine(models.Model):
     rpm = models.IntegerField(null=True)  # !TODO remove null
     image = models.ImageField(
         upload_to="machines/images",
-        null=True)
+        null=True)  # !TODO remove null
     diagram = models.ImageField(
         upload_to="machines/diagrams",
-        null=True)
+        null=True)  # !TODO remove null
 
 
 class Sensor(models.Model):
