@@ -33,7 +33,7 @@ import { ContextLayout } from "../../../../utility/context/Layout"
 import { setMachine } from "../../../../redux/actions/machine"
 import { setCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
-
+import { BookOpen } from "react-feather"
 
 class MachineList extends React.Component {
 
@@ -57,15 +57,26 @@ class MachineList extends React.Component {
     companyName: "Seleccione una opción",
     company: 0,
     columnDefs: [
-      // {
-      //   headerName: "ID",
-      //   field: "id",
-      //   width: 150,
-      //   filter: true,
-      //   // checkboxSelection: true,
-      //   // headerCheckboxSelectionFilteredOnly: true,
-      //   // headerCheckboxSelection: true
-      // },
+      {
+        width: 100,
+        cellRendererFramework: params => {
+          return (
+            <div
+              className="d-flex align-items-center justify-content-around cursor-pointer"
+            >
+              <span>
+                <BookOpen
+                  onClick={() => {
+                    this.props.setCompany(this.state.companiesMap[this.state.company])
+                    this.props.setMachine(params.data)
+                    history.push("/services/monitoring/machine")
+                  }}
+                />
+              </span>
+            </div>
+          )
+        }
+      },
       {
         headerName: "Nombre",
         field: "name",
@@ -75,11 +86,6 @@ class MachineList extends React.Component {
           return (
             <div
               className="d-flex align-items-center cursor-pointer"
-              onClick={() => {
-                this.props.setCompany(this.state.companiesMap[this.state.company])
-                this.props.setMachine(params.data)
-                history.push("/services/monitoring/machine")
-              }}
             >
               {/* <img
                 className="rounded-circle mr-50"
@@ -162,53 +168,7 @@ class MachineList extends React.Component {
       this.props.displayAlert(alertData)
       this.setState({ rowData: [] })
     }
-    // }
-    // if (this.state.companyId !== 0) {
-    //   try {
-    //     // TODO filter machines by ones that are being monitored
-    //     const res = await axios.get(`${GET_MACHINES_ENDPOINT}${this.state.companyId}`, {
-    //       headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }
-    //     })
-    //     this.setState({ rowData: res.data })
-    //   } catch {
-    //     const alertData = {
-    //       title: "Error de Conexión",
-    //       success: false,
-    //       show: true,
-    //       alertText: "Error al Conectar al Servidor"
-    //     }
-    //     this.props.displayAlert(alertData)
-    //     this.setState({ rowData: [] })
-    //   }
-    // } else {
-    // console.log(this.state.companies)
-    // this.setState({ rowData: [] })
-    // }
-
   }
-
-  // async getRowData() {
-  //   if (this.state.companyId !== 0) {
-  //     try {
-  //       // TODO filter machines by ones that are being monitored
-  //       const res = await axios.get(`${GET_MACHINES_ENDPOINT}${this.state.companyId}`, {
-  //         headers: { 'Authorization': `Bearer ${this.props.auth.tokens.access}` }
-  //       })
-  //       this.setState({ rowData: res.data })
-  //     } catch {
-  //       const alertData = {
-  //         title: "Error de Conexión",
-  //         success: false,
-  //         show: true,
-  //         alertText: "Error al Conectar al Servidor"
-  //       }
-  //       this.props.displayAlert(alertData)
-  //       this.setState({ rowData: [] })
-  //     }
-  //   } else {
-  //     this.setState({ rowData: [] })
-  //   }
-  // }
 
   onGridReady = params => {
     this.gridApi = params.api
@@ -308,10 +268,10 @@ class MachineList extends React.Component {
                     size={15}
                     onClick={() => {
                       this.refreshCard()
+                      this.componentDidMount()
                       this.gridApi.setFilterModel(null)
                     }}
                   />
-                  <X size={15} onClick={this.removeCard} />
                 </div>
               </CardHeader>
               <Collapse
@@ -386,25 +346,25 @@ class MachineList extends React.Component {
                               onClick={() => this.filterSize(10)}
                             >
                               10
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(20)}
                             >
                               20
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(30)}
                             >
                               30
-                        </DropdownItem>
+                            </DropdownItem>
                             <DropdownItem
                               tag="div"
                               onClick={() => this.filterSize(40)}
                             >
                               40
-                        </DropdownItem>
+                            </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                       </div>

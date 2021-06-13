@@ -299,18 +299,10 @@ class EditMachine extends React.Component {
                     <Col sm="12">
                         <Card>
                             <CardBody className="pt-2">
-
-
-
-
-
-
                                 <Row>
                                     <Col sm="12">
                                         <Form onSubmit={this.handleSubmit}>
                                             <Row>
-
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="id">Identificador</Label>
@@ -323,7 +315,6 @@ class EditMachine extends React.Component {
                                                         />
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="name">Nombre</Label>
@@ -336,9 +327,6 @@ class EditMachine extends React.Component {
                                                         />
                                                     </FormGroup>
                                                 </Col>
-
-
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="code">Código</Label>
@@ -359,7 +347,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="electric_feed">Alimentación Eléctrica</Label>
@@ -380,8 +367,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="power">Potencia</Label>
@@ -395,7 +380,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="power_units">Unidades de Potencia</Label>
@@ -415,7 +399,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="brand">Marca</Label>
@@ -428,7 +411,6 @@ class EditMachine extends React.Component {
                                                         />
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="norm">Norma</Label>
@@ -443,7 +425,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="hierarchy">Jerarquía</Label>
@@ -459,7 +440,6 @@ class EditMachine extends React.Component {
                                                                     hierarchyName: e.target.value,
                                                                     hierarchy: hierarchyId
                                                                 })
-
                                                             }}
                                                         >
                                                             {
@@ -470,7 +450,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
                                                 <Col md="6" sm="12">
                                                     <FormGroup>
                                                         <Label for="rpm">RPM</Label>
@@ -484,8 +463,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-
-
                                                 {/* <Col md="6" sm="12">
                                                     <FormGroup>
                                                     <Label for="customFile">Imagen</Label>
@@ -526,10 +503,6 @@ class EditMachine extends React.Component {
                                                         alt="card image cap"
                                                         />
                                                 </Col> */}
-
-
-
-
                                                 <Col
                                                     className="d-flex justify-content-end flex-wrap mt-2"
                                                     sm="12"
@@ -561,7 +534,6 @@ class EditMachine extends React.Component {
                     onConfirm={this.deleteMachine}
                     onCancel={() => this.setState({ show: false })}
                 >
-
                     <p className="sweet-alert-text">
                         Todas Mediciones Serán Borradas Junto Con Esta Máquina.
                     </p>

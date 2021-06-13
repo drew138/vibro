@@ -31,13 +31,18 @@ import { connect } from "react-redux"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { history } from "../../../../history"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
-import { GET_COMPANIES_ENDPOINT } from '../../../../config'
+import { GET_COMPANIES_ENDPOINT, DELETE_COMPANY_ENDPOINT } from '../../../../config'
 import { setCompany } from "../../../../redux/actions/company"
-import { Edit } from "react-feather"
+import { Edit, Trash2 } from "react-feather"
+
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 class CompaniesList extends React.Component {
 
   state = {
+    id: 0,
+    name: "",
+    show: false,
     rowData: null,
     pageSize: 20,
     isVisible: true,
@@ -69,6 +74,16 @@ class CompaniesList extends React.Component {
                       history.push("/app/companies/list/edit")
                     }
                   } />
+                {this.props.auth.user_type === "admin" &&
+                  <Trash2 style={{ color: "#F9596E" }}
+                    onClick={
+                      () => this.setState({
+                        name: params.data.name,
+                        id: params.data.id,
+                        show: true
+                      })
+                    }
+                  />}
               </span>
             </div>
           )
@@ -117,7 +132,7 @@ class CompaniesList extends React.Component {
     try {
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
 
-      this.setState({ rowData: res.data })
+      this.setState({ rowData: [...res.data] })
 
 
     } catch {
@@ -132,6 +147,37 @@ class CompaniesList extends React.Component {
     }
   }
 
+  deleteCompany = async () => {
+    this.setState({ show: false })
+    if (!this.state.id) {
+      return
+    }
+
+    try {
+      const res = await axios.delete(`${DELETE_COMPANY_ENDPOINT}${this.state.id}/`)
+      const alertData = {
+        title: "Empresa Borrada Exitosamente",
+        success: true,
+        show: true,
+        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Empresas.`
+      }
+      this.props.displayAlert(alertData)
+      const tmp = this.state.id;
+      this.setState({
+        rowData: [...this.state.rowData.filter((company) => company.id !== tmp)],
+        id: 0,
+        name: ""
+      })
+    } catch (e) {
+      const alertData = {
+        title: "Error Al Borrar Empresa",
+        success: false,
+        show: true,
+        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Empresa."
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
 
   onGridReady = params => {
     this.gridApi = params.api
@@ -294,6 +340,26 @@ class CompaniesList extends React.Component {
             </Card>
           </Col>
         </Row>
+
+
+        {this.props.auth.user_type === "admin" && <SweetAlert
+          warning
+          title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
+          showCancel
+          show={this.state.show}
+          cancelBtnText="Cancelar"
+          confirmBtnText="Borrar Empresa"
+          confirmBtnBsStyle="danger"
+          cancelBtnBsStyle="primary"
+          onConfirm={this.deleteCompany}
+          onCancel={() => this.setState({ show: false })}
+        >
+
+          <p className="sweet-alert-text">
+            Todas Las Máquinas Y Mediciones Serán Borradas Junto Con Esta Empresa.
+          </p>
+        </SweetAlert>}
+
       </React.Fragment>
     )
   }

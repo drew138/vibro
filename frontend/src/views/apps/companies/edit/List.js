@@ -103,6 +103,12 @@ class ListMachines extends React.Component {
         filter: true,
         width: 250
       },
+      {
+        headerName: "Marca",
+        field: "brand",
+        filter: true,
+        width: 250
+      },
       // {
       //   headerName: "Marca",
       //   field: "brand",
@@ -138,31 +144,31 @@ class ListMachines extends React.Component {
     }
   }
 
-  refreshRows = async () => {
-    if (!this.props.company.id) {
-      return
-    }
-    try {
-      const res = await axios.get(GET_MACHINES_ENDPOINT, {
-        params: {
-          company_id: this.props.company.id,
-        }
-      })
-      this.setState({ rowData: res.data })
-    } catch (e) {
-      console.log(e)
-      const alertData = {
-        title: "Error de Conexión",
-        success: false,
-        show: true,
-        alertText: "Error al Conectar al Servidor"
-      }
-      this.props.displayAlert(alertData)
-      this.setState({ rowData: [] })
+  // refreshRows = async () => {
+  //   if (!this.props.company.id) {
+  //     return
+  //   }
+  //   try {
+  //     const res = await axios.get(GET_MACHINES_ENDPOINT, {
+  //       params: {
+  //         company_id: this.props.company.id,
+  //       }
+  //     })
+  //     this.setState({ rowData: res.data })
+  //   } catch (e) {
+  //     console.log(e)
+  //     const alertData = {
+  //       title: "Error de Conexión",
+  //       success: false,
+  //       show: true,
+  //       alertText: "Error al Conectar al Servidor"
+  //     }
+  //     this.props.displayAlert(alertData)
+  //     this.setState({ rowData: [] })
 
-    }
+  //   }
 
-  }
+  // }
 
   onGridReady = params => {
     this.gridApi = params.api
@@ -241,9 +247,9 @@ class ListMachines extends React.Component {
                         onChange={e => this.updateSearchQuery(e.target.value)}
                         value={this.state.searchVal}
                       />
-                      <div className="mr-1 mb-1 mb-sm-0">
+                      {/* <div className="mr-1 mb-1 mb-sm-0">
                         <Button.Ripple outline color="info" onClick={this.refreshRows}>Refrescar</Button.Ripple>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                   {this.state.rowData !== null ? (

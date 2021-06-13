@@ -2,23 +2,14 @@
 import axios from "axios"
 import { UPDATE_USER_PROFILE_ENDPOINT } from '../../../config'
 
-export const updateProfile = (user) => {
+export const updateProfile = (user, id) => {
   return async dispatch => {
     try {
-      // const data = new FormData()
-      // for (const [key, value] of Object.entries(user)) {
-      //   if (value && value !== "N/A") {
-      //     if (key === "selectedFile") {
-      //       data.append("picture", value)
-      //     } else {
-      //       data.append(key, value)
-      //     }
-      //   }
-      // }
+
       const data = new FormData();
       Object.keys(user).forEach(key => data.append(key, user[key]));
       const res = await axios.patch(
-        `${UPDATE_USER_PROFILE_ENDPOINT}${user.id}/`,
+        `${UPDATE_USER_PROFILE_ENDPOINT}${id}/`,
         data)
       const values = { ...res.data }
       dispatch({

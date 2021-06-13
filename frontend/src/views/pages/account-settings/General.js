@@ -10,7 +10,7 @@ import {
   Col
 } from "reactstrap"
 import isValidCelphone from "../../../validators/celphone"
-import isValidPhone from "../../../validators/phone"
+// import isValidPhone from "../../../validators/phone"
 import { connect } from "react-redux"
 import { updateProfile } from "../../../redux/actions/auth/updateActions"
 import { getUserWithJWT } from "../../../redux/actions/auth/loginActions"
@@ -18,15 +18,6 @@ import { displayAlert } from "../../../redux/actions/alerts"
 
 
 class General extends React.Component {
-  // state = {
-  //   visible: true
-  // }
-
-  // dismissAlert = () => {
-  //   this.setState({
-  //     visible: false
-  //   })
-  // }
 
   constructor(props) {
     super(props)
@@ -35,12 +26,12 @@ class General extends React.Component {
   }
 
   state = {
-    id: this.props.auth.values?.id ?? undefined,
-    first_name: this.props.auth.values?.first_name ?? undefined,
-    last_name: this.props.auth.values?.last_name ?? undefined,
-    email: this.props.auth.values?.email ?? undefined,
-    phone: this.props.auth.values?.phone ?? undefined,
-    celphone: this.props.auth.values?.celphone ?? undefined,
+    id: this.props.auth?.id ?? undefined,
+    first_name: this.props.auth?.first_name ?? undefined,
+    last_name: this.props.auth?.last_name ?? undefined,
+    email: this.props.auth?.email ?? undefined,
+    // phone: this.props.auth?.phone ?? undefined,
+    celphone: this.props.auth?.celphone ?? undefined,
     picture: undefined
   }
 
@@ -53,26 +44,20 @@ class General extends React.Component {
       alertText: ""
     }
     if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
-      alertData.alertText = "El número de celular debe ser ingresado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      alertData.alertText = "El número de celular debe ser ingresado en el formato: xxxxxxxxxx."
       this.props.displayAlert(alertData)
       return
     }
-    if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-      this.props.displayAlert(alertData)
-      return
-    }
-    const data = {
+    const user = {
       first_name: this.state.first_name,
       last_name: this.state.last_name,
       email: this.state.email,
-      phone: this.state.phone,
       celphone: this.state.celphone,
     }
     if (this.state.picture) {
-      data.picture = this.state.picture
+      user.picture = this.state.picture
     }
-    this.props.updateProfile(data)
+    this.props.updateProfile(user, this.state.id)
 
   }
 
@@ -106,14 +91,6 @@ class General extends React.Component {
     return "";
   }
 
-  // componentDidMount() {
-  //   if (!this.props.auth.values) {
-  //     this.props.refreshJWTAndLogin()
-  //     this.setState({ ...this.props.auth.values })
-  //   }
-
-  // }
-
   render() {
     return (
       <React.Fragment>
@@ -125,7 +102,7 @@ class General extends React.Component {
               src={
                 this.state.picture ?
                   URL.createObjectURL(this.state.picture)
-                  : this.props.auth.values?.picture
+                  : this.props.auth?.picture
               }
               alt="User"
               height="64"
@@ -135,8 +112,8 @@ class General extends React.Component {
 
           <Media className="mt-25" body>
             <Media className="font-medium-1 text-bold-600" tag="p" heading>
-              {`${this.toTitleCase(this.props.auth.values?.first_name)} 
-              ${this.toTitleCase(this.props.auth.values?.last_name)}`}
+              {`${this.toTitleCase(this.props.auth?.first_name)} 
+              ${this.toTitleCase(this.props.auth?.last_name)}`}
             </Media>
 
             <div className="d-flex flex-sm-row flex-column justify-content-start px-0">
@@ -186,7 +163,7 @@ class General extends React.Component {
               </FormGroup>
             </Col>
 
-            <Col md="6" sm="12">
+            {/* <Col md="6" sm="12">
               <FormGroup>
                 <Label for="phone">Telefono</Label>
                 <Input
@@ -197,7 +174,7 @@ class General extends React.Component {
                   onChange={e => this.setState({ phone: e.target.value })}
                 />
               </FormGroup>
-            </Col>
+            </Col> */}
 
             <Col md="6" sm="12">
               <FormGroup>

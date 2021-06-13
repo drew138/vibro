@@ -12,11 +12,21 @@ import {
 import { connect } from "react-redux"
 import { updateUser } from "../../../../redux/actions/users"
 import isValidCelphone from "../../../../validators/celphone"
-import isValidPhone from "../../../../validators/phone"
+// import isValidPhone from "../../../../validators/phone"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { GET_COMPANIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import { history } from "../../../../history"
+
+
+const roles = {
+  admin: "Administrador",
+  engineer: "Ingeniero",
+  support: "Soporte",
+  arduino: "Arduino",
+  client: "Cliente"
+}
+
 
 class UserAccountTab extends React.Component {
 
@@ -35,12 +45,11 @@ class UserAccountTab extends React.Component {
     first_name: this.props.user.first_name,
     last_name: this.props.user.last_name,
     email: this.props.user.email,
-    phone: this.props.user.phone,
     celphone: this.props.user.celphone,
-    selectedFile: null,
-    companyName: this.props.user.company?.name ?? "N/A",
+    picture: undefined,
+    companyName: this.props.user.company?.name ?? "Seleccione una opción",
     company: this.props.user.company?.id ?? 0,
-    companies: [],
+    companies: [{ id: 0, name: "Seleccione una opción" }],
     is_active: this.props.user.is_active,
     isActiveText: this.props.user.is_active ? "Activo" : "Inactivo",
     user_type: this.props.user.user_type
@@ -55,22 +64,30 @@ class UserAccountTab extends React.Component {
       alertText: ""
     }
     if (this.state.celphone && !isValidCelphone(this.state.celphone)) {
-      alertData.alertText = "El número de celular debe ser ingresado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      alertData.alertText = "El número de celular debe ser ingresado en el formato: xxxxxxxxxx."
       this.props.displayAlert(alertData)
       return
     }
-    if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-      this.props.displayAlert(alertData)
-      return
+    const user = {
+      first_name: this.state.first_name,
+      last_name: this.state.last_name,
+      email: this.state.email,
+      celphone: this.state.celphone,
+      is_active: this.state.is_active,
+      user_type: this.state.user_type
     }
-    this.props.updateUser(this.state)
-
+    if (this.state.company) {
+      user.company = this.state.company
+    }
+    if (this.state.picture) {
+      user.picture = this.state.picture
+    }
+    this.props.updateUser(user, this.state.id)
   }
 
   fileSelectedHandler = (event) => {
     this.setState({
-      selectedFile: event.target.files[0]
+      picture: event.target.files[0]
     })
   }
 
@@ -81,7 +98,7 @@ class UserAccountTab extends React.Component {
   removePicture = () => {
     this.imageInputRef.current.value = null
     this.setState({
-      selectedFile: null
+      picture: undefined
     })
   }
 
@@ -98,7 +115,7 @@ class UserAccountTab extends React.Component {
     if (this.props.user.id) {
       // add try catch
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
-      const companies = [{ id: 0, name: "N/A" }, ...res.data]
+      const companies = [{ id: 0, name: "Seleccione una opción" }, ...res.data]
       this.setState({ companies })
     }
   }
@@ -113,7 +130,7 @@ class UserAccountTab extends React.Component {
                 className="users-avatar-shadow rounded"
                 object
                 src={
-                  this.state.selectedFile ? URL.createObjectURL(this.state.selectedFile) :
+                  this.state.picture ? URL.createObjectURL(this.state.picture) :
                     this.props.user.picture
                 }
                 alt="user profile image"
@@ -171,21 +188,6 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-
-              <Col md="6" sm="12">
-                <FormGroup>
-                  <Label for="phone">Telefono</Label>
-                  <Input
-                    type="text"
-                    id="phone"
-                    placeholder="Telefono"
-                    value={this.state.phone}
-                    onChange={e => this.setState({ phone: e.target.value })}
-                  />
-                </FormGroup>
-              </Col>
-
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="celphone">Celular</Label>
@@ -198,7 +200,6 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="email">Email</Label>
@@ -211,7 +212,6 @@ class UserAccountTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="company">Empresa</Label>
@@ -223,10 +223,9 @@ class UserAccountTab extends React.Component {
                     onChange={e => {
                       const idx = e.target.selectedIndex;
                       const companyId = e.target.childNodes[idx].getAttribute("companyid");
-
                       this.setState({
                         companyName: e.target.value,
-                        company: companyId
+                        company: parseInt(companyId)
                       }
                       )
                     }}
@@ -237,26 +236,28 @@ class UserAccountTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="user_type">Tipo</Label>
                   <Input
                     type="select"
                     id="user_type"
-                    // placeholder="Empresa"
-                    value={this.state.user_type}
-                    onChange={e => this.setState({ user_type: e.target.value })}
+
+                    value={roles[this.state.user_type]}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const role = e.target.childNodes[idx].getAttribute("companyrole");
+                      this.setState({ user_type: role })
+                    }}
                   >
-                    <option value="admin">Administrativo</option>
-                    <option value="engineer">Ingeniero</option>
-                    <option value="client">Cliente</option>
-                    <option value="support">Soporte</option>
-                    <option value="arduino">Arduino</option>
+                    <option companyrole="admin">Administrador</option>
+                    <option companyrole="engineer">Ingeniero</option>
+                    <option companyrole="client">Cliente</option>
+                    <option companyrole="support">Soporte</option>
+                    <option companyrole="arduino">Arduino</option>
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="state">Estado</Label>
@@ -265,17 +266,18 @@ class UserAccountTab extends React.Component {
                     id="state"
                     // placeholder="Empresa"
                     value={this.state.isActiveText}
-                    onChange={e => this.setState({
-                      isActiveText: e.target.value,
-                      is_active: e.target.value === "Activo"
-                    })}
+                    onChange={e => {
+                      this.setState({
+                        isActiveText: e.target.value,
+                        is_active: e.target.value === "Activo"
+                      })
+                    }}
                   >
                     <option>Activo</option>
                     <option>Inactivo</option>
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col
                 className="d-flex justify-content-end flex-wrap mt-2"
                 sm="12"

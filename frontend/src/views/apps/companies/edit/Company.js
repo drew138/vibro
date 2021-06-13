@@ -21,7 +21,6 @@ import axios from "axios"
 import { history } from "../../../../history"
 import SweetAlert from 'react-bootstrap-sweetalert';
 
-
 class CompanyTab extends React.Component {
 
   constructor(props) {
@@ -53,12 +52,12 @@ class CompanyTab extends React.Component {
       alertText: ""
     }
     if (this.state.nit && !isValidNit(this.state.nit)) {
-      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
+      alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x."
       this.props.displayAlert(alertData)
       return
     }
     if (this.state.phone && !isValidPhone(this.state.phone)) {
-      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
+      alertData.alertText = "El número de teléfono debe ser ingresado en el formato: xxxxxxx."
       this.props.displayAlert(alertData)
       return
     }
@@ -99,7 +98,7 @@ class CompanyTab extends React.Component {
   removePicture = () => {
     this.imageInputRef.current.value = null
     this.setState({
-      picture: null
+      picture: undefined
     })
   }
 
@@ -196,8 +195,8 @@ class CompanyTab extends React.Component {
 
               <Media className="mt-25" body>
                 <Media className="font-medium-1 text-bold-600" tag="p" heading>
-                  {`${this.toTitleCase(this.props.auth.values?.first_name)} 
-              ${this.toTitleCase(this.props.auth.values?.last_name)}`}
+                  {`${this.toTitleCase(this.props.auth?.first_name)} 
+              ${this.toTitleCase(this.props.auth?.last_name)}`}
                 </Media>
 
                 <div className="d-flex flex-sm-row flex-column justify-content-start px-0">
@@ -317,7 +316,7 @@ class CompanyTab extends React.Component {
                   className="d-flex justify-content-end flex-wrap mt-2"
                   sm="12"
                 >
-                  {this.props.auth.values.user_type === "admin" && <Button.Ripple className="mr-1" color="danger" type="button" onClick={() => this.setState({ show: true })} >
+                  {this.props.auth.user_type === "admin" && <Button.Ripple className="mr-1" color="danger" type="button" onClick={() => this.setState({ show: true })} >
                     Borrar Empresa
                   </Button.Ripple>}
                   <Button.Ripple className="mr-1" color="primary">
@@ -328,7 +327,7 @@ class CompanyTab extends React.Component {
             </Form>
           </Col>
         </Row>
-        {this.props.auth.values.user_type === "admin" && <SweetAlert
+        {this.props.auth.user_type === "admin" && <SweetAlert
           warning
           title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
           showCancel

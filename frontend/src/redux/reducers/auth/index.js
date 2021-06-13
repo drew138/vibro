@@ -1,27 +1,30 @@
 import localStorageService from "../../../axios/localStorageService"
 
-const values = localStorageService.getUserValues();
+const initialState = localStorageService.getUserValues();
 
 
-const auth = (state = { values }, action) => {
+const auth = (state = initialState, action) => {
   switch (action.type) {
     case "LOGIN_WITH_JWT": {
       return {
-        ...state,
-        values: action.values,
+        // ...state,
+        // values: action.values,
+        ...action.auth
       }
     }
     case "LOGOUT_WITH_JWT": {
       return {
-        ...state,
-        values: action.payload,
-        tokens: action.payload
+        // ...state,
+        // values: action.payload,
+        // tokens: action.payload
+        ...initialState
       }
     }
     case "UPDATE_USER_PROFILE": {
       return {
         ...state,
-        values: { ...state.values, ...action.values }
+        // values: { ...state.values, ...action.values }
+        ...action.auth
       }
     }
     default: {

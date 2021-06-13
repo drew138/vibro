@@ -15,13 +15,12 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { createMachine } from "../../../../redux/actions/machine"
-// import isValidCelphone from "../../../../validators/celphone"
-// import isValidPhone from "../../../../validators/phone"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 // import { CustomInput } from "reactstrap"
 
+import defaultDiagramOrImage from "../../../../assets/img/machine/default.png"
 
 class CompanyTab extends React.Component {
 
@@ -165,23 +164,6 @@ class CompanyTab extends React.Component {
     })
   }
 
-  // fileSelectedHandler = (event) => {
-  //   this.setState({
-  //     selectedFile: event.target.files[0]
-  //   })
-  // }
-
-  // fileUploadHandler = () => {
-  //   this.imageInputRef.current.click()
-  // }
-
-  // removePicture = () => {
-  //   this.imageInputRef.current.value = null
-  //   this.setState({
-  //     selectedFile: null
-  //   })
-  // }
-
   toTitleCase(str) {
     return str.replace(
       /\w\S*/g,
@@ -192,26 +174,6 @@ class CompanyTab extends React.Component {
   }
 
   async getHierarchies(id) {
-    // if (!companyId) {
-    //   return
-    // }
-    // try {
-    //   const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
-    //     params: {
-    //       company_id: companyId
-    //     }
-    //   })
-    //   this.setState({ parents: [{ id: 0, name: "N/A" }, ...res.data] })
-    // } catch (e) {
-    //   console.log(e);
-    //   const alertData = {
-    //     title: "Error de Conexión",
-    //     success: false,
-    //     show: true,
-    //     alertText: "Error al Conectar al Servidor"
-    //   }
-    //   this.props.displayAlert(alertData)
-    // }
     if (!id) {
       this.setState({
         hierarchies: [{ id: 0, name: "Seleccione una opción" }],
@@ -231,8 +193,6 @@ class CompanyTab extends React.Component {
       console.log(e)
     }
   }
-  async componentDidMount() {
-  }
 
   render() {
     return (
@@ -242,7 +202,8 @@ class CompanyTab extends React.Component {
             <CardBody>
               <CardImg
                 className="img-fluid mb-2"
-                src={this.state.image ? URL.createObjectURL(this.state.image) : ""}
+                height="300"
+                src={this.state.image ? URL.createObjectURL(this.state.image) : defaultDiagramOrImage}
                 alt="card image cap"
               />
               <input
@@ -269,7 +230,7 @@ class CompanyTab extends React.Component {
             <CardBody>
               <CardImg
                 className="img-fluid mb-2"
-                src={this.state.diagram ? URL.createObjectURL(this.state.diagram) : ""}
+                src={this.state.diagram ? URL.createObjectURL(this.state.diagram) : defaultDiagramOrImage}
                 alt="card image cap"
               />
               <input
@@ -278,7 +239,6 @@ class CompanyTab extends React.Component {
                 onChange={this.diagramSelectedHandler}
                 ref={this.diagramInputRef} />
               <h3>Diagrama Esquematico</h3>
-
               <hr className="my-1" />
               <div className="card-btns d-flex justify-content-between mt-2">
                 <Button.Ripple type="button" color="primary" onClick={this.diagramUploadHandler}>
@@ -294,7 +254,6 @@ class CompanyTab extends React.Component {
         <Col sm="12">
           <Form onSubmit={this.handleSubmit}>
             <Row>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="id">Identificador</Label>
@@ -307,7 +266,6 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="name">Nombre</Label>
@@ -320,9 +278,6 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-
-
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="code">Código</Label>
@@ -343,7 +298,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="electric_feed">Alimentación Eléctrica</Label>
@@ -364,8 +318,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="power">Potencia</Label>
@@ -379,7 +331,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="power_units">Unidades de Potencia</Label>
@@ -399,7 +350,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="brand">Marca</Label>
@@ -412,7 +362,6 @@ class CompanyTab extends React.Component {
                   />
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="norm">Norma</Label>
@@ -427,7 +376,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="hierarchy">Jerarquía</Label>
@@ -443,7 +391,6 @@ class CompanyTab extends React.Component {
                         hierarchyName: e.target.value,
                         hierarchy: hierarchyId
                       })
-
                     }}
                   >
                     {
@@ -454,7 +401,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
               <Col md="6" sm="12">
                 <FormGroup>
                   <Label for="rpm">RPM</Label>
@@ -468,8 +414,6 @@ class CompanyTab extends React.Component {
                   </Input>
                 </FormGroup>
               </Col>
-
-
               {/* <Col md="6" sm="12">
                 <FormGroup>
                 <Label for="customFile">Imagen</Label>
@@ -512,19 +456,15 @@ class CompanyTab extends React.Component {
                       this.getHierarchies(companyId);
                       this.setState({ company: companyId, companyName: e.target.value });
                     }}
-
                   >
                     {
                       this.props.companies.map((company) => (
-
                         <option companyid={company.id} key={company.id}>{company.name}</option>
                       ))
                     }
                   </Input>
                 </FormGroup>
               </Col>
-
-
               <Col
                 className="d-flex justify-content-end flex-wrap mt-2"
                 sm="12"

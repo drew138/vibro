@@ -19,23 +19,14 @@ export const setUser = (user) => {
 //     }
 // }
 
-export const updateUser = (user) => {
+export const updateUser = (user, id) => {
   return async dispatch => {
 
     try {
       const data = new FormData();
-      for (const [key, value] of Object.entries(user)) {
-        if (value && value !== "N/A") {
-          if (key === "selectedFile") {
-            data.append("picture", value)
-          } else {
-            // console.log(key)
-            data.append(key, value)
-          }
-        }
-      }
+      Object.keys(user).forEach(key => data.append(key, user[key]))
       const res = await axios.patch(
-        `${UPDATE_USER_PROFILE_ENDPOINT}${user.id}/`, data)
+        `${UPDATE_USER_PROFILE_ENDPOINT}${id}/`, data)
       dispatch({
         type: "UPDATE_USER",
         payload: { ...res.data }

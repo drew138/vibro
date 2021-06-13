@@ -1,24 +1,27 @@
 import { history } from "../../../history"
 import axios from "axios"
 import { REGISTER_WITH_JWT_ENDPOINT } from "../../../config"
+import localStorageService from "../../../axios/localStorageService"
 
 export const signupWithJWT = (data) => {
   return async dispatch => {
     try {
 
       const res = await axios.post(REGISTER_WITH_JWT_ENDPOINT, data)
-      localStorage.setItem("token", res.data.access)
-      localStorage.setItem("refresh", res.data.refresh)
+      // localStorage.setItem("token", res.data.access)
+      // localStorage.setItem("refresh", res.data.refresh)
 
-
-      const values = {
-        ...res.data.user
+      const auth = {
+        ...res.data.user,
+        access: res.data.access,
+        refresh: res.data.refresh
       }
-      delete values["access"]
-      delete values["refresh"]
+      localStorageService.setUserValues(auth)
+      delete auth["access"]
+      delete auth["refresh"]
       dispatch({
         type: "LOGIN_WITH_JWT",
-        values
+        auth
       })
       const alertData = {
         title: "Registro Exitoso",
@@ -26,7 +29,7 @@ export const signupWithJWT = (data) => {
         show: true,
         alertText: "Su Cuenta Ha Sido Creada Exitosamente"
       }
-      dispatch({
+      await dispatch({
         type: "DISPLAY_SWEET_ALERT",
         payload: alertData
       })

@@ -31,14 +31,18 @@ import { connect } from "react-redux"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { history } from "../../../../history"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
-import { GET_HIERARCHIES_ENDPOINT, GET_COMPANIES_ENDPOINT } from '../../../../config'
+import { GET_HIERARCHIES_ENDPOINT, GET_COMPANIES_ENDPOINT, DELETE_HIERARCHY_ENDPOINT } from '../../../../config'
 import { setCompany } from "../../../../redux/actions/company"
 import { setHierarchy } from "../../../../redux/actions/hierarchy"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
+import SweetAlert from 'react-bootstrap-sweetalert';
+import { Edit, Trash2 } from "react-feather"
 
 class HierarchiesList extends React.Component {
     // agregar filtro por empresa
     state = {
+        id: 0,
+        show: false,
+        name: "",
         rowData: [],
         pageSize: 20,
         isVisible: true,
@@ -54,10 +58,42 @@ class HierarchiesList extends React.Component {
         },
         searchVal: "",
         companies: [{ id: 0, name: "Seleccione una opción" }],
-        // companiesMap: {},
         companyName: "Seleccione una opción",
         company: 0,
         columnDefs: [
+            {
+                width: 100,
+                cellRendererFramework: params => {
+                    return (
+                        <div
+                            className="d-flex align-items-center justify-content-around cursor-pointer"
+                        >
+                            <span>
+                                <Edit className="ml-1 mr-1"
+                                    onClick={() => {
+                                        this.props.setCompany(params.data.company)
+                                        const hierarchy = { ...params.data }
+                                        hierarchy.company = hierarchy.company.id
+                                        hierarchy.parentName = hierarchy.parent?.name
+                                        this.props.setHierarchy(hierarchy)
+                                        history.push("/app/companies/hierarchy/edit")
+                                    }}
+                                />
+
+                                <Trash2 style={{ color: "#F9596E" }}
+                                    onClick={
+                                        () => this.setState({
+                                            name: params.data.name,
+                                            id: params.data.id,
+                                            show: true
+                                        })
+                                    }
+                                />
+                            </span>
+                        </div>
+                    )
+                }
+            },
             {
                 headerName: "Nombre",
                 field: "name",
@@ -67,14 +103,7 @@ class HierarchiesList extends React.Component {
                     return (
                         <div
                             className="d-flex align-items-center cursor-pointer"
-                            onClick={() => {
-                                this.props.setCompany(params.data.company)
-                                const hierarchy = { ...params.data }
-                                hierarchy.company = hierarchy.company.id
-                                hierarchy.parentName = hierarchy.parent?.name
-                                this.props.setHierarchy(hierarchy)
-                                history.push("/app/companies/hierarchy/edit")
-                            }}>
+                        >
                             <span>{params.data.name}</span>
                         </div>
                     )
@@ -186,6 +215,40 @@ class HierarchiesList extends React.Component {
         }
     }
 
+    deleteHierarchy = async () => {
+        this.setState({ show: false })
+        if (!this.state.id) {
+            return
+        }
+
+        try {
+            const res = await axios.delete(`${DELETE_HIERARCHY_ENDPOINT}${this.state.id}/`)
+            const alertData = {
+                title: "Jerarquía Borrada Exitosamente",
+                success: true,
+                show: true,
+                alertText: `Se Ha Borrado ${this.state.name} De La Lista de Jerarquías.`
+            }
+            history.push("/app/companies/hierarchies")
+            this.props.displayAlert(alertData)
+            const tmp = this.state.id
+            this.setState({
+                rowData: [...this.state.rowData.filter((hierarchy) => hierarchy.id !== tmp)],
+                id: 0,
+                name: ""
+            })
+
+        } catch (e) {
+            const alertData = {
+                title: "Error Al Borrar Jerarquía",
+                success: false,
+                show: true,
+                alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Jerarquía."
+            }
+            this.props.displayAlert(alertData)
+        }
+    }
+
     updateSearchQuery = val => {
         this.gridApi.setQuickFilter(val)
         this.setState({
@@ -265,10 +328,11 @@ class HierarchiesList extends React.Component {
                                         size={15}
                                         onClick={() => {
                                             this.refreshCard()
+                                            this.componentDidMount()
                                             this.gridApi.setFilterModel(null)
                                         }}
                                     />
-                                    <X size={15} onClick={this.removeCard} />
+                                    {/* <X size={15} onClick={this.removeCard} /> */}
                                 </div>
                             </CardHeader>
                             <Collapse
@@ -346,25 +410,25 @@ class HierarchiesList extends React.Component {
                                                             onClick={() => this.filterSize(10)}
                                                         >
                                                             10
-                        </DropdownItem>
+                                                        </DropdownItem>
                                                         <DropdownItem
                                                             tag="div"
                                                             onClick={() => this.filterSize(20)}
                                                         >
                                                             20
-                        </DropdownItem>
+                                                        </DropdownItem>
                                                         <DropdownItem
                                                             tag="div"
                                                             onClick={() => this.filterSize(30)}
                                                         >
                                                             30
-                        </DropdownItem>
+                                                        </DropdownItem>
                                                         <DropdownItem
                                                             tag="div"
                                                             onClick={() => this.filterSize(40)}
                                                         >
                                                             40
-                        </DropdownItem>
+                                                        </DropdownItem>
                                                     </DropdownMenu>
                                                 </UncontrolledDropdown>
                                             </div>
@@ -406,6 +470,24 @@ class HierarchiesList extends React.Component {
                         </Card>
                     </Col>
                 </Row>
+
+                <SweetAlert
+                    warning
+                    title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
+                    showCancel
+                    show={this.state.show}
+                    cancelBtnText="Cancelar"
+                    confirmBtnText="Borrar Jerarquía"
+                    confirmBtnBsStyle="danger"
+                    cancelBtnBsStyle="primary"
+                    onConfirm={this.deleteHierarchy}
+                    onCancel={() => this.setState({ show: false })}
+                >
+
+                    <p className="sweet-alert-text">
+                        Esta Acción No Puede Ser Reversada.
+                    </p>
+                </SweetAlert>
             </React.Fragment>
         )
     }

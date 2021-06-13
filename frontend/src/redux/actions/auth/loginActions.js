@@ -3,10 +3,7 @@ import axios from "axios"
 import {
   LOGIN_WITH_JWT_ENDPOINT,
   GET_USER_WITH_JWT_ENDPOINT,
-  // REFRESH_JWT_ENDPOINT,
-
 } from '../../../config'
-// import { requestInterceptor, responseInterceptordt } from "../../../axios/axiosInstance"
 import localStorageService from "../../../axios/localStorageService"
 
 export const loginWithUsernameAndPassword = user => {
@@ -19,15 +16,15 @@ export const loginWithUsernameAndPassword = user => {
       })
 
 
-      const values = {
+      const auth = {
         ...res.data
       }
-      localStorageService.setUserValues(values);
-      delete values["access"]
-      delete values["refresh"]
+      localStorageService.setUserValues(auth);
+      delete auth["access"]
+      delete auth["refresh"]
       dispatch({
         type: "LOGIN_WITH_JWT",
-        values
+        auth
       })
       history.push("/")
     } catch (e) {
@@ -53,13 +50,13 @@ export const getUserWithJWT = () => {
   return async dispatch => {
     try {
       const res = await axios.get(GET_USER_WITH_JWT_ENDPOINT)
-      const values = {
+      const auth = {
         ...res.data
       }
-      localStorageService.setUserValues(values);
+      localStorageService.setUserValues(auth);
       dispatch({
         type: "LOGIN_WITH_JWT",
-        values
+        auth
       })
     } catch (e) {
       console.log(e)
@@ -70,7 +67,7 @@ export const getUserWithJWT = () => {
 
 export const logoutWithJWT = () => {
   return dispatch => {
-    dispatch({ type: "LOGOUT_WITH_JWT", payload: {} })
+    dispatch({ type: "LOGOUT_WITH_JWT" })
     history.push("/pages/login")
     localStorageService.clearToken();
     localStorageService.clearUserValues();

@@ -42,10 +42,10 @@ class Profile extends React.Component {
   }
 
   getFullName() {
-    if (this.props.auth.values?.first_name && this.props.auth.values?.last_name) {
-      return `${this.props.auth.values?.first_name} ${this.props.auth.values?.last_name}`
-    } else if (this.props.auth.values?.first_name) {
-      return this.props.auth.values?.first_name
+    if (this.props.auth?.first_name && this.props.auth?.last_name) {
+      return `${this.props.auth?.first_name} ${this.props.auth?.last_name}`
+    } else if (this.props.auth?.first_name) {
+      return this.props.auth?.first_name
     } else {
       return "N/A"
     }
@@ -74,7 +74,7 @@ class Profile extends React.Component {
                           className="rounded mr-2"
                           object
                           src={
-                            this.props.auth.values?.picture
+                            this.props.auth?.picture
                           }
                           alt="Generic placeholder image"
                           height="112"
@@ -89,7 +89,7 @@ class Profile extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Usuario
                                 </div>
-                                <div>{this.props.auth.values?.username}</div>
+                                <div>{this.props.auth?.username}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
@@ -107,7 +107,7 @@ class Profile extends React.Component {
                                   Email
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{!this.props.auth.values?.email ? "N/A" : this.props.auth.values.email}</span>
+                                  <span>{!this.props.auth?.email ?? "N/A"}</span>
                                 </div>
                               </div>
                               <div className="d-flex user-info">
@@ -115,7 +115,7 @@ class Profile extends React.Component {
                                   Celular
                                 </div>
                                 <div className="text-truncate">
-                                  <span>{!this.props.auth.values?.celphone ? "N/A" : this.props.auth.values.celphone}</span>
+                                  <span>{!this.props.auth?.celphone ? "N/A" : this.props.auth.celphone}</span>
                                 </div>
                               </div>
                             </div>
@@ -128,7 +128,7 @@ class Profile extends React.Component {
                                 </div>
                                 <div>
                                   {
-                                    this.props.auth.values?.is_active ? "ACTIVO" : "INACTIVO"
+                                    this.props.auth?.is_active ? "ACTIVO" : "INACTIVO"
                                   }
                                 </div>
                               </div>
@@ -136,7 +136,7 @@ class Profile extends React.Component {
                                 <div className="user-info-title font-weight-bold">
                                   Tipo
                                 </div>
-                                <div>{user_type_map[this.props.auth.values?.user_type]?.toUpperCase()}</div>
+                                <div>{user_type_map[this.props.auth?.user_type]?.toUpperCase()}</div>
                               </div>
                               <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
@@ -144,21 +144,21 @@ class Profile extends React.Component {
                                 </div>
                                 <div>
                                   <span>
-                                    {!this.props.auth.values?.company ?
-                                      "N/A" : this.toTitleCase(this.props.auth.values?.company.name)}
+                                    {!this.props.auth?.company ?
+                                      "N/A" : this.toTitleCase(this.props.auth?.company.name)}
                                   </span>
                                 </div>
                               </div>
-                              <div className="d-flex user-info">
+                              {/* <div className="d-flex user-info">
                                 <div className="user-info-title font-weight-bold">
                                   Telefono
                                 </div>
                                 <div>
                                   <span>
-                                    {this.props.auth.values?.phone ? this.props.auth.values?.phone : "N/A"}
+                                    {this.props.auth?.phone ? this.props.auth?.phone : "N/A"}
                                   </span>
                                 </div>
-                              </div>
+                              </div> */}
                             </div>
                           </Col>
                         </Row>

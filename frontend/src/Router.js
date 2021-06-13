@@ -214,7 +214,7 @@ const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
 )
 const mapStateToProps = state => {
   return {
-    permissions: state.auth.values.user_type,
+    permissions: state.auth.user_type,
   }
 }
 

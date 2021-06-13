@@ -37,7 +37,7 @@ class RegisterJWT extends React.Component {
       return
     }
     if (!isValidCelphone(this.state.celphone)) {
-      alertProps.alertText = "El número de celular debe ser entrado en el formato: (+xxx) xxx xxxx xxxx siendo el código de país opcional"
+      alertProps.alertText = "El número de celular debe ser entrado en el formato:  xxxxxxxxxx."
       this.props.displayAlert(alertProps)
       return
     }
@@ -45,10 +45,11 @@ class RegisterJWT extends React.Component {
     this.props.signupWithJWT({
       username: this.state.username,
       first_name: this.state.first_name,
-      last_name:  this.state.last_name,
+      last_name: this.state.last_name,
       email: this.state.email,
       password: this.state.password,
-      celphone: this.state.celphone})
+      celphone: this.state.celphone
+    })
   }
 
   render() {
@@ -133,9 +134,9 @@ class RegisterJWT extends React.Component {
           <Label>Confirma Contraseña</Label>
         </FormGroup>
 
-        
-        
-        
+
+
+
         <div className="d-flex justify-content-between">
           <Button.Ripple
             color="primary"

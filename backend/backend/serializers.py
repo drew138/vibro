@@ -61,7 +61,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'first_name',
             "last_name",
             'celphone',
-            'phone',
+            # 'phone',
             'email',
             'company',
             'user_type',
@@ -84,7 +84,7 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
             'email',
             'company',
             'password',
-            'phone',
+            # 'phone',
             'celphone',
         ]
         extra_kwargs = {'password': {'write_only': True,
@@ -118,7 +118,7 @@ class RegisterAdminUserSerializer(serializers.ModelSerializer):
             'email',
             'company',
             'password',
-            'phone',
+            # 'phone',
             'celphone',
             'user_type'
         ]
@@ -176,7 +176,7 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
             "id",
             'first_name',
             'last_name',
-            'phone',
+            # 'phone',
             'celphone',
             'email',
             'company',
@@ -188,6 +188,8 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
+
+    # company = DefaultCompanySerializer()
 
     default_error_messages = {
         'no_active_account':
@@ -212,9 +214,10 @@ class LoginSerializer(TokenObtainPairSerializer):
         data["first_name"] = self.user.first_name
         data["last_name"] = self.user.last_name
         data["celphone"] = self.user.celphone
-        data["phone"] = self.user.phone
+        # data["phone"] = self.user.phone
         data["email"] = self.user.email
-        data["company"] = self.user.company
+        if self.user.company:
+            data["company"] = self.user.company.id
         data["user_type"] = self.user.user_type
         data["is_active"] = self.user.is_active
         request = self.context.get('request')

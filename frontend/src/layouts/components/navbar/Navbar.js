@@ -10,7 +10,7 @@ import NavbarUser from "./NavbarUser"
 import userImg from "../../../assets/img/user/default.png"
 
 const UserName = props => {
-  return props.auth.values?.username ?? "demo"
+  return props.auth?.username ?? "demo"
 
 }
 
@@ -90,18 +90,19 @@ const ThemeNavbar = props => {
                 changeCurrentLang={props.changeCurrentLang}
                 userName={<UserName {...props} />}
                 userImg={
-                  props.auth.values?.picture ?? userImg
+                  props.auth?.picture ?? userImg
                 }
                 loggedInWith={
                   props.auth !== undefined &&
-                    props.auth.values !== undefined
-                    ? props.auth.values.loggedInWith
+                    props.auth !== undefined
+                    ? props.auth.loggedInWith
                     : null
                 }
                 logoutWithJWT={props.logoutWithJWT}
                 userType={
-                  !props.auth.values ? "demo" // TODO remove in production
-                    : user_type_map[props.auth.values.user_type]
+                  props.auth ?
+                    user_type_map[props.auth.user_type] :
+                    "demo" // TODO remove in production
                 }
               />
             </div>

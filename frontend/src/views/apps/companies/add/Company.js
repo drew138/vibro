@@ -128,7 +128,7 @@ class Company extends React.Component {
   removePicture = () => {
     this.imageInputRef.current.value = null
     this.setState({
-      picture: null
+      picture: undefined
     })
   }
 
@@ -152,8 +152,8 @@ class Company extends React.Component {
 
             <Media className="mt-25" body>
               <Media className="font-medium-1 text-bold-600" tag="p" heading>
-                {`${this.toTitleCase(this.props.auth.values?.first_name)} 
-              ${this.toTitleCase(this.props.auth.values?.last_name)}`}
+                {`${this.toTitleCase(this.props.auth?.first_name)} 
+              ${this.toTitleCase(this.props.auth?.last_name)}`}
               </Media>
 
               <div className="d-flex flex-sm-row flex-column justify-content-start px-0">

@@ -5,7 +5,8 @@ from .validators import (
     PHONE_REGEX_VALIDATOR,
     CELPHONE_REGEX_VALIDATOR,
     NIT_REGEX_VALIDATOR,
-    ADDRESS_REGEX_VALIDATOR)
+    # ADDRESS_REGEX_VALIDATOR
+)
 
 
 class City(models.Model):
@@ -30,7 +31,7 @@ class Company(models.Model):
         max_length=15,
         unique=True)
     address = models.CharField(
-        validators=[ADDRESS_REGEX_VALIDATOR],
+        # validators=[ADDRESS_REGEX_VALIDATOR],
         max_length=50)
     phone = models.CharField(
         validators=[PHONE_REGEX_VALIDATOR],
@@ -41,8 +42,8 @@ class Company(models.Model):
         related_name='company',
         on_delete=models.CASCADE, null=True)
     picture = models.ImageField(
-        upload_to="profile/companies",
-        default='profile/companies/default.png')
+        upload_to="company",
+        default='company/default.png')
 
     def __str__(self):
         return f'{self.name} {self.nit}'
@@ -72,10 +73,10 @@ class VibroUser(AbstractUser):
     ]
 
     email = models.EmailField(unique=True)
-    phone = models.CharField(
-        validators=[PHONE_REGEX_VALIDATOR],
-        max_length=17,
-        default="")
+    # phone = models.CharField(  # TODO ! remove this field
+    #     validators=[PHONE_REGEX_VALIDATOR],
+    #     max_length=17,
+    #     default="")
     celphone = models.CharField(
         validators=[CELPHONE_REGEX_VALIDATOR],
         max_length=20,
@@ -95,8 +96,8 @@ class VibroUser(AbstractUser):
         default=list,
         max_length=5)
     picture = models.ImageField(
-        upload_to="profile/users",
-        default='profile/users/default.png')
+        upload_to="user/profile",
+        default='user/profile/default.png')
 
     def blur_email(self):
 
@@ -138,7 +139,7 @@ class Machine(models.Model):
     )
 
     # ! TODO remove default, make unique field
-    identifier = models.IntegerField(default=0)
+    identifier = models.IntegerField()
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -153,7 +154,7 @@ class Machine(models.Model):
         choices=ELECTRIC_FEED_CHOICES,
         null=True)
     brand = models.CharField(max_length=50)
-    power = models.IntegerField(default=0)
+    power = models.IntegerField()
     power_units = models.CharField(
         max_length=2,
         choices=POWER_UNIT_CHOICES,
@@ -165,13 +166,13 @@ class Machine(models.Model):
         Hierarchy,
         null=True,
         on_delete=models.SET_NULL)
-    rpm = models.IntegerField(null=True)  # !TODO remove null
+    rpm = models.IntegerField()
     image = models.ImageField(
-        upload_to="machines/images",
-        null=True)  # !TODO remove null
+        upload_to="machine/images",
+        default="machine/images/deafult.png")
     diagram = models.ImageField(
-        upload_to="machines/diagrams",
-        null=True)  # !TODO remove null
+        upload_to="machine/diagrams",
+        default="machine/diagrams/deafult.png")
 
 
 class Sensor(models.Model):
@@ -196,7 +197,7 @@ class Sensor(models.Model):
         on_delete=models.CASCADE)
     machine = models.ForeignKey(
         Machine, related_name="sensor",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,  # !TODO change to cascade
         null=True)
 
 
