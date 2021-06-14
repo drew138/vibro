@@ -14,13 +14,35 @@ import {
 
 } from "reactstrap"
 import { connect } from "react-redux"
-import { createMachine } from "../../../../redux/actions/machine"
+// import { createMachine } from "../../../../redux/actions/machine"
 import { displayAlert } from "../../../../redux/actions/alerts"
-import { GET_HIERARCHIES_ENDPOINT } from "../../../../config"
+import { GET_HIERARCHIES_ENDPOINT, CREATE_MACHINE_ENDPOINT } from "../../../../config"
 import axios from "axios"
 // import { CustomInput } from "reactstrap"
 
 import defaultDiagramOrImage from "../../../../assets/img/machine/default.png"
+
+const initialState = {
+
+  identifier: "",
+  name: "",
+  code: "",
+  electric_feed: "",
+  brand: "",
+  power: "",
+  power_units: "KW",
+  norm: "",
+  company: 0,
+  companyName: "Seleccione una opción",
+  rpm: "",
+  image: undefined,
+  diagram: undefined,
+  hierarchy: 0,
+  hierarchyName: "Seleccione una opción",
+  hierarchies: [{ id: 0, name: "Seleccione una opción" }],
+
+}
+
 
 class CompanyTab extends React.Component {
 
@@ -38,28 +60,13 @@ class CompanyTab extends React.Component {
 
   state = {
     // id: 0,
-    identifier: "",
-    name: "",
-    code: "",
-    electric_feed: "",
-    brand: "",
-    power: "",
-    power_units: "KW",
-    norm: "",
-    company: 0,
-    companyName: "Seleccione una opción",
-    rpm: "",
-    image: undefined,
-    diagram: undefined,
-    hierarchy: 0,
-    hierarchyName: "Seleccione una opción",
-    hierarchies: [{ id: 0, name: "Seleccione una opción" }],
+    ...initialState
     // parent: 0,
     // parentName: "N/A",
     // parents: [{ id: 0, name: "N/A" }],
   }
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault()
     const alertData = {
       title: "Error de Validación",
@@ -103,7 +110,7 @@ class CompanyTab extends React.Component {
     }
     // add more validators
 
-    const body = {
+    const machine = {
       identifier,
       name,
       code,
@@ -119,10 +126,31 @@ class CompanyTab extends React.Component {
       diagram
     }
     if (!hierarchy) {
-      delete body["hierarchy"]
+      delete machine["hierarchy"]
     }
-    // console.log(body)
-    this.props.createMachine(body)
+
+    try {
+      const data = new FormData();
+      Object.keys(machine).forEach(key => data.append(key, machine[key]));
+      const res = await axios.post(CREATE_MACHINE_ENDPOINT, data)
+      const alertData = {
+        title: "Máquina Creada Exitosamente",
+        success: true,
+        show: true,
+        alertText: `${res.data.name} ha sido agregado a la lista de maquinas de esta empresa`
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ ...initialState })
+    } catch (e) {
+      console.log(e.response.data)
+      const alertData = {
+        title: "Error de Validación",
+        success: false,
+        show: true,
+        alertText: Object.entries(e.response.data)[0][1]
+      }
+      this.props.displayAlert(alertData)
+    }
   }
 
 
@@ -489,4 +517,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { createMachine, displayAlert })(CompanyTab)
+export default connect(mapStateToProps, { displayAlert })(CompanyTab)

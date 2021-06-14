@@ -10,17 +10,29 @@ import {
   Media
 } from "reactstrap"
 import { connect } from "react-redux"
-import { createCompany } from "../../../../redux/actions/company"
+// import { createCompany } from "../../../../redux/actions/company"
 import isValidAddress from "../../../../validators/address"
 import isValidPhone from "../../../../validators/phone"
 import isValidNit from "../../../../validators/nit"
 import { displayAlert } from "../../../../redux/actions/alerts"
-// import { POST_COMPANY_ENDPOINT } from "../../../../config"
+import { POST_COMPANY_ENDPOINT } from "../../../../config"
 import { GET_CITIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
 import AutoComplete from "../../../../components/@vuexy/autoComplete/AutoCompleteComponent"
 // import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
 import userImg from "../../../../assets/img/user/default.png"
+
+const initialState = {
+  name: "",
+  nit: "",
+  address: "",
+  phone: "",
+  city: "",
+  picture: "",
+  suggestions: [{ name: "" }],
+  cityMap: {}
+}
+
 
 class Company extends React.Component {
 
@@ -31,17 +43,10 @@ class Company extends React.Component {
   }
 
   state = {
-    name: "",
-    nit: "",
-    address: "",
-    phone: "",
-    city: "",
-    picture: "",
-    suggestions: [{ name: "" }],
-    cityMap: {}
+    ...initialState
   }
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault()
     const alertData = {
       title: "Error de Validación",
@@ -69,7 +74,7 @@ class Company extends React.Component {
       this.props.displayAlert(alertData)
       return
     }
-    const data = {
+    const company = {
       name: this.state.name,
       nit: this.state.nit,
       address: this.state.address,
@@ -77,10 +82,47 @@ class Company extends React.Component {
       city: this.state.cityMap[this.state.city]
     }
     if (this.state.picture) {
-      data.picture = this.state.picture;
+      company.picture = this.state.picture;
     }
     // console.log(data)
-    this.props.createCompany(data)
+    try {
+      const data = new FormData();
+      Object.keys(company).forEach(key => data.append(key, company[key]));
+      const res = await axios.post(POST_COMPANY_ENDPOINT, data)
+      // dispatch({
+      //   type: "SET_COMPANY_STATE",
+      //   payload: { ...res.data }
+      // })
+      const alertData = {
+        title: "Registro Exitoso",
+        success: true,
+        show: true,
+        alertText: "Empresa creada exitosamente"
+      }
+      this.props.displayAlert(alertData)
+      // dispatch({
+      //   type: "DISPLAY_SWEET_ALERT",
+      //   payload: alertData
+      // })
+      // history.push("/")
+      this.setState({ ...initialState })
+    } catch (e) {
+      console.log(e)
+      const alertData = {
+        title: "Error de Validación",
+        success: false,
+        show: true,
+        alertText: Object.entries(e.response.data)[0][1][0]
+      }
+      this.props.displayAlert(alertData)
+      // dispatch({
+      //   type: "DISPLAY_SWEET_ALERT",
+      //   payload: alertData
+      // })
+    }
+
+
+    // this.props.createCompany(data)
   }
 
   toTitleCase(str) {
@@ -301,4 +343,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { createCompany, displayAlert })(Company) // tODO change redux actions
+export default connect(mapStateToProps, { displayAlert })(Company) // tODO change redux actions

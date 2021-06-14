@@ -11,9 +11,9 @@ import { requestInterceptor, responseInterceptor } from "./axios/axiosInstance"
 console.log(requestInterceptor, responseInterceptor)
 
 // Route-based code splitting
-const analyticsDashboard = lazy(() =>
-  import("./views/dashboard/analytics/AnalyticsDashboard")
-)
+// const analyticsDashboard = lazy(() =>
+//   import("./views/dashboard/analytics/AnalyticsDashboard")
+// )
 const ecommerceDashboard = lazy(() =>
   import("./views/dashboard/ecommerce/EcommerceDashboard")
 )
@@ -172,7 +172,7 @@ const register = lazy(() =>
 //   import("./extensions/access-control/AccessControl")
 // )
 
-
+const home = lazy(() => import("./views/apps/home/Home"))
 const espectra = lazy(() => import("./views/apps/services/Espectra"))
 const upload = lazy(() => import("./views/apps/services/Upload"))
 const wform = lazy(() => import("./views/apps/services/WizardForm"))
@@ -265,7 +265,7 @@ class AppRouter extends React.Component {
       // Set the directory path if you are deploying in sub-folder
       <Router history={history}>
         <Switch>
-          <PrivateAppRoute exact path="/" component={analyticsDashboard} />
+          <PrivateAppRoute exact path="/" component={home} />
 
 
           <AppRoute exact path="/services/monitoring/machine" component={espectra} />

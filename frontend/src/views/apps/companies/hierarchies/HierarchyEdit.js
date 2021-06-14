@@ -8,10 +8,11 @@ import {
     Label,
     FormGroup,
     Card,
-    CardBody
+    CardBody,
+    CardTitle,
+    CardHeader
 } from "reactstrap"
 import { connect } from "react-redux"
-import { createCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { DELETE_HIERARCHY_ENDPOINT, CHANGE_HIERARCHY_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
@@ -27,7 +28,6 @@ class Hierarchy extends React.Component {
         if (!props.hierarchy.id) { // redirect if page is refreshed
             history.push("/app/companies/hierarchies")
         }
-
     }
 
     state = {
@@ -37,9 +37,6 @@ class Hierarchy extends React.Component {
         parentName: this.props.hierarchy.parentName ?? "Seleccione una opción",
         parentsNames: new Set(),
         parents: [{ id: 0, name: "Seleccione una opción" }],
-        company: 0,
-        companyName: "Seleccione una opción",
-        companies: [{ id: 0, name: "Seleccione una opción" }],
         show: false,
     }
 
@@ -54,9 +51,7 @@ class Hierarchy extends React.Component {
         const { parent, name } = this.state
         const body = { name }
         if (parent) {
-            body.parent = parent;
-        } else {
-            body.parent = "";
+            body.parent = parent.id;
         }
         if (this.state.parentsNames.has(name)) {
             alertData.alertText = `El Nombre ${name} Ya Ha Sido Asignado A Otra Jerarquía`
@@ -69,12 +64,14 @@ class Hierarchy extends React.Component {
             return
         }
         try {
+            // console.log(body)
             const res = await axios.patch(`${CHANGE_HIERARCHY_ENDPOINT}${this.state.id}/`, body)
             alertData.alertText = "Jerarquía Cambiada Exitosamente"
             alertData.success = true
             this.props.displayAlert(alertData)
 
         } catch (e) {
+            // console.log(e.response.data)
             console.log(e)
         }
     }
@@ -87,29 +84,6 @@ class Hierarchy extends React.Component {
             }
         );
     }
-
-    // async getParents(companyId) {
-    //     if (!companyId) {
-    //         return
-    //     }
-    //     try {
-    //         const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
-    //             params: {
-    //                 company_id: companyId
-    //             }
-    //         })
-    //         this.setState({ parents: [{ id: 0, name: "N/A" }, ...res.data] })
-    //     } catch (e) {
-    //         console.log(e);
-    //         const alertData = {
-    //             title: "Error de Conexión",
-    //             success: false,
-    //             show: true,
-    //             alertText: "Error al Conectar al Servidor"
-    //         }
-    //         this.props.displayAlert(alertData)
-    //     }
-    // }
 
     async componentDidMount() {
         if (!this.props.company.id) {
@@ -184,9 +158,41 @@ class Hierarchy extends React.Component {
                     breadCrumbActive="Editar Jerarquía"
                 />
                 <Row>
+                    <Col lg="12" md="6" sm="12">
+                        <Card>
+                            <CardHeader className="mx-auto flex-column">
+                                <h1>{this.props.company.name}</h1>
+                            </CardHeader>
+                            <CardBody className="text-center pt-0">
+                                <div className="avatar mr-1 avatar-xl mt-1 mb-1">
+                                    <img src={this.props.company.picture} alt="avatarImg" />
+                                </div>
+                                {/* <div className="uploads mt-1 mb-1">
+                                    <span>Ciudad</span>
+                                    <p className="font-weight-bold font-medium-2 mb-0">{this.props.company?.city ?? "N/A"}</p>
+                                </div> */}
+                                <div className="followers mt-1 mb-1">
+                                    <span>Dirección</span>
+                                    <p className="font-weight-bold font-medium-2 mb-0">{this.props.company.address}</p>
+                                </div>
+                                <div className="uploads mt-1 mb-1">
+                                    <span>Telefono</span>
+                                    <p className="font-weight-bold font-medium-2 mb-0">{this.props.company.phone}</p>
+                                </div>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                </Row>
+
+                <Row>
                     <Col sm="12">
                         <Card>
                             <CardBody className="pt-2">
+                                {/* <CardTitle className="mb-3">
+
+                                    {this.props.company.name}
+
+                                </CardTitle> */}
                                 <Row>
                                     <Col sm="12">
                                         <Form onSubmit={this.handleSubmit}>
@@ -275,4 +281,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, { createCompany, displayAlert })(Hierarchy) // tODO change redux actions
+export default connect(mapStateToProps, { displayAlert })(Hierarchy) // tODO change redux actions

@@ -1,7 +1,7 @@
 import axios from "axios"
 // import { history } from "../../../history"
 import {
-  POST_COMPANY_ENDPOINT,
+  // POST_COMPANY_ENDPOINT,
   PATCH_COMPANY_ENDPOINT
 } from "../../../config"
 
@@ -65,39 +65,39 @@ export const setCompany = (company) => {
   }
 }
 
-export const createCompany = (company) => {
-  return async dispatch => {
-    try {
-      const data = new FormData();
-      Object.keys(company).forEach(key => data.append(key, company[key]));
-      const res = await axios.post(POST_COMPANY_ENDPOINT, data)
-      dispatch({
-        type: "SET_COMPANY_STATE",
-        payload: { ...res.data }
-      })
-      const alertData = {
-        title: "Registro Exitoso",
-        success: true,
-        show: true,
-        alertText: "Empresa creada exitosamente"
-      }
-      dispatch({
-        type: "DISPLAY_SWEET_ALERT",
-        payload: alertData
-      })
-      // history.push("/")
-    } catch (e) {
-      console.log(e)
-      const alertData = {
-        title: "Error de Validación",
-        success: false,
-        show: true,
-        alertText: Object.entries(e.response.data)[0][1][0]
-      }
-      dispatch({
-        type: "DISPLAY_SWEET_ALERT",
-        payload: alertData
-      })
-    }
-  }
-}
+// export const createCompany = (company) => {
+//   return async dispatch => {
+//     try {
+//       const data = new FormData();
+//       Object.keys(company).forEach(key => data.append(key, company[key]));
+//       const res = await axios.post(POST_COMPANY_ENDPOINT, data)
+//       dispatch({
+//         type: "SET_COMPANY_STATE",
+//         payload: { ...res.data }
+//       })
+//       const alertData = {
+//         title: "Registro Exitoso",
+//         success: true,
+//         show: true,
+//         alertText: "Empresa creada exitosamente"
+//       }
+//       dispatch({
+//         type: "DISPLAY_SWEET_ALERT",
+//         payload: alertData
+//       })
+//       // history.push("/")
+//     } catch (e) {
+//       console.log(e)
+//       const alertData = {
+//         title: "Error de Validación",
+//         success: false,
+//         show: true,
+//         alertText: Object.entries(e.response.data)[0][1][0]
+//       }
+//       dispatch({
+//         type: "DISPLAY_SWEET_ALERT",
+//         payload: alertData
+//       })
+//     }
+//   }
+// }

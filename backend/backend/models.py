@@ -143,7 +143,7 @@ class Machine(models.Model):
     company = models.ForeignKey(
         Company,
         related_name="machines",
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE)  # cambiar a nulo
     name = models.CharField(max_length=50)
     code = models.CharField(
         max_length=7,
@@ -167,6 +167,7 @@ class Machine(models.Model):
         null=True,
         on_delete=models.SET_NULL)
     rpm = models.IntegerField()
+    # severity = models   morada por defecto
     image = models.ImageField(
         upload_to="machine/images",
         default="machine/images/deafult.png")
@@ -197,7 +198,7 @@ class Sensor(models.Model):
         on_delete=models.CASCADE)
     machine = models.ForeignKey(
         Machine, related_name="sensor",
-        on_delete=models.CASCADE,  # !TODO change to cascade
+        on_delete=models.CASCADE,  # !TODO change to null
         null=True)
 
 
@@ -410,6 +411,7 @@ class Measurement(models.Model):
     GREEN = 'green'
     YELLOW = 'yellow'
     BLACK = 'black'
+    PURPLE = 'purple'
 
     # service type
     PRED = 'predictivo'
@@ -440,6 +442,7 @@ class Measurement(models.Model):
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
         (BLACK, 'Black'),
+        (PURPLE, 'Purple')
     ]
     SERVICE_CHOICES = [
         (PRED, 'Predictivo'),
@@ -480,7 +483,7 @@ class Measurement(models.Model):
     severity = models.CharField(
         max_length=9,
         choices=SEVERITY_CHOICES,
-        default=BLACK)
+        default=PURPLE)
     engineer_one = models.ForeignKey(
         VibroUser,
         related_name="measurements",
@@ -543,6 +546,7 @@ class Flaw(models.Model):  # falla
     GREEN = 'green'
     YELLOW = 'yellow'
     BLACK = 'black'
+    PURPLE = 'purple'
 
     # severity
     SEVERITY_CHOICES = [
@@ -550,6 +554,7 @@ class Flaw(models.Model):  # falla
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
         (BLACK, 'Black'),
+        (PURPLE, 'Purple')
     ]
 
     # flaw types
@@ -602,7 +607,7 @@ class Flaw(models.Model):  # falla
     severity = models.CharField(
         max_length=6,
         choices=SEVERITY_CHOICES,
-        default=BLACK)
+        default=PURPLE)
 
 
 class TermoImage(models.Model):

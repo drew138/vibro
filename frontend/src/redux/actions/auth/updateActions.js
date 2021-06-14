@@ -11,10 +11,12 @@ export const updateProfile = (user, id) => {
       const res = await axios.patch(
         `${UPDATE_USER_PROFILE_ENDPOINT}${id}/`,
         data)
-      const values = { ...res.data }
+      const auth = { ...res.data }
+      delete auth["certifications"]
+      // console.log(auth)
       dispatch({
         type: "UPDATE_USER_PROFILE",
-        values
+        auth
       })
       const alertData = {
         title: "Información de Usuario Actualizada Exitosamente",

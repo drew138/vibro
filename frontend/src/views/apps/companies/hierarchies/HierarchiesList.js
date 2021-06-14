@@ -22,7 +22,7 @@ import { AgGridReact } from "ag-grid-react"
 import {
     ChevronDown,
     RotateCw,
-    X
+    // X
 } from "react-feather"
 import classnames from "classnames"
 import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"

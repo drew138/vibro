@@ -51,7 +51,7 @@ class ListHierarchySerializer(serializers.ModelSerializer):
 # User Serializer
 class VibroUserSerializer(serializers.ModelSerializer):
 
-    company = DefaultCompanySerializer(required=False)
+    # company = DefaultCompanySerializer(required=False)
 
     class Meta:
         model = custom_models.VibroUser

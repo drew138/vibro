@@ -1,8 +1,8 @@
 import React from "react"
-import { history } from "../../../../history"
-import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
-import "../../../../assets/scss/pages/users.scss"
-import { GET_MACHINES_ENDPOINT, GET_COMPANIES_ENDPOINT } from "../../../../config"
+import { history } from "../../../history"
+import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
+import "../../../assets/scss/pages/users.scss"
+import { GET_MACHINES_ENDPOINT, GET_COMPANIES_ENDPOINT } from "../../../config"
 import {
   Card,
   CardBody,
@@ -18,7 +18,8 @@ import {
   DropdownItem,
   DropdownToggle,
   Collapse,
-  Spinner
+  Spinner,
+  Button
 } from "reactstrap"
 import { AgGridReact } from "ag-grid-react"
 import { connect } from "react-redux"
@@ -29,11 +30,12 @@ import {
   // X
 } from "react-feather"
 import classnames from "classnames"
-import { ContextLayout } from "../../../../utility/context/Layout"
-import { setMachine } from "../../../../redux/actions/machine"
-import { setCompany } from "../../../../redux/actions/company"
-import { displayAlert } from "../../../../redux/actions/alerts"
+import { ContextLayout } from "../../../utility/context/Layout"
+import { setMachine } from "../../../redux/actions/machine"
+import { setCompany } from "../../../redux/actions/company"
+import { displayAlert } from "../../../redux/actions/alerts"
 import { Activity } from "react-feather"
+import { updateProfile } from "../../../redux/actions/auth/updateActions"
 
 class MachineList extends React.Component {
 
@@ -55,7 +57,9 @@ class MachineList extends React.Component {
     companies: [{ id: 0, name: "Seleccione una opción" }],
     companiesMap: {},
     companyName: "Seleccione una opción",
+    title: "",
     company: 0,
+    buttonDisabled: true,
     columnDefs: [
       {
         width: 100,
@@ -145,6 +149,20 @@ class MachineList extends React.Component {
   }
 
   async componentDidMount() {
+    setTimeout(() => {
+      // console.log(this.props.auth.company?.id)
+
+      this.setState({
+        company: this.props.auth.company ?? 0,
+        // companyName: this.props.auth.company?.name ?? "Seleccione una opción",
+      })
+      this.getCompanyMachines(this.props.auth.company ?? 0);
+    }, 700)
+
+    if (this.props.auth.user_type === "client") {
+      return
+    }
+
     try {
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
       const companiesMap = {};
@@ -153,9 +171,16 @@ class MachineList extends React.Component {
           companiesMap[comp.id] = comp
         }
       );
+      const companies = [{ id: 0, name: "Seleccione una opción" }, ...res.data];
+      const currentCompany = companies.filter((company) => company.id === this.props.auth.company);
+      const title = currentCompany ? currentCompany[0].name : "";
       this.setState({
-        companies: [{ id: 0, name: "Seleccione una opción" }, ...res.data],
-        companiesMap
+        companies,
+        companiesMap,
+        title,
+        companyName: currentCompany ? currentCompany[0].name : "Seleccione una opción",
+        company: currentCompany ? currentCompany[0].id : "Seleccione una opción"
+
       })
 
     } catch {
@@ -244,8 +269,19 @@ class MachineList extends React.Component {
     return (
       <React.Fragment>
 
+        <div className="content-header row">
+          <div className="content-header-left col-md-9 col-12 mb-2">
+            <div className="row breadcrumbs-top">
+              <div className="col-12">
+                <h2 className="content-header-title float-left mb-0">
+                  {this.state.title}
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
         <Row className="app-user-list">
-          <Col sm="12">
+          {this.props.auth.user_type !== "client" && <Col sm="12">
             <Card
               className={classnames("card-action card-reload", {
                 "d-none": this.state.isVisible === false,
@@ -288,7 +324,7 @@ class MachineList extends React.Component {
                     ""
                   )}
                   <Row>
-                    <Col lg="12" md="6" sm="12">
+                    <Col lg="8" md="6" sm="12">
                       <FormGroup className="mb-0">
                         <Label for="role">Empresa</Label>
                         <Input
@@ -299,19 +335,16 @@ class MachineList extends React.Component {
                           onChange={e => {
                             const idx = e.target.selectedIndex;
                             const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
-                            this.getCompanyMachines(companyId)
+
+                            // console.log(this.state.company, companyId);
                             this.setState(
                               {
                                 companyName: e.target.value,
-                                company: companyId
+                                company: companyId,
+                                buttonDisabled: !companyId || this.props.auth.company === companyId
                               }
-                              // this.getRowData()
-                              // () =>
-                              //   this.filterData(
-                              //     "company",
-                              //     this.state.company.toLowerCase()
-                              //   )
                             )
+                            this.getCompanyMachines(companyId)
                           }}
                         >
                           {
@@ -322,11 +355,33 @@ class MachineList extends React.Component {
                         </Input>
                       </FormGroup>
                     </Col>
+                    <Col lg="4" md="6" sm="12" >
+                      <FormGroup className="mb-0">
+                        <Button.Ripple
+                          color="primary"
+                          disabled={this.state.buttonDisabled}
+                          className="mr-1"
+                          style={{ marginTop: 19 }}
+                          onClick={() => {
+                            // console.log(this.state.company, this.props.auth.id)
+                            // this.props.updateProfile({ company: this.state.company }, this.props.auth.id)
+                            const companyName = this.state.companyName
+                            // console.log(companyName)
+                            this.setState({
+                              title: companyName
+                            })
+                          }}
+
+                        >
+                          Asignar Esta Empresa Por Defecto
+                        </Button.Ripple>
+                      </FormGroup>
+                    </Col>
                   </Row>
                 </CardBody>
               </Collapse>
             </Card>
-          </Col>
+          </Col>}
           <Col sm="12">
             <Card>
               <CardBody>
@@ -406,7 +461,7 @@ class MachineList extends React.Component {
             </Card>
           </Col>
         </Row>
-      </React.Fragment>
+      </React.Fragment >
     )
   }
 }
@@ -417,5 +472,5 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setMachine, setCompany, displayAlert })(MachineList)
+export default connect(mapStateToProps, { setMachine, setCompany, displayAlert, updateProfile })(MachineList)
 

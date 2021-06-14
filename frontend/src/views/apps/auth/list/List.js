@@ -37,7 +37,7 @@ import { Edit } from "react-feather";
 
 
 const UserTypes = {
-  'admin': "Administrativo",
+  'admin': "Administrador",
   'engineer': "Ingeniero",
   'client': "Cliente",
   'support': "Soporte",
@@ -151,6 +151,22 @@ class UsersList extends React.Component {
           ) : (
             <div className="badge badge-pill badge-light-warning">
               {"Inactivo"}
+            </div>
+          )
+        }
+      },
+      {
+        headerName: "Empresa",
+        field: "is_active",
+        filter: true,
+        width: 150,
+        cellRendererFramework: params => {
+          return (
+            <div className="d-flex align-items-center cursor-pointer">
+              {
+                params.data.user_type === "client" ?
+                  params.data.company?.name ?? "No Asignada" : "N/A"
+              }
             </div>
           )
         }

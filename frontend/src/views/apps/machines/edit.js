@@ -14,16 +14,12 @@ import {
     CardHeader,
 } from "reactstrap"
 import { connect } from "react-redux"
-// import { createMachine } from "../../../redux/actions/machine"
-// import isValidCelphone from "../../../validators/celphone"
-// import isValidPhone from "../../../validators/phone"
-// import { displayAlert } from "../../../redux/actions/alerts"
-import { GET_HIERARCHIES_ENDPOINT, DELETE_MACHINE_ENDPOINT } from "../../../config"
+import { displayAlert } from "../../../redux/actions/alerts"
+import { GET_HIERARCHIES_ENDPOINT, DELETE_MACHINE_ENDPOINT, PATCH_MACHINE_ENDPOINT } from "../../../config"
 import axios from "axios"
-// import { CustomInput } from "reactstrap"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { history } from "../../../history"
-import { updateMachine } from "../../../redux/actions/machine"
+// import { updateMachine } from "../../../redux/actions/machine"
 import SweetAlert from 'react-bootstrap-sweetalert';
 
 class EditMachine extends React.Component {
@@ -59,7 +55,7 @@ class EditMachine extends React.Component {
         show: false
     }
 
-    handleSubmit = e => {
+    handleSubmit = async e => {
         e.preventDefault()
         const alertData = {
             title: "Error de Validación",
@@ -67,7 +63,6 @@ class EditMachine extends React.Component {
             show: true,
             alertText: ""
         }
-        // console.log(this.state)
         const {
             id,
             identifier,
@@ -97,14 +92,38 @@ class EditMachine extends React.Component {
             company,
             hierarchy,
             rpm,
-            image,
-            diagram
+        }
+        if (image) {
+            machine.image = image
+        }
+        if (diagram) {
+            machine.diagram = diagram
         }
         if (!hierarchy) {
             delete machine["hierarchy"]
         }
         console.log(machine)
-        // this.props.createMachine(machine, id)
+        try {
+            const data = new FormData();
+            Object.keys(machine).forEach(key => data.append(key, machine[key]));
+            const res = await axios.patch(`${PATCH_MACHINE_ENDPOINT}${id}/`, data)
+            const alertData = {
+                title: "Máquina Actualizada Exitosamente",
+                success: true,
+                show: true,
+                alertText: `${res.data.name} ha sido actualizada`
+            }
+            this.props.displayAlert(alertData)
+        } catch (e) {
+            console.log(e.response.data)
+            const alertData = {
+                title: "Error de Validación",
+                success: false,
+                show: true,
+                alertText: Object.entries(e.response.data)[0][1]
+            }
+            this.props.displayAlert(alertData)
+        }
 
     }
 
@@ -463,46 +482,6 @@ class EditMachine extends React.Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>
-                                                {/* <Col md="6" sm="12">
-                                                    <FormGroup>
-                                                    <Label for="customFile">Imagen</Label>
-                                                        <CustomInput
-                                                            type="file"
-                                                            id="image"
-                                                            name="Imagen"
-                                                            onChange={e => {
-                                                                this.setState({ image: e.target.files[0] ?? "" })
-                                                            }}
-                                                            />
-                                                    </FormGroup>
-                                                    <CardImg
-                                                        top
-                                                        className="img-fluid"
-                                                        src={img1}
-                                                        alt="card image cap"
-                                                    />
-                                                    </Col>
-                                                    
-                                                <Col md="6" sm="12">
-                                                <FormGroup>
-                                                        <Label for="customFile">Diagrama</Label>
-                                                        <CustomInput
-                                                        type="file"
-                                                            id="diagram"
-                                                            name="Diagrama"
-                                                            mb="3"
-                                                            onChange={e => {
-                                                                this.setState({ diagram: e.target.files[0] ?? "" })
-                                                            }}
-                                                        />
-                                                        </FormGroup>
-                                                        <CardImg
-                                                        top
-                                                        className="img-fluid"
-                                                        src={img1}
-                                                        alt="card image cap"
-                                                        />
-                                                </Col> */}
                                                 <Col
                                                     className="d-flex justify-content-end flex-wrap mt-2"
                                                     sm="12"
@@ -549,7 +528,6 @@ const mapStateToProps = state => {
         company: state.company,
         machine: state.machine
     }
-
 }
 
-export default connect(mapStateToProps, { updateMachine })(EditMachine)
+export default connect(mapStateToProps, { displayAlert })(EditMachine)

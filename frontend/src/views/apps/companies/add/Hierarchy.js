@@ -9,7 +9,7 @@ import {
     FormGroup
 } from "reactstrap"
 import { connect } from "react-redux"
-import { createCompany } from "../../../../redux/actions/company"
+// import { createCompany } from "../../../../redux/actions/company"
 import { displayAlert } from "../../../../redux/actions/alerts"
 import { CREATE_HIERARCHY_ENDPOINT, GET_HIERARCHIES_ENDPOINT } from "../../../../config"
 import axios from "axios"
@@ -53,6 +53,8 @@ class Hierarchy extends React.Component {
         alertData.alertText = "Jerarquía Creada Exitosamente"
         alertData.success = true
         this.props.displayAlert(alertData)
+        this.setState({ name: "", parentName: "Seleccione una opción" })
+        this.getParents(this.state.company)
     }
 
     toTitleCase(str) {
@@ -194,4 +196,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, { createCompany, displayAlert })(Hierarchy) // tODO change redux actions
+export default connect(mapStateToProps, { displayAlert })(Hierarchy) // tODO change redux actions
