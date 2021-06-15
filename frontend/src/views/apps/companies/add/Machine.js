@@ -35,6 +35,8 @@ const initialState = {
   company: 0,
   companyName: "Seleccione una opción",
   rpm: "",
+  severity: "purple",
+  severityName: "No Asignada (Morado)",
   image: undefined,
   diagram: undefined,
   hierarchy: 0,
@@ -88,7 +90,8 @@ class CompanyTab extends React.Component {
       hierarchy,
       rpm,
       image,
-      diagram
+      diagram,
+      severity
     } = this.state
 
     if (!identifier) {
@@ -123,7 +126,8 @@ class CompanyTab extends React.Component {
       hierarchy,
       rpm,
       image,
-      diagram
+      diagram,
+      severity
     }
     if (!hierarchy) {
       delete machine["hierarchy"]
@@ -447,17 +451,17 @@ class CompanyTab extends React.Component {
                 <Label for="customFile">Imagen</Label>
                 <CustomInput
                 type="file"
-                    id="image"
-                    name="Imagen"
-                    onChange={e => {
-                      this.setState({ image: e.target.files[0] ?? "" })
-                    }}
-                  />
-                  </FormGroup>
-                  </Col>
-                  
-                  <Col md="6" sm="12">
-                  <FormGroup>
+                id="image"
+                name="Imagen"
+                onChange={e => {
+                  this.setState({ image: e.target.files[0] ?? "" })
+                }}
+                />
+                </FormGroup>
+                </Col>
+                
+                <Col md="6" sm="12">
+                <FormGroup>
                   <Label for="customFile">Diagrama</Label>
                   <CustomInput
                   type="file"
@@ -490,6 +494,31 @@ class CompanyTab extends React.Component {
                         <option companyid={company.id} key={company.id}>{company.name}</option>
                       ))
                     }
+                  </Input>
+                </FormGroup>
+              </Col>
+              <Col md="6" sm="12">
+                <FormGroup>
+                  <Label for="norm">Severidad</Label>
+                  <Input
+                    type="select"
+                    id="severity"
+                    placeholder="Severidad"
+                    value={this.state.severityName}
+                    onChange={e => {
+                      const idx = e.target.selectedIndex;
+                      const severity = e.target.childNodes[idx].getAttribute('severity');
+                      this.setState({
+                        severity,
+                        severityName: e.target.value
+                      })
+                    }}
+                  >
+                    <option severity="green">OK (Verde)</option>
+                    <option severity="yellow">Alerta (Amarillo)</option>
+                    <option severity="red">Alarma (Rojo)</option>
+                    <option severity="purple">No Asignada (Morado)</option>
+                    <option severity="black">No Medido (Negro)</option>
                   </Input>
                 </FormGroup>
               </Col>

@@ -15,7 +15,7 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownToggle,
-  Button
+  // Button
 } from "reactstrap"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../../redux/actions/alerts"
@@ -62,7 +62,8 @@ class ListMachines extends React.Component {
                     this.props.setMachine(params.data)
                     history.push("/app/machine/measurements")
                   }
-                } /> {/* TODO add functionality 
+                } />
+                {/* TODO add functionality 
                 to create a new measurements */}
 
               </span>
@@ -99,9 +100,18 @@ class ListMachines extends React.Component {
       },
       {
         headerName: "Jerarquía",
-        field: "name",
+        // field: "name",
         filter: true,
-        width: 250
+        width: 250,
+        cellRendererFramework: params => {
+          return (
+            <div
+              className="d-flex align-items-center justify-content-around cursor-pointer"
+            >
+              <span>{params.data.hierarchy}</span>
+            </div>
+          )
+        }
       },
       {
         headerName: "Marca",

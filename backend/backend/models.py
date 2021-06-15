@@ -114,6 +114,19 @@ class Machine(models.Model):
     class Meta:
         unique_together = ["name", "company"]
 
+    # severity
+    RED = "red"
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    BLACK = 'black'
+    PURPLE = 'purple'
+    SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+        (PURPLE, 'Purple')
+    ]
     # codes
     SAP = 'sap'
     INTERNO = 'interno'
@@ -143,7 +156,7 @@ class Machine(models.Model):
     company = models.ForeignKey(
         Company,
         related_name="machines",
-        on_delete=models.CASCADE)  # cambiar a nulo
+        on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50)
     code = models.CharField(
         max_length=7,
@@ -167,7 +180,10 @@ class Machine(models.Model):
         null=True,
         on_delete=models.SET_NULL)
     rpm = models.IntegerField()
-    # severity = models   morada por defecto
+    severity = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=PURPLE)
     image = models.ImageField(
         upload_to="machine/images",
         default="machine/images/deafult.png")
@@ -195,10 +211,11 @@ class Sensor(models.Model):
     arduino = models.ForeignKey(
         VibroUser,
         related_name='sensor',
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL,
+        null=True)
     machine = models.ForeignKey(
         Machine, related_name="sensor",
-        on_delete=models.CASCADE,  # !TODO change to null
+        on_delete=models.SET_NULL,
         null=True)
 
 

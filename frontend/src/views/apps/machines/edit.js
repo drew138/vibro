@@ -22,12 +22,20 @@ import { history } from "../../../history"
 // import { updateMachine } from "../../../redux/actions/machine"
 import SweetAlert from 'react-bootstrap-sweetalert';
 
+const severityMap = {
+    purple: "No Asignada (Morado)",
+    green: "OK (Verde)",
+    yellow: "Alerta (Amarillo)",
+    red: "Alarma (Rojo)",
+    black: "No Medido (Negro)"
+}
+
 class EditMachine extends React.Component {
 
     constructor(props) {
         super(props);
         if (!props.machine.id) {
-            history.push("/app/companies/list");
+            history.push("/");
         }
         this.diagramInputRef = React.createRef();
         this.imageInputRef = React.createRef();
@@ -52,7 +60,9 @@ class EditMachine extends React.Component {
         hierarchyName: "Seleccione una opción",
         hierarchy: 0,
         hierarchies: [{ id: 0, name: "Seleccione una opción" }],
-        show: false
+        show: false,
+        severity: this.props.machine.severity,
+        severityName: severityMap[this.props.machine.severity],
     }
 
     handleSubmit = async e => {
@@ -77,7 +87,8 @@ class EditMachine extends React.Component {
             hierarchy,
             rpm,
             image,
-            diagram
+            diagram,
+            severity
         } = this.state
 
         const machine = {
@@ -92,6 +103,7 @@ class EditMachine extends React.Component {
             company,
             hierarchy,
             rpm,
+            severity
         }
         if (image) {
             machine.image = image
@@ -102,7 +114,7 @@ class EditMachine extends React.Component {
         if (!hierarchy) {
             delete machine["hierarchy"]
         }
-        console.log(machine)
+        // console.log(machine)
         try {
             const data = new FormData();
             Object.keys(machine).forEach(key => data.append(key, machine[key]));
@@ -291,6 +303,7 @@ class EditMachine extends React.Component {
                                     className="img-fluid mb-2"
                                     src={this.state.diagram ? URL.createObjectURL(this.state.diagram) : this.props.machine.diagram}
                                     alt="card image cap"
+                                    style={{ maxHeight: "600px" }}
                                 />
                                 <input
                                     style={{ display: "none" }}
@@ -479,6 +492,31 @@ class EditMachine extends React.Component {
                                                             value={this.state.rpm}
                                                             onChange={e => this.setState({ rpm: e.target.value })}
                                                         >
+                                                        </Input>
+                                                    </FormGroup>
+                                                </Col>
+                                                <Col md="6" sm="12">
+                                                    <FormGroup>
+                                                        <Label for="norm">Severidad</Label>
+                                                        <Input
+                                                            type="select"
+                                                            id="severity"
+                                                            placeholder="Severidad"
+                                                            value={this.state.severityName}
+                                                            onChange={e => {
+                                                                const idx = e.target.selectedIndex;
+                                                                const severity = e.target.childNodes[idx].getAttribute('severity');
+                                                                this.setState({
+                                                                    severity,
+                                                                    severityName: e.target.value
+                                                                })
+                                                            }}
+                                                        >
+                                                            <option severity="green">OK (Verde)</option>
+                                                            <option severity="yellow">Alerta (Amarillo)</option>
+                                                            <option severity="red">Alarma (Rojo)</option>
+                                                            <option severity="purple">No Asignada (Morado)</option>
+                                                            <option severity="black">No Medido (Negro)</option>
                                                         </Input>
                                                     </FormGroup>
                                                 </Col>

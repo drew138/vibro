@@ -2,7 +2,7 @@
 // import axios from "axios"
 
 export const setMachine = (machine) => {
-  return async dispatch => {
+  return dispatch => {
 
 
     dispatch({
@@ -11,6 +11,14 @@ export const setMachine = (machine) => {
     })
 
 
+  }
+}
+
+export const clearMachine = () => {
+  return dispatch => {
+    dispatch({
+      type: "CLEAR_MACHINE_STATE"
+    })
   }
 }
 

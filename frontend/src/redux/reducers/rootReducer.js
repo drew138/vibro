@@ -9,7 +9,7 @@ import alerts from "./alert"
 import machine from "./machine"
 import company from "./company"
 import hierarchy from "./hierarchy"
-
+import measurement from "./measurement"
 
 const rootReducer = combineReducers({
   calendar: calenderReducer,
@@ -21,7 +21,8 @@ const rootReducer = combineReducers({
   alerts,
   company,
   machine,
-  hierarchy
+  hierarchy,
+  measurement
 })
 
 export default rootReducer

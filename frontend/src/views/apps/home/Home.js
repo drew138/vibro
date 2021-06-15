@@ -2,7 +2,12 @@ import React from "react"
 import { history } from "../../../history"
 import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../assets/scss/pages/users.scss"
-import { GET_MACHINES_ENDPOINT, GET_COMPANIES_ENDPOINT } from "../../../config"
+import {
+  GET_MACHINES_ENDPOINT,
+  GET_COMPANIES_ENDPOINT,
+  GET_HIERARCHIES_ENDPOINT,
+  DELETE_MACHINE_ENDPOINT
+} from "../../../config"
 import {
   Card,
   CardBody,
@@ -27,6 +32,9 @@ import axios from "axios"
 import {
   ChevronDown,
   RotateCw,
+  Edit,
+  FilePlus,
+  Trash2
   // X
 } from "react-feather"
 import classnames from "classnames"
@@ -36,10 +44,12 @@ import { setCompany } from "../../../redux/actions/company"
 import { displayAlert } from "../../../redux/actions/alerts"
 import { Activity } from "react-feather"
 import { updateProfile } from "../../../redux/actions/auth/updateActions"
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 class MachineList extends React.Component {
 
   state = {
+    show: false,
     rowData: [],
     pageSize: 20,
     isVisible: true,
@@ -60,9 +70,13 @@ class MachineList extends React.Component {
     title: "",
     company: 0,
     buttonDisabled: true,
+    hierarchies: [],
+    hierarchyMap: {},
+    id: 0, // used to delete machine 
+    name: "", // used to delete machine
     columnDefs: [
       {
-        width: 100,
+        width: 150,
         cellRendererFramework: params => {
           return (
             <div
@@ -73,14 +87,101 @@ class MachineList extends React.Component {
                   onClick={() => {
                     this.props.setCompany(this.state.companiesMap[this.state.company])
                     this.props.setMachine(params.data)
-                    history.push("/services/monitoring/machine")
+                    history.push("/services/monitoring/machine") // TODO change
                   }}
                 />
+                <Edit className="ml-1 mr-1"
+                  onClick={
+                    () => {
+                      // console.log(this.state.companiesMap)
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      history.push("/app/machine/edit")
+                    }
+                  } />
+                <FilePlus className="mr-1" onClick={
+                  () => {
+                    this.props.setCompany(this.state.companiesMap[this.state.company])
+                    this.props.setMachine(params.data)
+                    history.push("/app/machine/measurements") // TODO change
+                  }
+                } />
+                {
+                  this.props.auth.user_type === "admin" &&
+                  <Trash2
+                    style={{ color: "#F9596E" }}
+                    onClick={
+                      () => this.setState({
+                        name: params.data.name,
+                        id: params.data.id,
+                        show: true
+                      })
+                    }
+                  />
+                }
               </span>
             </div>
           )
         }
       },
+      {
+        headerName: "Identificador",
+        field: "identifier",
+        filter: true,
+        width: 175
+      },
+      {
+        headerName: "Severidad",
+        width: 150,
+        cellRendererFramework: params => {
+          switch (params.data.severity) {
+            case "red":
+              return (
+                <div className="badge badge-pill badge-light-danger">
+                  Alarma
+                </div>
+              )
+            case "yellow":
+              return (
+                <div className="badge badge-pill badge-light-warning">
+                  Alerta
+                </div>
+              )
+            case "green":
+              return (
+                <div className="badge badge-pill badge-light-success">
+                  Ok
+                </div>
+              )
+            case "purple":
+              return (
+                <div className="badge badge-pill badge-light-primary">
+                  No Asignada
+                </div> // ! TODO cambiar a valor por defecto
+              )
+            case "black":
+              return (
+                <div
+                  className="badge badge-pill badge-light-dark"
+                  style={{
+                    backgroundColor: "#43393A",
+                    color: "#F0E5E6 !important",
+                    fontWeight: "500",
+                    textTransform: "uppercase"
+                  }}>
+                  No Medido
+                </div>
+              )
+            default:
+              return (
+                <div className="badge badge-pill badge-light-primary">
+                  No Asignada
+                </div> // ! TODO cambiar a valor por defecto
+              )
+          }
+        }
+      },
+
       {
         headerName: "Nombre",
         field: "name",
@@ -104,25 +205,49 @@ class MachineList extends React.Component {
         }
       },
       {
-        headerName: "Código",
-        field: "code",
-        filter: true,
-        width: 250
-      },
-      {
         headerName: "Jerarquía",
-        field: "name",
+        // field: "name",
         filter: true,
-        width: 250
+        width: 250,
+        cellRendererFramework: params => {
+          return (
+            <div
+              className="d-flex align-items-center cursor-pointer"
+            >
+              {/* <img
+                className="rounded-circle mr-50"
+                src={params.data.avatar}
+                alt="user avatar"
+                height="30"
+                width="30"
+              /> */}
+              <span>{
+                this.getFullHierarchy(params.data.hierarchy)
+              }</span>
+            </div>
+          )
+        }
       },
-      {
-        headerName: "Marca",
-        field: "brand",
-        filter: true,
-        width: 250
-      }
+      // {
+      //   headerName: "Marca",
+      //   field: "brand",
+      //   filter: true,
+      //   width: 250
+      // }
     ]
   }
+
+  getFullHierarchy = (id) => {
+    let fullHierarchy = ""
+    // console.log(this.state.hierarchyMap)
+    while (this.state.hierarchyMap.hasOwnProperty(id)) {
+      const tmp = this.state.hierarchyMap[id]
+      fullHierarchy = `/${tmp.name}` + fullHierarchy
+      id = tmp.parent?.id
+    }
+    return fullHierarchy
+  }
+
 
   async getCompanyMachines(companyId) {
     if (!companyId) {
@@ -148,15 +273,75 @@ class MachineList extends React.Component {
     }
   }
 
+  async getCompanyHierarchies(company_id) {
+    if (!company_id) {
+      this.setState({ hierarchies: [] })
+      return
+    }
+
+    try {
+      const res = await axios.get(GET_HIERARCHIES_ENDPOINT, {
+        params: { company_id }
+      })
+      const hierarchyMap = {}
+      res.data.forEach((hierarchy) => {
+        hierarchyMap[hierarchy.id] = hierarchy
+      })
+
+
+      this.setState({
+        hierarchies: [...res.data],
+        hierarchyMap
+      })
+    } catch {
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ rowData: [] })
+    }
+  }
+
+  deleteMachine = async () => {
+    this.setState({ show: false })
+    if (!this.state.id) {
+      return
+    }
+
+    try {
+      const res = await axios.delete(`${DELETE_MACHINE_ENDPOINT}${this.state.id}/`)
+      const alertData = {
+        title: "Máquina Borrada Exitosamente",
+        success: true,
+        show: true,
+        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Máquinas.`
+      }
+      history.push("/app/companies/list")
+      this.props.displayAlert(alertData)
+    } catch (e) {
+      const alertData = {
+        title: "Error Al Borrar Máquina",
+        success: false,
+        show: true,
+        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Máquina."
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
+
   async componentDidMount() {
-    setTimeout(() => {
+    setTimeout(async () => {
       // console.log(this.props.auth.company?.id)
 
       this.setState({
         company: this.props.auth.company ?? 0,
         // companyName: this.props.auth.company?.name ?? "Seleccione una opción",
       })
-      this.getCompanyMachines(this.props.auth.company ?? 0);
+      await this.getCompanyHierarchies(this.props.auth.company ?? 0)
+      await this.getCompanyMachines(this.props.auth.company ?? 0);
     }, 700)
 
     if (this.props.auth.user_type === "client") {
@@ -324,7 +509,7 @@ class MachineList extends React.Component {
                     ""
                   )}
                   <Row>
-                    <Col lg="8" md="6" sm="12">
+                    <Col lg="7" md="6" sm="12">
                       <FormGroup className="mb-0">
                         <Label for="role">Empresa</Label>
                         <Input
@@ -355,7 +540,7 @@ class MachineList extends React.Component {
                         </Input>
                       </FormGroup>
                     </Col>
-                    <Col lg="4" md="6" sm="12" >
+                    <Col lg="5" md="6" sm="12" >
                       <FormGroup className="mb-0">
                         <Button.Ripple
                           color="primary"
@@ -364,11 +549,12 @@ class MachineList extends React.Component {
                           style={{ marginTop: 19 }}
                           onClick={() => {
                             // console.log(this.state.company, this.props.auth.id)
-                            // this.props.updateProfile({ company: this.state.company }, this.props.auth.id)
+                            this.props.updateProfile({ company: this.state.company }, this.props.auth.id)
                             const companyName = this.state.companyName
                             // console.log(companyName)
                             this.setState({
-                              title: companyName
+                              title: companyName,
+                              buttonDisabled: true
                             })
                           }}
 
@@ -461,6 +647,23 @@ class MachineList extends React.Component {
             </Card>
           </Col>
         </Row>
+        {this.props.auth.user_type === "admin" &&
+          <SweetAlert
+            warning
+            title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
+            showCancel
+            show={this.state.show}
+            cancelBtnText="Cancelar"
+            confirmBtnText="Borrar Máquina"
+            confirmBtnBsStyle="danger"
+            cancelBtnBsStyle="primary"
+            onConfirm={this.deleteMachine}
+            onCancel={() => this.setState({ show: false })}
+          >
+            <p className="sweet-alert-text">
+              Todas Mediciones Serán Borradas Junto Con Esta Máquina.
+            </p>
+          </SweetAlert>}
       </React.Fragment >
     )
   }

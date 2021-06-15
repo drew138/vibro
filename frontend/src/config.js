@@ -21,3 +21,5 @@ export const GET_MACHINES_ENDPOINT = `${domain}/api/machine/`
 export const CREATE_MACHINE_ENDPOINT = `${domain}/api/machine/`
 export const PATCH_MACHINE_ENDPOINT = `${domain}/api/machine/`
 export const DELETE_MACHINE_ENDPOINT = `${domain}/api/machine/`
+export const GET_MEASUREMENTS_ENDPOINT = `${domain}/api/measurement/`
+export const DELETE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/`
