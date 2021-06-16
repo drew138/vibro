@@ -184,7 +184,10 @@ const companyEdit = lazy(() => import("./views/apps/companies/edit/Edit"))
 const companyAdd = lazy(() => import("./views/apps/companies/add/Add"))
 const machineEdit = lazy(() => import("./views/apps/machines/edit"))
 const hierarchyEdit = lazy(() => import("./views/apps/companies/hierarchies/HierarchyEdit"))
-const measurementList = lazy(() => import("./views/apps/measurements/Measurements"))
+const measurementList = lazy(() => import("./views/apps/measurements/MeasurementsList"))
+const measurementsAdd = lazy(() => import("./views/apps/measurements/MeasurementsAdd"))
+const measurementEdit = lazy(() => import("./views/apps/measurements/MeasurementEdit"))
+const measurementAdd = lazy(() => import("./views/apps/measurements/MeasurementAdd"))
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -304,6 +307,21 @@ class AppRouter extends React.Component {
             exact
             path="/app/measurement/list"
             component={measurementList}
+          />
+          <AppRoute
+            exact
+            path="/app/measurements/add"
+            component={measurementsAdd}
+          />
+          <AppRoute
+            exact
+            path="/app/measurement/add"
+            component={measurementAdd}
+          />
+          <AppRoute
+            exact
+            path="/app/measurement/edit"
+            component={measurementEdit}
           />
 
 

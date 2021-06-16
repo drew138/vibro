@@ -220,7 +220,7 @@ class VibroUserView(viewsets.ModelViewSet):
                 user_type="client").exclude(user_type='arduino')
         if id:
             queryset = queryset.filter(id=id)
-        if user_type:
+        if user_type:  # en uso
             queryset = queryset.filter(user_type=user_type)
         if company_name:
             queryset = queryset.filter(company__name__contains=company_name)

@@ -162,10 +162,10 @@ class MachineList extends React.Component {
             case "black":
               return (
                 <div
-                  className="badge badge-pill badge-light-dark"
+                  className="badge badge-pill"
                   style={{
                     backgroundColor: "#43393A",
-                    color: "#F0E5E6 !important",
+                    color: "#F0E5E6",
                     fontWeight: "500",
                     textTransform: "uppercase"
                   }}>

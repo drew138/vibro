@@ -525,8 +525,8 @@ class Measurement(models.Model):
         Machine,
         related_name="measurements",
         on_delete=models.CASCADE)
-    revised = models.BooleanField(default=False)
-    resolved = models.BooleanField(default=False)
+    revised = models.BooleanField(default=False)  # remove
+    resolved = models.BooleanField(default=False)  # remove
     prev_changes = models.TextField(null=True, )
     prev_changes_date = models.DateField(null=True)
 
