@@ -6,33 +6,23 @@ import { GET_MEASUREMENTS_ENDPOINT, DELETE_MEASUREMENT_ENDPOINT } from "../../..
 import {
   Card,
   CardBody,
-  // CardHeader,
-  // CardTitle,
-  // FormGroup,
-  // Label,
   Input,
   Row,
   Col,
   UncontrolledDropdown,
   DropdownMenu,
   DropdownItem,
-  DropdownToggle,
-  // Collapse,
-  // Spinner,
-  // Button
+  DropdownToggle
 } from "reactstrap"
 import { AgGridReact } from "ag-grid-react"
 import { connect } from "react-redux"
 import axios from "axios"
 import {
   ChevronDown,
-  // RotateCw,
-  // X
 } from "react-feather"
 // import classnames from "classnames"
 import { ContextLayout } from "../../../utility/context/Layout"
-import { setMachine } from "../../../redux/actions/machine"
-import { setCompany } from "../../../redux/actions/company"
+import { setMeasurement } from "../../../redux/actions/measurement"
 import { displayAlert } from "../../../redux/actions/alerts"
 import { Activity, Edit, Trash2 } from "react-feather"
 import { updateProfile } from "../../../redux/actions/auth/updateActions"
@@ -44,16 +34,16 @@ class MeasurementList extends React.Component {
 
   constructor(props) {
     super(props)
-    // if (!props.machine.id) {
-    //   history.push("/")
-    // }
+    if (!props.machine.id) {
+      history.push("/")
+    }
   }
 
 
 
   state = {
     show: false,
-    rowData: [{ severity: "black" }],
+    rowData: [],
     pageSize: 20,
     isVisible: true,
     reload: false,
@@ -84,23 +74,20 @@ class MeasurementList extends React.Component {
               <span>
                 <Activity
                   onClick={() => {
-                    this.props.setCompany(this.state.companiesMap[this.state.company])
-                    this.props.setMachine(params.data)
-                    history.push("/services/monitoring/machine")
+                    this.props.setMeasurement(params.data)
+                    history.push("/app/measurement/view")
                   }}
-
-
-
                 />
-
-                <Edit className="ml-1 mr-1"
-                  onClick={
-                    () => {
-
-                      this.props.setCompany(params.data)
-                      history.push("/app/companies/list/edit")
-                    }
-                  } />
+                {
+                  this.props.auth.user_type !== "client" && this.props.auth.user_type !== "arduino" &&
+                  <Edit className="ml-1 mr-1"
+                    onClick={
+                      () => {
+                        this.props.setMeasurement(params.data)
+                        history.push("/app/measurement/edit")
+                      }
+                    } />
+                }
                 {this.props.auth.user_type === "admin" &&
                   <Trash2 style={{ color: "#F9596E" }}
                     onClick={
@@ -170,32 +157,10 @@ class MeasurementList extends React.Component {
       },
       {
         headerName: "Fecha",
-        field: "data",
+        field: "date",
         filter: false,
         width: 200,
       },
-      // {
-      //   headerName: "Máquina",
-      //   // field: "code",
-      //   filter: true,
-      //   width: 200,
-      //   cellRendererFramework: params => {
-      //     return (
-      //       <div
-      //         className="d-flex align-items-center cursor-pointer"
-      //       >
-      //         {/* <img
-      //           className="rounded-circle mr-50"
-      //           src={params.data.avatar}
-      //           alt="user avatar"
-      //           height="30"
-      //           width="30"
-      //         /> */}
-      //         <span>{params.data.machine?.name}</span>
-      //       </div>
-      //     )
-      //   }
-      // },
       {
         headerName: "Servicio",
         field: "service",
@@ -211,76 +176,23 @@ class MeasurementList extends React.Component {
     ]
   }
 
-  // async getCompanyMachines(companyId) {
-  //   if (!companyId) {
-  //     this.setState({ rowData: [] })
-  //     return
-  //   }
-  //   try {
-  //     // console.log(companyId)
-  //     const res = await axios.get(GET_MACHINES_ENDPOINT, {
-  //       params: { company_id: companyId }
-  //     })
-  //     const rowData = [...res.data]
-  //     this.setState({ rowData })
-  //   } catch {
-  //     const alertData = {
-  //       title: "Error de Conexión",
-  //       success: false,
-  //       show: true,
-  //       alertText: "Error al Conectar al Servidor"
-  //     }
-  //     this.props.displayAlert(alertData)
-  //     this.setState({ rowData: [] })
-  //   }
-  // }
 
   async componentDidMount() {
     if (!this.props.machine.id) {
       return
     }
-
-
-
-    // setTimeout(() => {
-    //   // console.log(this.props.auth.company?.id)
-
-    //   this.setState({
-    //     company: this.props.auth.company ?? 0,
-    //     // companyName: this.props.auth.company?.name ?? "Seleccione una opción",
-    //   })
-    //   this.getCompanyMachines(this.props.auth.company ?? 0);
-    // }, 700)
-
-    // if (this.props.auth.user_type === "client") {
-    //   return
-    // }
-
     try {
       const res = await axios.get(GET_MEASUREMENTS_ENDPOINT, {
         params: {
           machine: this.props.machine.id
         }
       })
-      const companiesMap = {};
-      res.data.forEach(
-        comp => {
-          companiesMap[comp.id] = comp
-        }
-      );
-      const companies = [{ id: 0, name: "Seleccione una opción" }, ...res.data];
-      const currentCompany = companies.filter((company) => company.id === this.props.auth.company);
-      const title = currentCompany ? currentCompany[0].name : "";
       this.setState({
-        companies,
-        companiesMap,
-        title,
-        companyName: currentCompany ? currentCompany[0].name : "Seleccione una opción",
-        company: currentCompany ? currentCompany[0].id : "Seleccione una opción"
-
+        rowData: [{ severity: "black" }, ...res.data]
       })
-
-    } catch {
+    } catch (e) {
+      console.log(e)
+      // console.log(e.response.data)
       const alertData = {
         title: "Error de Conexión",
         success: false,
@@ -301,24 +213,24 @@ class MeasurementList extends React.Component {
     try {
       const res = await axios.delete(`${DELETE_MEASUREMENT_ENDPOINT}${this.state.id}/`)
       const alertData = {
-        title: "Empresa Borrada Exitosamente",
+        title: "Medición Borrada Exitosamente",
         success: true,
         show: true,
-        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Empresas.`
+        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Mediciones.`
       }
       this.props.displayAlert(alertData)
       const tmp = this.state.id;
       this.setState({
-        rowData: [...this.state.rowData.filter((company) => company.id !== tmp)],
+        rowData: [...this.state.rowData.filter((measurement) => measurement.id !== tmp)],
         id: 0,
         name: ""
       })
     } catch (e) {
       const alertData = {
-        title: "Error Al Borrar Empresa",
+        title: "Error Al Borrar Medición ",
         success: false,
         show: true,
-        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Empresa."
+        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Medición"
       }
       this.props.displayAlert(alertData)
     }
@@ -513,5 +425,5 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setMachine, setCompany, displayAlert, updateProfile })(MeasurementList)
+export default connect(mapStateToProps, { setMeasurement, displayAlert, updateProfile })(MeasurementList)
 

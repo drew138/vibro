@@ -87,13 +87,12 @@ class MachineList extends React.Component {
                   onClick={() => {
                     this.props.setCompany(this.state.companiesMap[this.state.company])
                     this.props.setMachine(params.data)
-                    history.push("/services/monitoring/machine") // TODO change
+                    history.push("/app/measurement/list") // TODO change
                   }}
                 />
                 <Edit className="ml-1 mr-1"
                   onClick={
                     () => {
-                      // console.log(this.state.companiesMap)
                       this.props.setCompany(this.state.companiesMap[this.state.company])
                       this.props.setMachine(params.data)
                       history.push("/app/machine/edit")
@@ -103,7 +102,7 @@ class MachineList extends React.Component {
                   () => {
                     this.props.setCompany(this.state.companiesMap[this.state.company])
                     this.props.setMachine(params.data)
-                    history.push("/app/machine/measurements") // TODO change
+                    history.push("/app/measurement/add")
                   }
                 } />
                 {
@@ -123,12 +122,6 @@ class MachineList extends React.Component {
             </div>
           )
         }
-      },
-      {
-        headerName: "Identificador",
-        field: "identifier",
-        filter: true,
-        width: 175
       },
       {
         headerName: "Severidad",
@@ -180,6 +173,12 @@ class MachineList extends React.Component {
               )
           }
         }
+      },
+      {
+        headerName: "Identificador",
+        field: "identifier",
+        filter: true,
+        width: 175
       },
 
       {
@@ -245,6 +244,7 @@ class MachineList extends React.Component {
       fullHierarchy = `/${tmp.name}` + fullHierarchy
       id = tmp.parent?.id
     }
+    if (fullHierarchy === "") return "N/A"
     return fullHierarchy
   }
 
@@ -334,7 +334,7 @@ class MachineList extends React.Component {
 
   async componentDidMount() {
     setTimeout(async () => {
-      // console.log(this.props.auth.company?.id)
+
 
       this.setState({
         company: this.props.auth.company ?? 0,
@@ -509,7 +509,7 @@ class MachineList extends React.Component {
                     ""
                   )}
                   <Row>
-                    <Col lg="7" md="6" sm="12">
+                    <Col lg="5" md="6" sm="12">
                       <FormGroup className="mb-0">
                         <Label for="role">Empresa</Label>
                         <Input
@@ -517,7 +517,7 @@ class MachineList extends React.Component {
                           name="company"
                           id="company"
                           value={this.state.companyName}
-                          onChange={e => {
+                          onChange={async e => {
                             const idx = e.target.selectedIndex;
                             const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
 
@@ -529,6 +529,7 @@ class MachineList extends React.Component {
                                 buttonDisabled: !companyId || this.props.auth.company === companyId
                               }
                             )
+                            await this.getCompanyHierarchies(companyId)
                             this.getCompanyMachines(companyId)
                           }}
                         >
@@ -540,29 +541,46 @@ class MachineList extends React.Component {
                         </Input>
                       </FormGroup>
                     </Col>
-                    <Col lg="5" md="6" sm="12" >
-                      <FormGroup className="mb-0">
-                        <Button.Ripple
-                          color="primary"
-                          disabled={this.state.buttonDisabled}
-                          className="mr-1"
-                          style={{ marginTop: 19 }}
-                          onClick={() => {
-                            // console.log(this.state.company, this.props.auth.id)
-                            this.props.updateProfile({ company: this.state.company }, this.props.auth.id)
-                            const companyName = this.state.companyName
-                            // console.log(companyName)
-                            this.setState({
-                              title: companyName,
-                              buttonDisabled: true
-                            })
-                          }}
 
-                        >
-                          Asignar Esta Empresa Por Defecto
-                        </Button.Ripple>
-                      </FormGroup>
+                    <Col lg="7" md="6" sm="12" >
+                      <Row>
+                        <FormGroup className="mb-0 mr-2 ml-1">
+                          <Button.Ripple
+                            color="primary"
+                            disabled={this.state.buttonDisabled}
+                            style={{ marginTop: 19 }}
+                            onClick={() => {
+                              this.props.updateProfile({ company: this.state.company }, this.props.auth.id)
+                              const companyName = this.state.companyName
+                              this.setState({
+                                title: companyName,
+                                buttonDisabled: true
+                              })
+                            }}
+
+                          >
+                            Asignar Esta Empresa Por Defecto
+                          </Button.Ripple>
+                        </FormGroup>
+
+                        <FormGroup className="mb-0">
+                          <Button.Ripple
+                            color="primary"
+                            style={{ marginTop: 19 }}
+                            onClick={
+                              () => {
+                                this.props.setCompany(this.state.companiesMap[this.state.company])
+                                history.push("/app/measurements/add")
+                              }}
+                          >
+                            Agregar Mediciones
+                          </Button.Ripple>
+                        </FormGroup>
+
+
+                      </Row>
                     </Col>
+
                   </Row>
                 </CardBody>
               </Collapse>
