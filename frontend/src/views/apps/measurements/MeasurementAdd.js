@@ -14,7 +14,7 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../redux/actions/alerts"
-import { GET_USERS_ENDPOINT } from "../../../config"
+import { GET_USERS_ENDPOINT, CREATE_MEASUREMENT_ENDPOINT } from "../../../config"
 import axios from "axios"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { history } from "../../../history"
@@ -22,12 +22,13 @@ import Img from "../../../assets/img/machine/default.png"
 var DatePicker = require("reactstrap-date-picker");
 
 const severityMap = {
-  purple: "No Asignada (Morado)",
+  purple: "No Asignado (Morado)",
   green: "OK (Verde)",
   yellow: "Alerta (Amarillo)",
   red: "Alarma (Rojo)",
   black: "No Medido (Negro)"
 }
+
 const initialState = {
   service: "predictivo",
   serviceName: "Predictivo",
@@ -47,7 +48,10 @@ const initialState = {
   analyst: 0,
   analystName: "Seleccione una opción",
   certifier: 0,
-  certifierName: "Seleccione una opción"
+  certifierName: "Seleccione una opción",
+  prev_changes: "",
+  severity: "purple",
+  severityName: severityMap["purple"],
 }
 
 
@@ -62,10 +66,7 @@ class MeasurementAdd extends React.Component {
   }
 
   state = {
-    machine: this.props.machine.id,
     ...initialState,
-    severity: this.props.machine.severity,
-    severityName: severityMap[this.props.machine.severity],
   }
 
   handleSubmit = async e => {
@@ -76,75 +77,62 @@ class MeasurementAdd extends React.Component {
       show: true,
       alertText: ""
     }
-    // if (this.state.nit && !isValidNit(this.state.nit)) {
-    //   alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.phone && !isValidPhone(this.state.phone)) {
-    //   alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.address && !isValidAddress(this.state.address)) {
-    //   alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (!this.state.cityMap[this.state.city]) {
-    //   alertData.alertText = "La ciudad ingresada no es valida."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // const company = {
-    //   name: this.state.name,
-    //   nit: this.state.nit,
-    //   address: this.state.address,
-    //   phone: this.state.phone,
-    //   city: this.state.cityMap[this.state.city]
-    // }
-    // if (this.state.picture) {
-    //   company.picture = this.state.picture;
-    // }
-    // // console.log(data)
-    // try {
-    //   const data = new FormData();
-    //   Object.keys(company).forEach(key => data.append(key, company[key]));
-    //   const res = await axios.post(POST_COMPANY_ENDPOINT, data)
-    //   // dispatch({
-    //   //   type: "SET_COMPANY_STATE",
-    //   //   payload: { ...res.data }
-    //   // })
-    //   const alertData = {
-    //     title: "Registro Exitoso",
-    //     success: true,
-    //     show: true,
-    //     alertText: "Empresa creada exitosamente"
-    //   }
-    //   this.props.displayAlert(alertData)
-    //   // dispatch({
-    //   //   type: "DISPLAY_SWEET_ALERT",
-    //   //   payload: alertData
-    //   // })
-    //   // history.push("/")
-    //   this.setState({ ...initialState })
-    // } catch (e) {
-    //   console.log(e)
-    //   const alertData = {
-    //     title: "Error de Validación",
-    //     success: false,
-    //     show: true,
-    //     alertText: Object.entries(e.response.data)[0][1][0]
-    //   }
-    //   this.props.displayAlert(alertData)
-    //   // dispatch({
-    //   //   type: "DISPLAY_SWEET_ALERT",
-    //   //   payload: alertData
-    //   // })
-    // }
+    if (!this.state.date) {
+      alertData.alertText = "El Campo De Fecha No Puede Estar En Blanco."
+      this.props.displayAlert(alertData)
+      return
+    }
 
 
-    // this.props.createCompany(data)
+    const measurement = {
+      service: this.state.service,
+      measurement_type: this.state.measurement_type,
+      machine: this.props.machine.id,
+      prev_changes: this.state.prev_changes,
+      analysis: this.state.analysis,
+      diagnostic: this.state.diagnostic,
+      severity: this.state.severity,
+      date: this.state.date,
+    }
+    if (this.state.prev_changes_date) {
+      measurement.prev_changes_date = this.state.prev_changes_date
+    }
+    if (this.state.engineer_one) {
+      measurement.engineer_one = this.state.engineer_one
+    }
+    if (this.state.engineer_two) {
+      measurement.engineer_two = this.state.engineer_two
+    }
+    if (this.state.analyst) {
+      measurement.analyst = this.state.analyst
+    }
+    if (this.state.certifier) {
+      measurement.certifier = this.state.certifier
+    }
+
+    try {
+
+      const res = await axios.post(CREATE_MEASUREMENT_ENDPOINT, measurement)
+      const alertData = {
+        title: "Registro Exitoso",
+        success: true,
+        show: true,
+        alertText: "Medición creada exitosamente"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ ...initialState })
+    } catch (e) {
+      console.log(e.response.data)
+      const alertData = {
+        title: "Error de Validación",
+        success: false,
+        show: true,
+        alertText: Object.entries(e.response.data)[0][1][0]
+      }
+      this.props.displayAlert(alertData)
+    }
+
+
   }
 
   handleDateChange(value, formattedValue) {
@@ -207,67 +195,18 @@ class MeasurementAdd extends React.Component {
             breadCrumbParent="Máquina"
             breadCrumbActive="Agregar Medición"
           />
+
+
+
+
+
+
           <Row>
             <Col lg="12" md="6" sm="12">
               <Card>
                 <CardHeader className="mx-auto flex-column">
-                  {/* <h1>{this.props.company.name !== "" ? this.props.company.name : "N/A"}</h1> */}
                 </CardHeader>
                 <CardBody className="text-center pt-0">
-                  {/* <div className="avatar mr-1 avatar-xl mt-1 mb-1">
-                    <img src={this.props.company.picture !== "" ? this.props.company.picture : companyImg} alt="avatarImg" />
-                  </div>
-                  <div className="followers mt-1 mb-1">
-                  <span>Dirección</span>
-                  <p className="font-weight-bold font-medium-2 mb-0">
-                  {this.props.company.address !== "" ? this.props.company.address : "N/A"}
-                  </p>
-                  </div>
-                  <div className="uploads mt-1 mb-1">
-                  <span>Telefono</span>
-                  <p className="font-weight-bold font-medium-2 mb-0">
-                  {this.props.company.phone !== "" ? this.props.company.phone : "N/A"}
-                  </p>
-                </div> */}
-                  {/* <Col lg="6" md="6" sm="12">
-
-                    <Row lg="6" md="6" sm="12">
-                      <div className="uploads mt-1 mb-1">
-                        <span>Máquina</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.name !== "" ? this.props.machine.name : "N/A"}
-                        </p>
-                      </div>
-
-                    </Row>
-                    <Row lg="6" md="6" sm="12">
-
-                      <div className="uploads mt-1 mb-1">
-                        <span>Código</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.code !== "" ? this.props.machine.code : "N/A"}
-                        </p>
-                      </div>
-
-                    </Row>
-                  </Col>
-
-                  <Col>
-                  </Col>
-
-                  <Col>
-
-                    <Row lg="6" md="6" sm="12">
-                      <div className="uploads mt-1 mb-1">
-                        <span>Alimentación Eléctrica</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.electric_feed !== "" ? this.props.machine.electric_feed : "N/A"}
-                        </p>
-                      </div>
-
-                    </Row>
-                  </Col> */}
-
                   <Row >
                     <Col className="mt-3" lg="4" md="6" sm="12">
                       <Row >
@@ -275,7 +214,7 @@ class MeasurementAdd extends React.Component {
                           <div className="uploads mt-1 mb-1">
                             <span>Máquina</span>
                             <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.name !== "" ? this.props.machine.name : "N/A"}
+                              {this.props.machine.name ? this.props.machine.name : "N/A"}
                             </p>
                           </div>
                         </Col>
@@ -285,7 +224,7 @@ class MeasurementAdd extends React.Component {
                           <div className="uploads mt-1 mb-1">
                             <span>Código</span>
                             <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.code !== "" ? this.props.machine.code : "N/A"}
+                              {this.props.machine.code ? this.props.machine.code : "N/A"}
                             </p>
                           </div>
                         </Col>
@@ -295,7 +234,7 @@ class MeasurementAdd extends React.Component {
                           <div className="uploads mt-1 mb-1">
                             <span>Alimentación Eléctrica</span>
                             <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.electric_feed !== "" ? this.props.machine.electric_feed : "N/A"}
+                              {this.props.machine.electric_feed ? this.props.machine.electric_feed : "N/A"}
                             </p>
                           </div>
                         </Col>
@@ -328,7 +267,7 @@ class MeasurementAdd extends React.Component {
                                   case "purple":
                                     return (
                                       <div className="badge badge-pill badge-light-primary">
-                                        No Asignada
+                                        No Asignado
                                       </div> // ! TODO cambiar a valor por defecto
                                     )
                                   case "black":
@@ -347,7 +286,7 @@ class MeasurementAdd extends React.Component {
                                   default:
                                     return (
                                       <div className="badge badge-pill badge-light-primary">
-                                        No Asignada
+                                        No Asignado
                                       </div> // ! TODO cambiar a valor por defecto
                                     )
                                 }
@@ -364,18 +303,11 @@ class MeasurementAdd extends React.Component {
                     <Col lg="4" md="6" sm="12">
                       <Row>
                         <Col lg="12" md="6" sm="12">
-                          {/* <div className="uploads mt-1 mb-1">
-                            <span>Marca</span>
-                            <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.brand !== "" ? this.props.machine.brand : "N/A"}
-                            </p>
-                          </div> */}
                           <CardImg
                             className="img-fluid"
                             // style={{ maxHeight: "100%" }}
                             src={
-                              // this.state.image ? URL.createObjectURL(this.state.image) : this.props.machine.image
-                              Img
+                              this.props.machine.image ? this.props.machine.image : Img
                             }
                             alt="card image cap"
                           />
@@ -390,7 +322,7 @@ class MeasurementAdd extends React.Component {
                           <div className="uploads mt-1 mb-1">
                             <span>Marca</span>
                             <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.brand !== "" ? this.props.machine.brand : "N/A"}
+                              {this.props.machine.brand ? this.props.machine.brand : "N/A"}
                             </p>
                           </div>
                         </Col>
@@ -411,7 +343,7 @@ class MeasurementAdd extends React.Component {
                           <div className="uploads mt-1 mb-1">
                             <span>Norma</span>
                             <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.norm !== "" ? this.props.machine.norm : "N/A"}
+                              {this.props.machine.norm ? this.props.machine.norm : "N/A"}
                             </p>
                           </div>
                         </Col>
@@ -421,40 +353,13 @@ class MeasurementAdd extends React.Component {
                           <div className="uploads mt-1 mb-1">
                             <span>RPM</span>
                             <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.rpm !== "" ? this.props.machine.rpm : "N/A"}
+                              {this.props.machine.rpm ? this.props.machine.rpm : "N/A"}
                             </p>
                           </div>
                         </Col>
                       </Row>
                     </Col>
                   </Row>
-
-
-
-
-
-
-
-                  {/* <Row>
-                    <Col lg="4" md="4" sm="6">
-
-                      <div className="uploads mt-1 mb-1">
-                        <span>Marca</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.brand !== "" ? this.props.machine.brand : "N/A"}
-                        </p>
-                      </div>
-                    </Col>
-
-
-                  </Row> */}
-
-
-
-
-
-
-
                 </CardBody>
               </Card>
             </Col>
@@ -517,10 +422,6 @@ class MeasurementAdd extends React.Component {
                       </Input>
                     </FormGroup>
                   </Col>
-
-
-
-
 
 
                   <Col md="6" sm="12">
@@ -598,8 +499,7 @@ class MeasurementAdd extends React.Component {
                     </FormGroup>
                   </Col>
 
-
-                  {/* <Col md="6" sm="12">
+                  <Col md="6" sm="12">
                     <FormGroup>
                       <Label for="certifier">Certifica</Label>
                       <Input
@@ -621,47 +521,7 @@ class MeasurementAdd extends React.Component {
                         }
                       </Input>
                     </FormGroup>
-                  </Col> */}
-
-
-
-                  <Col md="6" sm="12">
-                    <FormGroup>
-                      <Label for="severity">Severidad</Label>
-                      <Input
-                        type="select"
-                        id="severity"
-                        placeholder="Severidad"
-                        value={this.state.severityName}
-                        onChange={e => {
-                          const idx = e.target.selectedIndex;
-                          const severity = e.target.childNodes[idx].getAttribute('severity');
-                          this.setState({
-                            severity,
-                            severityName: e.target.value
-                          })
-                        }}
-                      >
-                        <option severity="green">OK (Verde)</option>
-                        <option severity="yellow">Alerta (Amarillo)</option>
-                        <option severity="red">Alarma (Rojo)</option>
-                        <option severity="purple">No Asignada (Morado)</option>
-                        <option severity="black">No Medido (Negro)</option>
-                      </Input>
-                    </FormGroup>
                   </Col>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                   <Col md="6" sm="12">
@@ -689,7 +549,30 @@ class MeasurementAdd extends React.Component {
 
                   {/* <Col md="6" sm="12">
                     <FormGroup>
-                      <Label for="norm">Revisado</Label>
+                    <Label for="norm">Revisado</Label>
+                    <Input
+                    type="select"
+                    id="severity"
+                    placeholder="Severidad"
+                    value={this.state.severityName}
+                    onChange={e => {
+                          const idx = e.target.selectedIndex;
+                          const severity = e.target.childNodes[idx].getAttribute('severity');
+                          this.setState({
+                            severity,
+                            severityName: e.target.value
+                          })
+                        }}
+                        >
+                        <option severity="green">Si</option>
+                        <option severity="yellow">No</option>
+                        </Input>
+                        </FormGroup>
+                      </Col> */}
+
+                  <Col md="12" sm="12">
+                    <FormGroup>
+                      <Label for="severity">Severidad</Label>
                       <Input
                         type="select"
                         id="severity"
@@ -704,23 +587,37 @@ class MeasurementAdd extends React.Component {
                           })
                         }}
                       >
-                        <option severity="green">Si</option>
-                        <option severity="yellow">No</option>
+                        <option severity="green">OK (Verde)</option>
+                        <option severity="yellow">Alerta (Amarillo)</option>
+                        <option severity="red">Alarma (Rojo)</option>
+                        <option severity="purple">No Asignada (Morado)</option>
+                        <option severity="black">No Medido (Negro)</option>
                       </Input>
                     </FormGroup>
-                  </Col> */}
+                  </Col>
 
 
+                  <Col md="12" sm="12">
+                    <FormGroup>
+                      <Label for="prev_changes">Cambios Previos</Label>
+                      <Input
+                        type="textarea"
+                        id="prev_changes"
+                        rows={7}
+                        placeholder="Cambios Previos"
+                        value={this.state.prev_changes}
+                        onChange={e => this.setState({ prev_changes: e.target.value })} />
+                    </FormGroup>
+                  </Col>
 
 
-
-                  <Col md="6" sm="12">
+                  <Col md="12" sm="12">
                     <FormGroup>
                       <Label for="analysis">Análisis</Label>
                       <Input
                         type="textarea"
                         id="analysis"
-                        rows={10}
+                        rows={7}
                         placeholder="Análisis"
                         value={this.state.analysis}
                         onChange={e => this.setState({ analysis: e.target.value })} />
@@ -728,13 +625,13 @@ class MeasurementAdd extends React.Component {
                   </Col>
 
 
-                  <Col md="6" sm="12">
+                  <Col md="12" sm="12">
                     <FormGroup>
                       <Label for="diagnostic">Diagnostico</Label>
                       <Input
                         type="textarea"
                         id="diagnostic"
-                        rows={10}
+                        rows={7}
                         placeholder="Diagnostico"
                         value={this.state.diagnostic}
                         onChange={e => this.setState({ diagnostic: e.target.value })} />
@@ -746,7 +643,7 @@ class MeasurementAdd extends React.Component {
                     sm="12"
                   >
                     <Button.Ripple className="mr-1" color="primary">
-                      Registrar Medición
+                      Agregar Medición
                     </Button.Ripple>
                   </Col>
                 </Row>
@@ -761,10 +658,7 @@ class MeasurementAdd extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    users: state.users,
-    auth: state.auth,
     machine: state.machine,
-    company: state.company
   }
 }
 

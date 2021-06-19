@@ -23,3 +23,7 @@ export const PATCH_MACHINE_ENDPOINT = `${domain}/api/machine/`
 export const DELETE_MACHINE_ENDPOINT = `${domain}/api/machine/`
 export const GET_MEASUREMENTS_ENDPOINT = `${domain}/api/measurement/`
 export const DELETE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/`
+export const CREATE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/`
+export const PATCH_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/`
+
+export const BULK_CREATE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/` // TODO

@@ -10,38 +10,20 @@ import {
   Card,
   CardBody,
   CustomInput,
-  CardHeader
+  CardHeader,
+  CardImg
 } from "reactstrap"
 import { connect } from "react-redux"
-// import { createCompany } from "../../../../redux/actions/company"
-// import isValidAddress from "../../../validators/address"
-// import isValidPhone from "../../../validators/phone"
-// import isValidNit from "../../../validators/nit"
 import { displayAlert } from "../../../redux/actions/alerts"
 // import { POST_COMPANY_ENDPOINT } from "../../../config"
 import { GET_USERS_ENDPOINT } from "../../../config"
 import axios from "axios"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
-// import AutoComplete from "../../../components/@vuexy/autoComplete/AutoCompleteComponent"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
-// import userImg from "../../../assets/img/user/default.png"
-// import Datepickers from "../../forms/form-elements/datepicker/Datepickers"
-// import InputMask from "react-input-mask"
+
+import Img from "../../../assets/img/machine/default.png"
 var DatePicker = require("reactstrap-date-picker");
 
 const initialState = {
-  // name: "",
-  // nit: "",
-  // address: "",
-  // phone: "",
-  // city: "",
-  // picture: "",
-  // suggestions: [{ name: "" }],
-  // cityMap: {},
-
-
-
-
 
   service: "predictivo",
   serviceName: "Predictivo",
@@ -208,38 +190,169 @@ class MeasurementAdd extends React.Component {
             breadCrumbParent="Empresa"
             breadCrumbActive="Agregar Mediciones"
           />
+
           <Row>
             <Col lg="12" md="6" sm="12">
               <Card>
                 <CardHeader className="mx-auto flex-column">
-                  <h1>{this.props.company.name ?? "N/A"}</h1>
                 </CardHeader>
                 <CardBody className="text-center pt-0">
-                  <div className="avatar mr-1 avatar-xl mt-1 mb-1">
-                    <img src={this.props.company.picture} alt="avatarImg" />
-                  </div>
-                  <div className="uploads mt-1 mb-1">
-                    <span>Ciudad</span>
-                    <p className="font-weight-bold font-medium-2 mb-0">
-                      {this.props.company.city !== "" ? this.props.company?.city : "N/A"}
-                    </p>
-                  </div>
-                  <div className="followers mt-1 mb-1">
-                    <span>Dirección</span>
-                    <p className="font-weight-bold font-medium-2 mb-0">
-                      {this.props.company.address !== "" ? this.props.company.address : "N/A"}
-                    </p>
-                  </div>
-                  <div className="uploads mt-1 mb-1">
-                    <span>Telefono</span>
-                    <p className="font-weight-bold font-medium-2 mb-0">
-                      {this.props.company.phone !== "" ? this.props.company.phone : "N/A"}
-                    </p>
-                  </div>
+                  <Row >
+                    <Col className="mt-3" lg="4" md="6" sm="12">
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Máquina</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {this.props.machine.name ? this.props.machine.name : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Código</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {this.props.machine.code ? this.props.machine.code : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Alimentación Eléctrica</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {this.props.machine.electric_feed ? this.props.machine.electric_feed : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Severidad</span>
+                            <div className="font-weight-bold font-medium-2 mb-0">
+                              {function (severity) {
+                                switch (severity) {
+                                  case "red":
+                                    return (
+                                      <div className="badge badge-pill badge-light-danger">
+                                        Alarma
+                                      </div>
+                                    )
+                                  case "yellow":
+                                    return (
+                                      <div className="badge badge-pill badge-light-warning">
+                                        Alerta
+                                      </div>
+                                    )
+                                  case "green":
+                                    return (
+                                      <div className="badge badge-pill badge-light-success">
+                                        Ok
+                                      </div>
+                                    )
+                                  case "purple":
+                                    return (
+                                      <div className="badge badge-pill badge-light-primary">
+                                        No Asignado
+                                      </div> // ! TODO cambiar a valor por defecto
+                                    )
+                                  case "black":
+                                    return (
+                                      <div
+                                        className="badge badge-pill"
+                                        style={{
+                                          backgroundColor: "#43393A",
+                                          color: "#F0E5E6",
+                                          fontWeight: "500",
+                                          textTransform: "uppercase"
+                                        }}>
+                                        No Medido
+                                      </div>
+                                    )
+                                  default:
+                                    return (
+                                      <div className="badge badge-pill badge-light-primary">
+                                        No Asignado
+                                      </div> // ! TODO cambiar a valor por defecto
+                                    )
+                                }
+                              }(this.props.machine.severity)
+                              }
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Col>
+
+
+                    <Col lg="4" md="6" sm="12">
+                      <Row>
+                        <Col lg="12" md="6" sm="12">
+                          <CardImg
+                            className="img-fluid"
+                            src={
+                              this.props.machine.image ? this.props.machine.image : Img
+                            }
+                            alt="card image cap"
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+
+
+                    <Col lg="4" md="6" sm="12" className="mt-3">
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Marca</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {this.props.machine.brand ? this.props.machine.brand : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Potencia</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {`${this.props.machine.power} ${this.props.machine.power_units}`.length > 3 ?
+                                `${this.props.machine.power} ${this.props.machine.power_units}` : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>Norma</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {this.props.machine.norm ? this.props.machine.norm : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                      <Row >
+                        <Col lg="12" md="6" sm="12">
+                          <div className="uploads mt-1 mb-1">
+                            <span>RPM</span>
+                            <p className="font-weight-bold font-medium-2 mb-0">
+                              {this.props.machine.rpm ? this.props.machine.rpm : "N/A"}
+                            </p>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 </CardBody>
               </Card>
             </Col>
           </Row>
+
 
           <Card>
             <CardBody>
@@ -297,11 +410,6 @@ class MeasurementAdd extends React.Component {
                       </Input>
                     </FormGroup>
                   </Col>
-
-
-
-
-
 
                   <Col md="6" sm="12">
                     <FormGroup>
@@ -395,10 +503,6 @@ class MeasurementAdd extends React.Component {
                       <CustomInput type="file" id="file-3" />
                     </FormGroup>
                   </Col>
-
-
-
-
 
 
                   <Col md="6" sm="12">

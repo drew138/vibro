@@ -188,6 +188,7 @@ const measurementList = lazy(() => import("./views/apps/measurements/Measurement
 const measurementsAdd = lazy(() => import("./views/apps/measurements/MeasurementsAdd"))
 const measurementEdit = lazy(() => import("./views/apps/measurements/MeasurementEdit"))
 const measurementAdd = lazy(() => import("./views/apps/measurements/MeasurementAdd"))
+const measurementView = lazy(() => import("./views/apps/measurements/MeasurementView"))
 
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
@@ -322,6 +323,11 @@ class AppRouter extends React.Component {
             exact
             path="/app/measurement/edit"
             component={measurementEdit}
+          />
+          <AppRoute
+            exact
+            path="/app/measurement/view"
+            component={measurementView}
           />
 
 

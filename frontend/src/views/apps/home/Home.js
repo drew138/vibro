@@ -149,7 +149,7 @@ class MachineList extends React.Component {
             case "purple":
               return (
                 <div className="badge badge-pill badge-light-primary">
-                  No Asignada
+                  No Asignado
                 </div> // ! TODO cambiar a valor por defecto
               )
             case "black":
@@ -168,7 +168,7 @@ class MachineList extends React.Component {
             default:
               return (
                 <div className="badge badge-pill badge-light-primary">
-                  No Asignada
+                  No Asignado
                 </div> // ! TODO cambiar a valor por defecto
               )
           }
@@ -511,7 +511,7 @@ class MachineList extends React.Component {
                   <Row>
                     <Col lg="5" md="6" sm="12">
                       <FormGroup className="mb-0">
-                        <Label for="role">Empresa</Label>
+                        <Label for="company">Empresa</Label>
                         <Input
                           type="select"
                           name="company"
@@ -520,8 +520,6 @@ class MachineList extends React.Component {
                           onChange={async e => {
                             const idx = e.target.selectedIndex;
                             const companyId = parseInt(e.target.childNodes[idx].getAttribute('companyid'));
-
-                            // console.log(this.state.company, companyId);
                             this.setState(
                               {
                                 companyName: e.target.value,
@@ -544,7 +542,7 @@ class MachineList extends React.Component {
 
                     <Col lg="7" md="6" sm="12" >
                       <Row>
-                        <FormGroup className="mb-0 mr-2 ml-1">
+                        <FormGroup className="mb-0 mr-1 ml-1">
                           <Button.Ripple
                             color="primary"
                             disabled={this.state.buttonDisabled}
@@ -563,7 +561,7 @@ class MachineList extends React.Component {
                           </Button.Ripple>
                         </FormGroup>
 
-                        <FormGroup className="mb-0">
+                        <FormGroup className="mb-0 ml-1 mr-1">
                           <Button.Ripple
                             color="primary"
                             style={{ marginTop: 19 }}
@@ -665,7 +663,8 @@ class MachineList extends React.Component {
             </Card>
           </Col>
         </Row>
-        {this.props.auth.user_type === "admin" &&
+        {
+          this.props.auth.user_type === "admin" &&
           <SweetAlert
             warning
             title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
@@ -681,7 +680,8 @@ class MachineList extends React.Component {
             <p className="sweet-alert-text">
               Todas Mediciones Serán Borradas Junto Con Esta Máquina.
             </p>
-          </SweetAlert>}
+          </SweetAlert>
+        }
       </React.Fragment >
     )
   }

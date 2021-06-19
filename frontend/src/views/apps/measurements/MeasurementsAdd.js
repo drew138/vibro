@@ -14,35 +14,17 @@ import {
   // CardImg
 } from "reactstrap"
 import { connect } from "react-redux"
-// import { createCompany } from "../../../../redux/actions/company"
-// import isValidAddress from "../../../validators/address"
-// import isValidPhone from "../../../validators/phone"
-// import isValidNit from "../../../validators/nit"
 import { displayAlert } from "../../../redux/actions/alerts"
-// import { POST_COMPANY_ENDPOINT } from "../../../config"
-import { GET_USERS_ENDPOINT } from "../../../config"
+import { GET_USERS_ENDPOINT, BULK_CREATE_MEASUREMENT_ENDPOINT } from "../../../config"
 import axios from "axios"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
-// import AutoComplete from "../../../components/@vuexy/autoComplete/AutoCompleteComponent"
-// import { requestInterceptor, responseInterceptor } from "../../../../axios/axiosInstance"
-// import userImg from "../../../assets/img/user/default.png"
-// import Datepickers from "../../forms/form-elements/datepicker/Datepickers"
-// import InputMask from "react-input-mask"
+
 import companyImg from "../../../assets/img/company/default.png"
 var DatePicker = require("reactstrap-date-picker");
+
+
+
 const initialState = {
-  // name: "",
-  // nit: "",
-  // address: "",
-  // phone: "",
-  // city: "",
-  // picture: "",
-  // suggestions: [{ name: "" }],
-  // cityMap: {},
-
-
-
-
 
   service: "predictivo",
   serviceName: "Predictivo",
@@ -50,10 +32,6 @@ const initialState = {
   measurementTypeName: "Vibración",
   date: "",
   formattedDate: "",
-  prev_changes_date: "",
-  formattedPrevChangesDate: "",
-  analysis: "",
-  diagnostic: "",
   engineers: [{ id: 0, first_name: "Seleccione", last_name: "una opción" }],
   engineer_one: 0,
   engineerOneName: "Seleccione una opción",
@@ -62,7 +40,7 @@ const initialState = {
 }
 
 
-class MeasurementAdd extends React.Component {
+class MeasurementsAdd extends React.Component {
 
   constructor(props) {
     super(props)
@@ -82,6 +60,49 @@ class MeasurementAdd extends React.Component {
       show: true,
       alertText: ""
     }
+
+
+    if (!this.state.date) {
+      alertData.alertText = "El Campo De Fecha No Puede Estar En Blanco."
+      this.props.displayAlert(alertData)
+      return
+    }
+
+
+    const measurement = {
+      service: this.state.service,
+      measurement_type: this.state.measurement_type,
+      severity: this.state.severity,
+      date: this.state.date,
+    }
+    if (this.state.engineer_one) {
+      measurement.engineer_one = this.state.engineer_one
+    }
+    if (this.state.engineer_two) {
+      measurement.engineer_two = this.state.engineer_two
+    }
+    try {
+
+      // const res = await axios.post(BULK_CREATE_MEASUREMENT_ENDPOINT, measurement) // TODO endpoint
+      const alertData = {
+        title: "Registro Exitoso",
+        success: true,
+        show: true,
+        alertText: "Mediciones serán creadas"
+      }
+      this.props.displayAlert(alertData)
+      this.setState({ ...initialState })
+    } catch (e) {
+      console.log(e.response.data)
+      const alertData = {
+        title: "Error de Validación",
+        success: false,
+        show: true,
+        alertText: Object.entries(e.response.data)[0][1][0]
+      }
+      this.props.displayAlert(alertData)
+    }
+
     // if (this.state.nit && !isValidNit(this.state.nit)) {
     //   alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
     //   this.props.displayAlert(alertData)
@@ -160,12 +181,12 @@ class MeasurementAdd extends React.Component {
     })
   }
 
-  handlePrevChangesDateChange(value, formattedValue) {
-    this.setState({
-      prev_changes_date: value, // ISO String, ex: "2016-11-19T12:00:00.000Z"
-      formattedPrevChangesDate: formattedValue // Formatted String, ex: "11/19/2016"
-    })
-  }
+  // handlePrevChangesDateChange(value, formattedValue) {
+  //   this.setState({
+  //     prev_changes_date: value, // ISO String, ex: "2016-11-19T12:00:00.000Z"
+  //     formattedPrevChangesDate: formattedValue // Formatted String, ex: "11/19/2016"
+  //   })
+  // }
 
 
   toTitleCase(str) {
@@ -178,6 +199,10 @@ class MeasurementAdd extends React.Component {
   }
 
   async componentDidMount() {
+    if (!this.props.company.id) {
+      return
+    }
+
     try {
       const res = await axios.get(GET_USERS_ENDPOINT, {
         params: {
@@ -186,7 +211,7 @@ class MeasurementAdd extends React.Component {
       })
       // console.log(res.data)
       this.setState({
-        engineers: [{ id: 0, first_name: "Seleccione una opción", last_name: "" }, ...res.data]
+        engineers: [{ id: 0, first_name: "Seleccione", last_name: " una opción" }, ...res.data]
       })
     } catch (e) {
       console.log(e);
@@ -215,28 +240,28 @@ class MeasurementAdd extends React.Component {
             <Col lg="12" md="6" sm="12">
               <Card>
                 <CardHeader className="mx-auto flex-column">
-                  <h1>{this.props.company.name !== "" ? this.props.company.name : "N/A"}</h1>
+                  <h1>{this.props.company.name ? this.props.company.name : "N/A"}</h1>
                 </CardHeader>
                 <CardBody className="text-center pt-0">
                   <div className="avatar mr-1 avatar-xl mt-1 mb-1">
-                    <img src={this.props.company.picture !== "" ? this.props.company.picture : companyImg} alt="avatarImg" />
+                    <img src={this.props.company.picture ? this.props.company.picture : companyImg} alt="avatarImg" />
                   </div>
                   <div className="uploads mt-1 mb-1">
                     <span>Ciudad</span>
                     <p className="font-weight-bold font-medium-2 mb-0">
-                      {this.props.company.city !== "" ? this.props.company?.city : "N/A"}
+                      {this.props.company.city ? this.props.company?.city : "N/A"}
                     </p>
                   </div>
                   <div className="followers mt-1 mb-1">
                     <span>Dirección</span>
                     <p className="font-weight-bold font-medium-2 mb-0">
-                      {this.props.company.address !== "" ? this.props.company.address : "N/A"}
+                      {this.props.company.address ? this.props.company.address : "N/A"}
                     </p>
                   </div>
                   <div className="uploads mt-1 mb-1">
                     <span>Telefono</span>
                     <p className="font-weight-bold font-medium-2 mb-0">
-                      {this.props.company.phone !== "" ? this.props.company.phone : "N/A"}
+                      {this.props.company.phone ? this.props.company.phone : "N/A"}
                     </p>
                   </div>
                 </CardBody>
@@ -391,7 +416,7 @@ class MeasurementAdd extends React.Component {
                     </FormGroup>
                   </Col>
 
-                  <Col md="6" sm="12">
+                  {/* <Col md="6" sm="12">
                     <FormGroup>
                       <Label for="prev-date">Fecha De Cambios Previos</Label>
                       <DatePicker
@@ -400,7 +425,7 @@ class MeasurementAdd extends React.Component {
                         calendarPlacement="top"
                         onChange={(v, f) => this.handlePrevChangesDateChange(v, f)} />
                     </FormGroup>
-                  </Col>
+                  </Col> */}
 
                   <Col md="6" sm="12">
                     <FormGroup>
@@ -449,11 +474,9 @@ class MeasurementAdd extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    users: state.users,
-    auth: state.auth,
     machine: state.machine,
     company: state.company
   }
 }
 
-export default connect(mapStateToProps, { displayAlert })(MeasurementAdd) // tODO change redux actions
+export default connect(mapStateToProps, { displayAlert })(MeasurementsAdd)

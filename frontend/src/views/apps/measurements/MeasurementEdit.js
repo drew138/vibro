@@ -15,16 +15,11 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { updateCompany } from "../../../redux/actions/company"
-// import isValidAddress from "../../../validators/address"
-// import isValidPhone from "../../../validators/phone"
-// import isValidNit from "../../../validators/nit"
 import { displayAlert } from "../../../redux/actions/alerts"
-// import AutoComplete from "../../../components/@vuexy/autoComplete/AutoCompleteComponent"
-// import { GET_CITIES_ENDPOINT, DELETE_COMPANY_ENDPOINT } from "../../../config"
-// import axios from "axios"
-// import { history } from "../../../history"
+import { GET_USERS_ENDPOINT, PATCH_MEASUREMENT_ENDPOINT } from "../../../config"
+import { history } from "../../../history"
 // import SweetAlert from 'react-bootstrap-sweetalert';
-
+import axios from "axios"
 import Img from "../../../assets/img/machine/default.png"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 var DatePicker = require("reactstrap-date-picker");
@@ -32,63 +27,85 @@ var DatePicker = require("reactstrap-date-picker");
 
 
 const severityMap = {
-  purple: "No Asignada (Morado)",
+  purple: "No Asignado (Morado)",
   green: "OK (Verde)",
   yellow: "Alerta (Amarillo)",
   red: "Alarma (Rojo)",
   black: "No Medido (Negro)"
 }
-const initialState = {
-  service: "predictivo",
-  serviceName: "Predictivo",
-  measurement_type: "vibración",
-  measurementTypeName: "Vibración",
-  date: "",
-  formattedDate: "",
-  prev_changes_date: "",
-  formattedPrevChangesDate: "",
-  analysis: "",
-  diagnostic: "",
-  engineers: [{ id: 0, first_name: "Seleccione", last_name: "una opción" }],
-  engineer_one: 0,
-  engineerOneName: "Seleccione una opción",
-  engineer_two: 0,
-  engineerTwoName: "Seleccione una opción",
-  analyst: 0,
-  analystName: "Seleccione una opción",
-  certifier: 0,
-  certifierName: "Seleccione una opción"
+
+const measurementTypeMap = {
+
+  "ultrasonido": "Ultrasonido",
+  "termografía": "Termografía",
+  "vibración": "Vibración",
+  "análisis de aceite": "Análisis de Aceite",
+  "alineacion laser polea": "Alineacion Laser Polea",
+  "tensión de bandas": "Tensión de Bandas",
+  "correción montajes poleas": "Correción Montajes Poleas",
+  "alineación laser acople": "Alineación Laser Acople",
+  "alineación laser cardan": "Alineación Laser Cardan",
+  "alineación engranes": "Alineación Engranes",
+  "alineación rodamientos": "Alineación Rodamientos",
+  "balanceo": "Balanceo",
+  "chequeo mecánico": "Chequeo Mecánico",
+  "medición especial": "Medición Especial",
+  "aire y caudal": "Aire y Caudal",
+  "suministro": "Suministro"
 }
 
+const serviceMap = {
+  "predictivo": "Predictivo",
+  "correctivo": "Correctivo",
+  "ingeniería": "Ingeniería",
+  "monitoreo": "Monitoreo en Línea"
 
 
+}
 
 class MeasurementEdit extends React.Component {
 
   constructor(props) {
     super(props);
-    this.imageInputRef = React.createRef();
-    this.fileSelectedHandler = this.fileSelectedHandler.bind(this);
+    if (!props.measurement.id || !props.measurement.id) {
+      history.push("/")
+    }
+
+
+    const date = new Date(props.measurement.date)
+    const prev_changes_date = new Date(props.measurement.prev_changes_date)
+    this.state = {
+
+      service: props.measurement.service,
+      serviceName: serviceMap[props.measurement.service],
+      measurement_type: props.measurement.measurement_type,
+      measurementTypeName: measurementTypeMap[props.measurement.measurement_type],
+      date: props.measurement.date ? date.toISOString() : "",
+      formattedDate: props.measurement.date ? `${date.getDay()}/${date.getMonth()}/${date.getFullYear()}` : "",
+      prev_changes_date: props.measurement.prev_changes_date ? prev_changes_date.toISOString() : "",
+      formattedPrevChangesDate: props.measurement.prev_changes_date ? `${prev_changes_date.getDay()}/${prev_changes_date.getMonth()}/${prev_changes_date.getFullYear()}` : "",
+      analysis: props.measurement.analysis,
+      diagnostic: props.measurement.diagnostic,
+      engineers: [{ id: 0, first_name: "Seleccione", last_name: "una opción" }],
+      engineer_one: props.measurement.engineer_one,
+      engineerOneName: "Seleccione una opción",
+      engineer_two: props.measurement.engineer_two,
+      engineerTwoName: "Seleccione una opción",
+      analyst: props.measurement.analyst,
+      analystName: "Seleccione una opción",
+      certifier: props.measurement.certifier,
+      certifierName: "Seleccione una opción",
+      revised: props.measurement.revised,
+      revisedName: props.measurement.revised ? "Si" : "No",
+      prev_changes: props.measurement.prev_changes,
+      severity: props.measurement.severity,
+      severityName: severityMap[props.measurement.severity],
+      machine: props.machine.id,
+    }
   }
 
-  state = {
-    // id: this.props.company.id,
-    // name: this.props.company.name,
-    // nit: this.props.company.nit,
-    // address: this.props.company.address,
-    // phone: this.props.company.phone,
-    // city: this.props.company.city,
-    // picture: undefined,
-    // suggestions: [{ name: "" }],
-    // cityMap: {},
-    // show: false
-    ...initialState,
-    severity: this.props.machine.severity,
-    severityName: severityMap[this.props.machine.severity],
-    machine: this.props.machine.id,
-  }
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault()
     const alertData = {
       title: "Error de Validación",
@@ -96,38 +113,66 @@ class MeasurementEdit extends React.Component {
       show: true,
       alertText: ""
     }
-    // if (this.state.nit && !isValidNit(this.state.nit)) {
-    //   alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.phone && !isValidPhone(this.state.phone)) {
-    //   alertData.alertText = "El número de teléfono debe ser ingresado en el formato: xxxxxxx."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.address && !isValidAddress(this.state.address)) {
-    //   alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (!this.state.cityMap[this.state.city]) {
-    //   alertData.alertText = "La ciudad ingresada no es valida."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // const data = {
-    //   name: this.state.name,
-    //   nit: this.state.nit,
-    //   address: this.state.address,
-    //   phone: this.state.phone,
-    //   city: this.state.cityMap[this.state.city]
-    // }
-    // if (this.state.picture) {
-    //   data.picture = this.state.picture
-    // }
-    // // console.log(data)
-    // this.props.updateCompany(data, this.state.id)
+
+
+    if (!this.state.date) {
+      alertData.alertText = "El Campo De Fecha No Puede Estar En Blanco."
+      this.props.displayAlert(alertData)
+      return
+    }
+
+
+    const measurement = {
+      service: this.state.service,
+      measurement_type: this.state.measurement_type,
+      machine: this.props.machine.id,
+      prev_changes: this.state.prev_changes,
+      analysis: this.state.analysis,
+      diagnostic: this.state.diagnostic,
+      severity: this.state.severity,
+      date: this.state.date,
+      revised: this.state.revised
+    }
+    if (this.state.prev_changes_date) {
+      measurement.prev_changes_date = this.state.prev_changes_date
+    }
+    if (this.state.engineer_one) {
+      measurement.engineer_one = this.state.engineer_one
+    }
+    if (this.state.engineer_two) {
+      measurement.engineer_two = this.state.engineer_two
+    }
+    if (this.state.analyst) {
+      measurement.analyst = this.state.analyst
+    }
+    if (this.state.certifier) {
+      measurement.certifier = this.state.certifier
+    }
+
+    try {
+
+      const res = await axios.patch(`${PATCH_MEASUREMENT_ENDPOINT}${this.props.measurement.id}/`, measurement)
+
+      const alertData = {
+        title: "Registro Exitoso",
+        success: true,
+        show: true,
+        alertText: "Medición Editada Exitosamente"
+      }
+      this.props.displayAlert(alertData)
+
+    } catch (e) {
+      console.log(e.response.data)
+      const alertData = {
+        title: "Error de Validación",
+        success: false,
+        show: true,
+        alertText: Object.entries(e.response.data)[0][1][0]
+      }
+      this.props.displayAlert(alertData)
+
+    }
+
   }
 
   handleDateChange(value, formattedValue) {
@@ -139,27 +184,11 @@ class MeasurementEdit extends React.Component {
 
   handlePrevChangesDateChange(value, formattedValue) {
     this.setState({
-      prev_changes_date: value, // ISO String, ex: "2016-11-19T12:00:00.000Z"
-      formattedPrevChangesDate: formattedValue // Formatted String, ex: "11/19/2016"
+      prev_changes_dateformatted: value, // ISO String, ex: "2016-11-19T12:00:00.000Z"
+      PrevChangesDate: formattedValue // Formatted String, ex: "11/19/2016"
     })
   }
 
-  fileSelectedHandler = (event) => {
-    this.setState({
-      picture: event.target.files[0]
-    })
-  }
-
-  fileUploadHandler = () => {
-    this.imageInputRef.current.click()
-  }
-
-  removePicture = () => {
-    this.imageInputRef.current.value = null
-    this.setState({
-      picture: undefined
-    })
-  }
 
   toTitleCase(str) {
     return str.replace(
@@ -171,66 +200,57 @@ class MeasurementEdit extends React.Component {
   }
 
   async componentDidMount() {
-    // console.log(this.state)
-    // if (!this.state.id) {
-    //   history.push("/app/companies/list")
-    //   return
-    // }
-    // console.log("here")
-    // this._isMounted = true;
-    // try {
-    //   if (this.state.id) {
 
-    //     const res = await axios.get(GET_CITIES_ENDPOINT)
-    //     const cities = res.data
-    //     const cityNames = []
-    //     const cityMap = {}
-    //     Object.values(cities).forEach(city => {
-    //       const name = `${city.name}, ${city.state}`
-    //       cityNames.push({ name })
-    //       cityMap[name] = city.id
-    //     })
-    //     // console.log(this.props.company)
-    //     this.setState({ suggestions: cityNames, cityMap })
-    //   }
-    // } catch (e) {
-    //   console.log(e);
-    //   const alertData = {
-    //     title: "Error de Conexión",
-    //     success: false,
-    //     show: true,
-    //     alertText: "Error al Conectar al Servidor"
-    //   }
-    //   this.props.displayAlert(alertData)
-    // }
+    if (!this.props.machine.id || !this.props.measurement.id) {
+      return
+    }
+
+    try {
+      const res = await axios.get(GET_USERS_ENDPOINT, {
+        params: {
+          user_type: "engineer"
+        }
+      })
+
+      res.data.forEach((engineer) => {
+        if (engineer.id === this.state.engineer_one) {
+          this.setState({
+            engineerOneName: `${this.toTitleCase(engineer.first_name)} ${engineer.last_name}`
+          })
+        }
+        else if (engineer.id === this.state.engineer_two) {
+          this.setState({
+            engineerTwoName: `${this.toTitleCase(engineer.first_name)} ${engineer.last_name}`
+          })
+        }
+        else if (engineer.id === this.state.analyst) {
+          this.setState({
+            analystName: `${this.toTitleCase(engineer.first_name)} ${engineer.last_name}`
+          })
+        }
+        else if (engineer.id === this.state.certifier) {
+          this.setState({
+            certifierName: `${this.toTitleCase(engineer.first_name)} ${engineer.last_name}`
+          })
+        }
+      })
+
+      this.setState({ engineers: [{ id: 0, first_name: "Seleccione", last_name: "una opción" }, ...res.data] })
+    } catch (e) {
+      console.log(e);
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+    }
+
+
   }
 
-  // deleteCompany = async () => {
-  //   this.setState({ show: false })
-  //   if (!this.state.id) {
-  //     return
-  //   }
 
-  //   try {
-  //     const res = await axios.delete(`${DELETE_COMPANY_ENDPOINT}${this.state.id}/`)
-  //     const alertData = {
-  //       title: "Empresa Borrada Exitosamente",
-  //       success: true,
-  //       show: true,
-  //       alertText: `Se Ha Borrado ${this.state.name} De La Lista de Empresas.`
-  //     }
-  //     history.push("/app/companies/list")
-  //     this.props.displayAlert(alertData)
-  //   } catch (e) {
-  //     const alertData = {
-  //       title: "Error Al Borrar Empresa",
-  //       success: false,
-  //       show: true,
-  //       alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Empresa."
-  //     }
-  //     this.props.displayAlert(alertData)
-  //   }
-  // }
 
   render() {
 
@@ -247,63 +267,8 @@ class MeasurementEdit extends React.Component {
               <Col lg="12" md="6" sm="12">
                 <Card>
                   <CardHeader className="mx-auto flex-column">
-                    {/* <h1>{this.props.company.name !== "" ? this.props.company.name : "N/A"}</h1> */}
                   </CardHeader>
                   <CardBody className="text-center pt-0">
-                    {/* <div className="avatar mr-1 avatar-xl mt-1 mb-1">
-                    <img src={this.props.company.picture !== "" ? this.props.company.picture : companyImg} alt="avatarImg" />
-                  </div>
-                  <div className="followers mt-1 mb-1">
-                  <span>Dirección</span>
-                  <p className="font-weight-bold font-medium-2 mb-0">
-                  {this.props.company.address !== "" ? this.props.company.address : "N/A"}
-                  </p>
-                  </div>
-                  <div className="uploads mt-1 mb-1">
-                  <span>Telefono</span>
-                  <p className="font-weight-bold font-medium-2 mb-0">
-                  {this.props.company.phone !== "" ? this.props.company.phone : "N/A"}
-                  </p>
-                </div> */}
-                    {/* <Col lg="6" md="6" sm="12">
-
-                    <Row lg="6" md="6" sm="12">
-                      <div className="uploads mt-1 mb-1">
-                        <span>Máquina</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.name !== "" ? this.props.machine.name : "N/A"}
-                        </p>
-                      </div>
-
-                    </Row>
-                    <Row lg="6" md="6" sm="12">
-
-                      <div className="uploads mt-1 mb-1">
-                        <span>Código</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.code !== "" ? this.props.machine.code : "N/A"}
-                        </p>
-                      </div>
-
-                    </Row>
-                  </Col>
-
-                  <Col>
-                  </Col>
-
-                  <Col>
-
-                    <Row lg="6" md="6" sm="12">
-                      <div className="uploads mt-1 mb-1">
-                        <span>Alimentación Eléctrica</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.electric_feed !== "" ? this.props.machine.electric_feed : "N/A"}
-                        </p>
-                      </div>
-
-                    </Row>
-                  </Col> */}
-
                     <Row >
                       <Col className="mt-3" lg="4" md="6" sm="12">
                         <Row >
@@ -311,7 +276,7 @@ class MeasurementEdit extends React.Component {
                             <div className="uploads mt-1 mb-1">
                               <span>Máquina</span>
                               <p className="font-weight-bold font-medium-2 mb-0">
-                                {this.props.machine.name !== "" ? this.props.machine.name : "N/A"}
+                                {this.props.machine.name ? this.props.machine.name : "N/A"}
                               </p>
                             </div>
                           </Col>
@@ -321,7 +286,7 @@ class MeasurementEdit extends React.Component {
                             <div className="uploads mt-1 mb-1">
                               <span>Código</span>
                               <p className="font-weight-bold font-medium-2 mb-0">
-                                {this.props.machine.code !== "" ? this.props.machine.code : "N/A"}
+                                {this.props.machine.code ? this.props.machine.code : "N/A"}
                               </p>
                             </div>
                           </Col>
@@ -331,7 +296,7 @@ class MeasurementEdit extends React.Component {
                             <div className="uploads mt-1 mb-1">
                               <span>Alimentación Eléctrica</span>
                               <p className="font-weight-bold font-medium-2 mb-0">
-                                {this.props.machine.electric_feed !== "" ? this.props.machine.electric_feed : "N/A"}
+                                {this.props.machine.electric_feed ? this.props.machine.electric_feed : "N/A"}
                               </p>
                             </div>
                           </Col>
@@ -364,7 +329,7 @@ class MeasurementEdit extends React.Component {
                                     case "purple":
                                       return (
                                         <div className="badge badge-pill badge-light-primary">
-                                          No Asignada
+                                          No Asignado
                                         </div> // ! TODO cambiar a valor por defecto
                                       )
                                     case "black":
@@ -383,7 +348,7 @@ class MeasurementEdit extends React.Component {
                                     default:
                                       return (
                                         <div className="badge badge-pill badge-light-primary">
-                                          No Asignada
+                                          No Asignado
                                         </div> // ! TODO cambiar a valor por defecto
                                       )
                                   }
@@ -400,18 +365,10 @@ class MeasurementEdit extends React.Component {
                       <Col lg="4" md="6" sm="12">
                         <Row>
                           <Col lg="12" md="6" sm="12">
-                            {/* <div className="uploads mt-1 mb-1">
-                            <span>Marca</span>
-                            <p className="font-weight-bold font-medium-2 mb-0">
-                              {this.props.machine.brand !== "" ? this.props.machine.brand : "N/A"}
-                            </p>
-                          </div> */}
                             <CardImg
                               className="img-fluid"
-                              // style={{ maxHeight: "100%" }}
                               src={
-                                // this.state.image ? URL.createObjectURL(this.state.image) : this.props.machine.image
-                                Img
+                                this.props.machine.image ? this.props.machine.image : Img
                               }
                               alt="card image cap"
                             />
@@ -426,7 +383,7 @@ class MeasurementEdit extends React.Component {
                             <div className="uploads mt-1 mb-1">
                               <span>Marca</span>
                               <p className="font-weight-bold font-medium-2 mb-0">
-                                {this.props.machine.brand !== "" ? this.props.machine.brand : "N/A"}
+                                {this.props.machine.brand ? this.props.machine.brand : "N/A"}
                               </p>
                             </div>
                           </Col>
@@ -447,7 +404,7 @@ class MeasurementEdit extends React.Component {
                             <div className="uploads mt-1 mb-1">
                               <span>Norma</span>
                               <p className="font-weight-bold font-medium-2 mb-0">
-                                {this.props.machine.norm !== "" ? this.props.machine.norm : "N/A"}
+                                {this.props.machine.norm ? this.props.machine.norm : "N/A"}
                               </p>
                             </div>
                           </Col>
@@ -457,37 +414,13 @@ class MeasurementEdit extends React.Component {
                             <div className="uploads mt-1 mb-1">
                               <span>RPM</span>
                               <p className="font-weight-bold font-medium-2 mb-0">
-                                {this.props.machine.rpm !== "" ? this.props.machine.rpm : "N/A"}
+                                {this.props.machine.rpm ? this.props.machine.rpm : "N/A"}
                               </p>
                             </div>
                           </Col>
                         </Row>
                       </Col>
                     </Row>
-
-
-
-
-
-
-
-                    {/* <Row>
-                    <Col lg="4" md="4" sm="6">
-
-                      <div className="uploads mt-1 mb-1">
-                        <span>Marca</span>
-                        <p className="font-weight-bold font-medium-2 mb-0">
-                          {this.props.machine.brand !== "" ? this.props.machine.brand : "N/A"}
-                        </p>
-                      </div>
-                    </Col>
-
-
-                  </Row> */}
-
-
-
-
 
 
 
@@ -635,29 +568,29 @@ class MeasurementEdit extends React.Component {
                     </Col>
 
 
-                    {/* <Col md="6" sm="12">
-                    <FormGroup>
-                      <Label for="certifier">Certifica</Label>
-                      <Input
-                        type="select"
-                        id="certifier"
-                        placeholder="Certifica"
-                        value={this.state.certifierName}
-                        onChange={e => {
-                          const idx = e.target.selectedIndex;
-                          const certifierid = parseInt(e.target.childNodes[idx].getAttribute('engineerid'));
-                          this.setState({ certifier: certifierid, certifierName: e.target.value })
-                        }} >
-                        {
-                          this.state.engineers.map((engineer) =>
-                            <option certifierid={engineer.id} key={engineer.id}>
-                              {`${this.toTitleCase(engineer.first_name)} ${engineer.last_name}`}
-                            </option>
-                          )
-                        }
-                      </Input>
-                    </FormGroup>
-                  </Col> */}
+                    <Col md="6" sm="12">
+                      <FormGroup>
+                        <Label for="certifier">Certifica</Label>
+                        <Input
+                          type="select"
+                          id="certifier"
+                          placeholder="Certifica"
+                          value={this.state.certifierName}
+                          onChange={e => {
+                            const idx = e.target.selectedIndex;
+                            const certifierid = parseInt(e.target.childNodes[idx].getAttribute('engineerid'));
+                            this.setState({ certifier: certifierid, certifierName: e.target.value })
+                          }} >
+                          {
+                            this.state.engineers.map((engineer) =>
+                              <option certifierid={engineer.id} key={engineer.id}>
+                                {`${this.toTitleCase(engineer.first_name)} ${engineer.last_name}`}
+                              </option>
+                            )
+                          }
+                        </Input>
+                      </FormGroup>
+                    </Col>
 
 
 
@@ -698,6 +631,28 @@ class MeasurementEdit extends React.Component {
 
 
 
+                    <Col md="6" sm="12">
+                      <FormGroup>
+                        <Label for="norm">Revisado</Label>
+                        <Input
+                          type="select"
+                          id="severity"
+                          placeholder="Severidad"
+                          value={this.state.revisedName}
+                          onChange={e =>
+
+                            this.setState({
+                              revised: e.target.value === "Si",
+                              revisedName: e.target.value
+                            })
+                          }
+                        >
+                          <option severity="green">Si</option>
+                          <option severity="yellow">No</option>
+                        </Input>
+                      </FormGroup>
+                    </Col>
+
 
 
                     <Col md="6" sm="12">
@@ -723,40 +678,29 @@ class MeasurementEdit extends React.Component {
                     </Col>
 
 
-                    {/* <Col md="6" sm="12">
-                    <FormGroup>
-                      <Label for="norm">Revisado</Label>
-                      <Input
-                        type="select"
-                        id="severity"
-                        placeholder="Severidad"
-                        value={this.state.severityName}
-                        onChange={e => {
-                          const idx = e.target.selectedIndex;
-                          const severity = e.target.childNodes[idx].getAttribute('severity');
-                          this.setState({
-                            severity,
-                            severityName: e.target.value
-                          })
-                        }}
-                      >
-                        <option severity="green">Si</option>
-                        <option severity="yellow">No</option>
-                      </Input>
-                    </FormGroup>
-                  </Col> */}
 
 
 
+                    <Col md="12" sm="12">
+                      <FormGroup>
+                        <Label for="prev_changes">Cambios Previos</Label>
+                        <Input
+                          type="textarea"
+                          id="prev_changes"
+                          rows={7}
+                          placeholder="Cambios Previos"
+                          value={this.state.prev_changes}
+                          onChange={e => this.setState({ prev_changes: e.target.value })} />
+                      </FormGroup>
+                    </Col>
 
-
-                    <Col md="6" sm="12">
+                    <Col md="12" sm="12">
                       <FormGroup>
                         <Label for="analysis">Análisis</Label>
                         <Input
                           type="textarea"
                           id="analysis"
-                          rows={10}
+                          rows={7}
                           placeholder="Análisis"
                           value={this.state.analysis}
                           onChange={e => this.setState({ analysis: e.target.value })} />
@@ -764,18 +708,20 @@ class MeasurementEdit extends React.Component {
                     </Col>
 
 
-                    <Col md="6" sm="12">
+                    <Col md="12" sm="12">
                       <FormGroup>
                         <Label for="diagnostic">Diagnostico</Label>
                         <Input
                           type="textarea"
                           id="diagnostic"
-                          rows={10}
+                          rows={7}
                           placeholder="Diagnostico"
                           value={this.state.diagnostic}
                           onChange={e => this.setState({ diagnostic: e.target.value })} />
                       </FormGroup>
                     </Col>
+
+
 
                     <Col
                       className="d-flex justify-content-end flex-wrap mt-2"
@@ -798,12 +744,9 @@ class MeasurementEdit extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    auth: state.auth,
-    company: state.company,
-
-    users: state.users,
+    measurement: state.measurement,
     machine: state.machine,
   }
 }
 
-export default connect(mapStateToProps, { updateCompany, displayAlert })(MeasurementEdit)
+export default connect(mapStateToProps, { displayAlert })(MeasurementEdit)

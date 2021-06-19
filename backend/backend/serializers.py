@@ -1,5 +1,5 @@
 # from django.contrib.postgres.fields.array import ArrayField
-from rest_framework import serializers
+from rest_framework import serializers, fields
 from . import models as custom_models
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
 from django.contrib.auth import password_validation
@@ -286,6 +286,7 @@ class MeasurementSerializer(serializers.ModelSerializer):
     # engineer_two = VibroUserSerializer()
     # analyst = VibroUserSerializer()
     # certifier = VibroUserSerializer()
+    date = fields.DateField(input_formats=['%Y-%m-%dT%H:%M:%S.%fZ'])
 
     class Meta:
         model = custom_models.Measurement

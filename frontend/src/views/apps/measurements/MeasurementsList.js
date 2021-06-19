@@ -188,7 +188,7 @@ class MeasurementList extends React.Component {
         }
       })
       this.setState({
-        rowData: [{ severity: "black" }, ...res.data]
+        rowData: [...res.data]
       })
     } catch (e) {
       console.log(e)

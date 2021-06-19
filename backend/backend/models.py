@@ -495,8 +495,8 @@ class Measurement(models.Model):
         choices=MEASUREMENT_CHOICES,
         default=VIB)
     date = models.DateField()
-    analysis = models.TextField()
-    diagnostic = models.TextField()
+    analysis = models.TextField(default="", blank=True)
+    diagnostic = models.TextField(default="", blank=True)
     severity = models.CharField(
         max_length=9,
         choices=SEVERITY_CHOICES,
@@ -525,9 +525,9 @@ class Measurement(models.Model):
         Machine,
         related_name="measurements",
         on_delete=models.CASCADE)
-    revised = models.BooleanField(default=False)  # remove
+    revised = models.BooleanField(default=False)
     resolved = models.BooleanField(default=False)  # remove
-    prev_changes = models.TextField(null=True, )
+    prev_changes = models.TextField(default="", blank=True)
     prev_changes_date = models.DateField(null=True)
 
 
