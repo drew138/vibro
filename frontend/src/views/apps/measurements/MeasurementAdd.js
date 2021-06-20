@@ -208,6 +208,12 @@ class MeasurementAdd extends React.Component {
                 </CardHeader>
                 <CardBody className="text-center pt-0">
                   <Row >
+                    <Col lg="12" md="6" sm="12">
+                      <Row className="d-flex justify-content-center text-center mb-3">
+                        <h1 className="font-large-2 content-header-title">Información De Máquina</h1>
+                      </Row>
+                    </Col>
+
                     <Col className="mt-3" lg="4" md="6" sm="12">
                       <Row >
                         <Col lg="12" md="6" sm="12">
@@ -380,7 +386,7 @@ class MeasurementAdd extends React.Component {
                         value={this.state.serviceName}
                         onChange={e => {
                           const idx = e.target.selectedIndex;
-                          const service = parseInt(e.target.childNodes[idx].getAttribute('service'));
+                          const service = e.target.childNodes[idx].getAttribute('service');
                           this.setState({ serviceName: e.target.value, service })
                         }} >
                         <option service="predictivo">Predictivo</option>
@@ -400,7 +406,7 @@ class MeasurementAdd extends React.Component {
                         value={this.state.measurementTypeName}
                         onChange={e => {
                           const idx = e.target.selectedIndex;
-                          const measurement_type = parseInt(e.target.childNodes[idx].getAttribute('measurement_type'));
+                          const measurement_type = e.target.childNodes[idx].getAttribute('measurement_type');
                           this.setState({ measurement_type, measurementTypeName: e.target.value })
                         }} >
                         <option measurement_type="ultrasonido">Ultrasonido</option>

@@ -1,7 +1,7 @@
 import axios from "axios";
 import localStorageService from "./localStorageService";
 import { history } from "../history"
-import { REFRESH_JWT_ENDPOINT } from "../config"
+import { REFRESH_JWT_ENDPOINT, LOGIN_WITH_JWT_ENDPOINT } from "../config"
 // https://medium.com/swlh/handling-access-and-refresh-tokens-using-axios-interceptors-3970b601a5da
 // LocalstorageService
 
@@ -26,8 +26,8 @@ export const responseInterceptor = axios.interceptors.response.use((response) =>
     return response
 }, async function (error) {
     const originalRequest = error.config;
-    if (error.response.status === 401 && originalRequest.url.endsWith(
-        REFRESH_JWT_ENDPOINT)) {
+    if (error.response.status === 401 && (originalRequest.url.endsWith(
+        REFRESH_JWT_ENDPOINT) || originalRequest.url.endsWith(LOGIN_WITH_JWT_ENDPOINT))) {
         history.push('/pages/login');
         localStorageService.clearToken();
         localStorageService.clearUserValues();

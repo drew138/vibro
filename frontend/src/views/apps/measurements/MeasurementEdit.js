@@ -444,8 +444,8 @@ class MeasurementEdit extends React.Component {
                           value={this.state.serviceName}
                           onChange={e => {
                             const idx = e.target.selectedIndex;
-                            const service = parseInt(e.target.childNodes[idx].getAttribute('service'));
-                            this.setState({ serviceName: e.target.value, service })
+                            const service = e.target.childNodes[idx].getAttribute('service');
+                            this.setState({ serviceName: e.target.value, service });
                           }} >
                           <option service="predictivo">Predictivo</option>
                           <option service="correctivo">Correctivo</option>
@@ -464,8 +464,8 @@ class MeasurementEdit extends React.Component {
                           value={this.state.measurementTypeName}
                           onChange={e => {
                             const idx = e.target.selectedIndex;
-                            const measurement_type = parseInt(e.target.childNodes[idx].getAttribute('measurement_type'));
-                            this.setState({ measurement_type, measurementTypeName: e.target.value })
+                            const measurement_type = e.target.childNodes[idx].getAttribute('measurement_type');
+                            this.setState({ measurement_type, measurementTypeName: e.target.value });
                           }} >
                           <option measurement_type="ultrasonido">Ultrasonido</option>
                           <option measurement_type="termografía">Termografía</option>
@@ -503,8 +503,7 @@ class MeasurementEdit extends React.Component {
                           onChange={e => {
                             const idx = e.target.selectedIndex;
                             const engineerid = parseInt(e.target.childNodes[idx].getAttribute('engineerid'));
-
-                            this.setState({ engineer_one: engineerid, engineerOneName: e.target.value })
+                            this.setState({ engineer_one: engineerid, engineerOneName: e.target.value });
                           }} >
                           {
                             this.state.engineers.map((engineer) =>
@@ -530,7 +529,7 @@ class MeasurementEdit extends React.Component {
                           onChange={e => {
                             const idx = e.target.selectedIndex;
                             const engineerid = parseInt(e.target.childNodes[idx].getAttribute('engineerid'));
-                            this.setState({ engineer_two: engineerid, engineerTwoName: e.target.value })
+                            this.setState({ engineer_two: engineerid, engineerTwoName: e.target.value });
                           }} >
                           {
                             this.state.engineers.map((engineer) =>
@@ -554,7 +553,7 @@ class MeasurementEdit extends React.Component {
                           onChange={e => {
                             const idx = e.target.selectedIndex;
                             const analystid = parseInt(e.target.childNodes[idx].getAttribute('analystid'));
-                            this.setState({ analyst: analystid, analystName: e.target.value })
+                            this.setState({ analyst: analystid, analystName: e.target.value });
                           }} >
                           {
                             this.state.engineers.map((engineer) =>
@@ -579,7 +578,7 @@ class MeasurementEdit extends React.Component {
                           onChange={e => {
                             const idx = e.target.selectedIndex;
                             const certifierid = parseInt(e.target.childNodes[idx].getAttribute('engineerid'));
-                            this.setState({ certifier: certifierid, certifierName: e.target.value })
+                            this.setState({ certifier: certifierid, certifierName: e.target.value });
                           }} >
                           {
                             this.state.engineers.map((engineer) =>
@@ -608,7 +607,7 @@ class MeasurementEdit extends React.Component {
                             this.setState({
                               severity,
                               severityName: e.target.value
-                            })
+                            });
                           }}
                         >
                           <option severity="green">OK (Verde)</option>

@@ -18,7 +18,7 @@ import { displayAlert } from "../../../redux/actions/alerts"
 import { GET_USERS_ENDPOINT, BULK_CREATE_MEASUREMENT_ENDPOINT } from "../../../config"
 import axios from "axios"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
-
+import { history } from "../../../history"
 import companyImg from "../../../assets/img/company/default.png"
 var DatePicker = require("reactstrap-date-picker");
 
@@ -44,11 +44,12 @@ class MeasurementsAdd extends React.Component {
 
   constructor(props) {
     super(props)
-
+    if (!this.props.company.id) {
+      history.push("/")
+    }
   }
 
   state = {
-    machine: this.props.machine.id,
     ...initialState
   }
 
@@ -88,7 +89,7 @@ class MeasurementsAdd extends React.Component {
         title: "Registro Exitoso",
         success: true,
         show: true,
-        alertText: "Mediciones serán creadas"
+        alertText: "Esta Funcionalidad Aun Esta En Desarrollo."
       }
       this.props.displayAlert(alertData)
       this.setState({ ...initialState })
@@ -102,76 +103,6 @@ class MeasurementsAdd extends React.Component {
       }
       this.props.displayAlert(alertData)
     }
-
-    // if (this.state.nit && !isValidNit(this.state.nit)) {
-    //   alertData.alertText = "El número NIT debe ser ingresado en el formato: xxxxxxxxx-x"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.phone && !isValidPhone(this.state.phone)) {
-    //   alertData.alertText = "El número de teléfono debe ser ingresado en el formato: (+xxx) xxx xxxx ext xxx siendo el código de área y la extensión opcionales."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (this.state.address && !isValidAddress(this.state.address)) {
-    //   alertData.alertText = "La dirección ingresada debe ser valida para Colombia"
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // if (!this.state.cityMap[this.state.city]) {
-    //   alertData.alertText = "La ciudad ingresada no es valida."
-    //   this.props.displayAlert(alertData)
-    //   return
-    // }
-    // const company = {
-    //   name: this.state.name,
-    //   nit: this.state.nit,
-    //   address: this.state.address,
-    //   phone: this.state.phone,
-    //   city: this.state.cityMap[this.state.city]
-    // }
-    // if (this.state.picture) {
-    //   company.picture = this.state.picture;
-    // }
-    // // console.log(data)
-    // try {
-    //   const data = new FormData();
-    //   Object.keys(company).forEach(key => data.append(key, company[key]));
-    //   const res = await axios.post(POST_COMPANY_ENDPOINT, data)
-    //   // dispatch({
-    //   //   type: "SET_COMPANY_STATE",
-    //   //   payload: { ...res.data }
-    //   // })
-    //   const alertData = {
-    //     title: "Registro Exitoso",
-    //     success: true,
-    //     show: true,
-    //     alertText: "Empresa creada exitosamente"
-    //   }
-    //   this.props.displayAlert(alertData)
-    //   // dispatch({
-    //   //   type: "DISPLAY_SWEET_ALERT",
-    //   //   payload: alertData
-    //   // })
-    //   // history.push("/")
-    //   this.setState({ ...initialState })
-    // } catch (e) {
-    //   console.log(e)
-    //   const alertData = {
-    //     title: "Error de Validación",
-    //     success: false,
-    //     show: true,
-    //     alertText: Object.entries(e.response.data)[0][1][0]
-    //   }
-    //   this.props.displayAlert(alertData)
-    //   // dispatch({
-    //   //   type: "DISPLAY_SWEET_ALERT",
-    //   //   payload: alertData
-    //   // })
-    // }
-
-
-    // this.props.createCompany(data)
   }
 
   handleDateChange(value, formattedValue) {
@@ -209,7 +140,6 @@ class MeasurementsAdd extends React.Component {
           user_type: "engineer"
         }
       })
-      // console.log(res.data)
       this.setState({
         engineers: [{ id: 0, first_name: "Seleccione", last_name: " una opción" }, ...res.data]
       })
@@ -240,7 +170,12 @@ class MeasurementsAdd extends React.Component {
             <Col lg="12" md="6" sm="12">
               <Card>
                 <CardHeader className="mx-auto flex-column">
-                  <h1>{this.props.company.name ? this.props.company.name : "N/A"}</h1>
+                  <Col lg="12" md="6" sm="12">
+                    <Row className="d-flex justify-content-center text-center mb-3">
+                      <h1 className="font-large-2 content-header-title mt-2">Información De Empresa</h1>
+                    </Row>
+                  </Col>
+                  <h1 className="font-large-1 content-header-title mt-1">{this.props.company.name ? this.props.company.name : "N/A"}</h1>
                 </CardHeader>
                 <CardBody className="text-center pt-0">
                   <div className="avatar mr-1 avatar-xl mt-1 mb-1">
@@ -283,7 +218,7 @@ class MeasurementsAdd extends React.Component {
                         value={this.state.serviceName}
                         onChange={e => {
                           const idx = e.target.selectedIndex;
-                          const service = parseInt(e.target.childNodes[idx].getAttribute('service'));
+                          const service = e.target.childNodes[idx].getAttribute('service');
                           this.setState({ serviceName: e.target.value, service })
                         }} >
                         <option service="predictivo">Predictivo</option>
@@ -303,7 +238,7 @@ class MeasurementsAdd extends React.Component {
                         value={this.state.measurementTypeName}
                         onChange={e => {
                           const idx = e.target.selectedIndex;
-                          const measurement_type = parseInt(e.target.childNodes[idx].getAttribute('measurement_type'));
+                          const measurement_type = e.target.childNodes[idx].getAttribute('measurement_type');
                           this.setState({ measurement_type, measurementTypeName: e.target.value })
                         }} >
                         <option measurement_type="ultrasonido">Ultrasonido</option>
@@ -325,34 +260,6 @@ class MeasurementsAdd extends React.Component {
                       </Input>
                     </FormGroup>
                   </Col>
-
-
-
-                  {/* <Col md="6" sm="12">
-                    <FormGroup>
-                      <Label for="analysis">Análisis</Label>
-                      <Input
-                        type="textarea"
-                        id="analysis"
-                        placeholder="Análisis"
-                        value={this.state.analysis}
-                        onChange={e => this.setState({ analysis: e.target.value })} />
-                    </FormGroup>
-                  </Col>
-
-                  
-                  <Col md="6" sm="12">
-                    <FormGroup>
-                      <Label for="diagnostic">Diagnostico</Label>
-                      <Input
-                        type="textarea"
-                        id="diagnostic"
-                        placeholder="Diagnostico"
-                        value={this.state.diagnostic}
-                        onChange={e => this.setState({ diagnostic: e.target.value })} />
-                    </FormGroup>
-                  </Col> */}
-
 
 
                   <Col md="6" sm="12">
@@ -474,7 +381,6 @@ class MeasurementsAdd extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    machine: state.machine,
     company: state.company
   }
 }

@@ -28,6 +28,7 @@ export const loginWithUsernameAndPassword = user => {
       })
       history.push("/")
     } catch (e) {
+      // console.log(e.response)
       const alerData = {
         title: "Error de Validación",
         success: false,
