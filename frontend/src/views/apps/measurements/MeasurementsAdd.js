@@ -336,21 +336,21 @@ class MeasurementsAdd extends React.Component {
 
                   <Col md="6" sm="12">
                     <FormGroup>
-                      <Label for="engineer_one" ></Label>
+                      <Label for="engineer_one" >CSV Tendencia</Label>
+                      <CustomInput type="file" id="file-2" />
+                    </FormGroup>
+                  </Col>
+                  <Col md="6" sm="12">
+                    <FormGroup>
+                      <Label for="engineer_one" >CSV Espectros de Frecuencia</Label>
                       <CustomInput type="file" id="file-1" />
                     </FormGroup>
                   </Col>
 
-                  <Col md="6" sm="12">
-                    <FormGroup>
-                      <Label for="engineer_one" ></Label>
-                      <CustomInput type="file" id="file-2" />
-                    </FormGroup>
-                  </Col>
 
                   <Col md="6" sm="12">
                     <FormGroup>
-                      <Label for="engineer_one" ></Label>
+                      <Label for="engineer_one" >CSV Señales En El Tiempo</Label>
                       <CustomInput type="file" id="file-3" />
                     </FormGroup>
                   </Col>

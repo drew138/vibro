@@ -370,36 +370,36 @@ class MeasurementDatesView(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
 
-class FlawView(viewsets.ModelViewSet):
+# class FlawView(viewsets.ModelViewSet):
 
-    serializer_class = custom_serializers.FlawSerializer
-    permission_classes = [custom_permissions.GeneralPermission]
+#     serializer_class = custom_serializers.FlawSerializer
+#     permission_classes = [custom_permissions.GeneralPermission]
 
-    def get_queryset(self):
-        """
-        Optionally filter fields based on url
-        params. For non staff/superusers,
-        flaws are always filtered by user to
-        prevent users from seeing unauthorized
-        data.
-        """
+#     def get_queryset(self):
+#         """
+#         Optionally filter fields based on url
+#         params. For non staff/superusers,
+#         flaws are always filtered by user to
+#         prevent users from seeing unauthorized
+#         data.
+#         """
 
-        measurement = self.request.query_params.get('measurement', None)
-        flaw_type = self.request.query_params.get('flaw_type', None)
-        severity = self.request.query_params.get('severity', None)
+#         measurement = self.request.query_params.get('measurement', None)
+#         flaw_type = self.request.query_params.get('flaw_type', None)
+#         severity = self.request.query_params.get('severity', None)
 
-        if self.request.user.user_type in STAFF:
-            queryset = custom_models.Flaw.objects.all()
-        else:
-            queryset = custom_models.Flaw.objects.filter(
-                machine__company__user=self.request.user)
-        if measurement:
-            queryset = queryset.filter(measurement__id=measurement)
-        if flaw_type:
-            queryset = queryset.filter(flaw_type=flaw_type)
-        if severity:
-            queryset = queryset.filter(severity=severity)
-        return queryset
+#         if self.request.user.user_type in STAFF:
+#             queryset = custom_models.Flaw.objects.all()
+#         else:
+#             queryset = custom_models.Flaw.objects.filter(
+#                 machine__company__user=self.request.user)
+#         if measurement:
+#             queryset = queryset.filter(measurement__id=measurement)
+#         if flaw_type:
+#             queryset = queryset.filter(flaw_type=flaw_type)
+#         if severity:
+#             queryset = queryset.filter(severity=severity)
+#         return queryset
 
 
 class ReportView(viewsets.ModelViewSet):

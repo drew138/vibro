@@ -74,7 +74,7 @@ const navigationConfig = [
     children: [
       {
         id: "list-users",
-        title: "Lista",
+        title: "Lista de Usuarios",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],

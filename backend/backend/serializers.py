@@ -293,13 +293,13 @@ class MeasurementSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FlawSerializer(serializers.ModelSerializer):
+# class FlawSerializer(serializers.ModelSerializer):
 
-    # measurement = MeasurementSerializer()
+#     # measurement = MeasurementSerializer()
 
-    class Meta:
-        model = custom_models.Flaw
-        fields = '__all__'
+#     class Meta:
+#         model = custom_models.Flaw
+#         fields = '__all__'
 
 
 class TermoImageSerializer(serializers.ModelSerializer):

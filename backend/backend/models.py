@@ -73,10 +73,6 @@ class VibroUser(AbstractUser):
     ]
 
     email = models.EmailField(unique=True)
-    # phone = models.CharField(  # TODO ! remove this field
-    #     validators=[PHONE_REGEX_VALIDATOR],
-    #     max_length=17,
-    #     default="")
     celphone = models.CharField(
         validators=[CELPHONE_REGEX_VALIDATOR],
         max_length=20,
@@ -152,7 +148,7 @@ class Machine(models.Model):
     )
 
     # ! TODO remove default, make unique field
-    identifier = models.IntegerField()
+    identifier = models.IntegerField(unique=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -461,6 +457,12 @@ class Measurement(models.Model):
         (BLACK, 'Black'),
         (PURPLE, 'Purple')
     ]
+    FLAW_SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+    ]
     SERVICE_CHOICES = [
         (PRED, 'Predictivo'),
         (CORR, 'Correctivo'),
@@ -529,6 +531,66 @@ class Measurement(models.Model):
     resolved = models.BooleanField(default=False)  # remove
     prev_changes = models.TextField(default="", blank=True)
     prev_changes_date = models.DateField(null=True)
+    balanceo = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    alineacion = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    tension = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    lubricacion = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    rodamientos = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    holgura = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    excentricidad = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    soltura = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    fractura = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    vacio = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    electrico = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    inspeccion = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    estructural = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    resonancia = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    otro = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
 
 
 class Values(models.Model):
@@ -557,74 +619,74 @@ class Values(models.Model):
         default=list)
 
 
-class Flaw(models.Model):  # falla
-    # severity
-    RED = "red"
-    GREEN = 'green'
-    YELLOW = 'yellow'
-    BLACK = 'black'
-    PURPLE = 'purple'
+# class Flaw(models.Model):  # falla
+#     # severity
+#     RED = "red"
+#     GREEN = 'green'
+#     YELLOW = 'yellow'
+#     BLACK = 'black'
+#     PURPLE = 'purple'
 
-    # severity
-    SEVERITY_CHOICES = [
-        (RED, 'Red'),
-        (GREEN, 'Green'),
-        (YELLOW, 'Yellow'),
-        (BLACK, 'Black'),
-        (PURPLE, 'Purple')
-    ]
+#     # severity
+#     SEVERITY_CHOICES = [
+#         (RED, 'Red'),
+#         (GREEN, 'Green'),
+#         (YELLOW, 'Yellow'),
+#         (BLACK, 'Black'),
+#         (PURPLE, 'Purple')
+#     ]
 
-    # flaw types
-    BN = 'bien'
-    BAL = 'balanceo'
-    ALI = 'alineación'
-    TEN = 'tensión'
-    LUB = 'lubricación'
-    ROD = 'rodamientos'
-    HOL = 'holgura'
-    EXC = 'excentricidad'
-    SOL = 'soltura'
-    FRA = 'fractura'
-    VAC = 'vacío'
-    ELE = 'eléctrico'
-    INS = 'inspección'
-    EST = 'estructural'
-    RES = 'resonancia'
-    NOM = 'no medido'
-    OTR = 'otro'
+#     # flaw types // estos son campos que van en medicion
+#     BN = 'bien'
+#     BAL = 'balanceo'
+#     ALI = 'alineación'
+#     TEN = 'tensión'
+#     LUB = 'lubricación'
+#     ROD = 'rodamientos'
+#     HOL = 'holgura'
+#     EXC = 'excentricidad'
+#     SOL = 'soltura'
+#     FRA = 'fractura'
+#     VAC = 'vacío'
+#     ELE = 'eléctrico'
+#     INS = 'inspección'
+#     EST = 'estructural'
+#     RES = 'resonancia'
+#     NOM = 'no medido'
+#     OTR = 'otro'
 
-    FLAW_CHOICES = [
-        (BN, 'Bien'),
-        (BAL, 'Balanceo'),
-        (ALI, 'Alineación'),
-        (TEN, 'Tensión'),
-        (LUB, 'Lubricación'),
-        (ROD, 'Rodamientos'),
-        (HOL, 'Holgura'),
-        (EXC, 'Excentricidad'),
-        (SOL, 'Soltura'),
-        (FRA, 'Fractura'),
-        (VAC, 'Vacío'),
-        (ELE, 'Eléctrico'),
-        (INS, 'Inspección'),
-        (EST, 'Estructural'),
-        (RES, 'Resonancia'),
-        (NOM, 'No medido'),
-        (OTR, 'Otro'),
-    ]
+#     FLAW_CHOICES = [
+#         (BN, 'Bien'),
+#         (BAL, 'Balanceo'),
+#         (ALI, 'Alineación'),
+#         (TEN, 'Tensión'),
+#         (LUB, 'Lubricación'),
+#         (ROD, 'Rodamientos'),
+#         (HOL, 'Holgura'),
+#         (EXC, 'Excentricidad'),
+#         (SOL, 'Soltura'),
+#         (FRA, 'Fractura'),
+#         (VAC, 'Vacío'),
+#         (ELE, 'Eléctrico'),
+#         (INS, 'Inspección'),
+#         (EST, 'Estructural'),
+#         (RES, 'Resonancia'),
+#         (NOM, 'No medido'),
+#         (OTR, 'Otro'),
+#     ]
 
-    measurement = models.ForeignKey(
-        Measurement,
-        related_name="flaws",
-        on_delete=models.CASCADE)
-    flaw_type = models.CharField(
-        max_length=13,
-        choices=FLAW_CHOICES,
-        default=OTR)
-    severity = models.CharField(
-        max_length=6,
-        choices=SEVERITY_CHOICES,
-        default=PURPLE)
+#     measurement = models.ForeignKey(
+#         Measurement,
+#         related_name="flaws",
+#         on_delete=models.CASCADE)
+#     flaw_type = models.CharField(
+#         max_length=13,
+#         choices=FLAW_CHOICES,
+#         default=OTR)
+#     severity = models.CharField(
+#         max_length=6,
+#         choices=SEVERITY_CHOICES,
+#         default=PURPLE)
 
 
 class TermoImage(models.Model):

@@ -19,6 +19,7 @@ import axios from "axios"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { history } from "../../../history"
 import Img from "../../../assets/img/machine/default.png"
+import Checkbox from "../../../components/@vuexy/checkbox/CheckboxesVuexy"
 var DatePicker = require("reactstrap-date-picker");
 
 const severityMap = {
@@ -52,6 +53,24 @@ const initialState = {
   prev_changes: "",
   severity: "purple",
   severityName: severityMap["purple"],
+
+
+
+  balanceo: "green",
+  alineacion: "green",
+  tension: "green",
+  lubricacion: "green",
+  rodamientos: "green",
+  holgura: "green",
+  excentricidad: "green",
+  soltura: "green",
+  fractura: "green",
+  vacio: "green",
+  electrico: "green",
+  inspeccion: "green",
+  estructural: "green",
+  resonancia: "green",
+  otro: "green"
 }
 
 
@@ -60,7 +79,7 @@ class MeasurementAdd extends React.Component {
   constructor(props) {
     super(props)
 
-    if (!props.machine.id) { // TODO remove comment
+    if (!props.machine.id) {
       history.push("/")
     }
   }
@@ -93,6 +112,22 @@ class MeasurementAdd extends React.Component {
       diagnostic: this.state.diagnostic,
       severity: this.state.severity,
       date: this.state.date,
+
+      balanceo: this.state.balanceo,
+      alineacion: this.state.alineacion,
+      tension: this.state.tension,
+      lubricacion: this.state.lubricacion,
+      rodamientos: this.state.rodamientos,
+      holgura: this.state.holgura,
+      excentricidad: this.state.excentricidad,
+      soltura: this.state.soltura,
+      fractura: this.state.fractura,
+      vacio: this.state.vacio,
+      electrico: this.state.electrico,
+      inspeccion: this.state.inspeccion,
+      estructural: this.state.estructural,
+      resonancia: this.state.resonancia,
+      otro: this.state.otro
     }
     if (this.state.prev_changes_date) {
       measurement.prev_changes_date = this.state.prev_changes_date
@@ -133,6 +168,54 @@ class MeasurementAdd extends React.Component {
     }
 
 
+  }
+
+
+  createCheckers(field, title) {
+    return (
+      <FormGroup>
+        <Label for={field}>{title}</Label>
+        <div className={field}>
+          <div className="d-inline-block mr-1 ml-1">
+            <Checkbox
+              color="success"
+              label="Ok"
+              disabled={this.state.severity === "black"}
+              checked={this.state[field] === "green"}
+              onChange={() => this.setState({ [field]: "green" })
+              }
+            />
+          </div>
+          <div className="d-inline-block mr-1">
+            <Checkbox
+              color="warning"
+              label="Alerta"
+              disabled={this.state.severity === "black" || this.state.severity === "green"}
+              checked={this.state[field] === "yellow"}
+              onChange={() => this.setState({ [field]: "yellow" })}
+            />
+          </div>
+          <div className="d-inline-block mr-1">
+            <Checkbox
+              color="danger"
+              label="Alarma"
+              disabled={this.state.severity === "black" || this.state.severity === "green"}
+              checked={this.state[field] === "red"}
+              onChange={() => this.setState({ [field]: "red" })}
+            />
+          </div>
+          <div className="d-inline-block mr-1">
+            <Checkbox
+              color="dark"
+              label="No Medido"
+              checked={this.state[field] === "black"}
+              disabled={this.state.severity === "green"}
+              onChange={() => this.setState({ [field]: "black" })}
+            />
+          </div>
+        </div>
+      </FormGroup>
+    )
   }
 
   handleDateChange(value, formattedValue) {
@@ -562,8 +645,8 @@ class MeasurementAdd extends React.Component {
                     placeholder="Severidad"
                     value={this.state.severityName}
                     onChange={e => {
-                          const idx = e.target.selectedIndex;
-                          const severity = e.target.childNodes[idx].getAttribute('severity');
+                      const idx = e.target.selectedIndex;
+                      const severity = e.target.childNodes[idx].getAttribute('severity');
                           this.setState({
                             severity,
                             severityName: e.target.value
@@ -587,21 +670,62 @@ class MeasurementAdd extends React.Component {
                         onChange={e => {
                           const idx = e.target.selectedIndex;
                           const severity = e.target.childNodes[idx].getAttribute('severity');
-                          this.setState({
+                          let newState = {
+
                             severity,
                             severityName: e.target.value
-                          })
+                          }
+                          if (severity === "green") {
+                            newState = {
+                              ...newState,
+                              balanceo: "green",
+                              alineacion: "green",
+                              tension: "green",
+                              lubricacion: "green",
+                              rodamientos: "green",
+                              holgura: "green",
+                              excentricidad: "green",
+                              soltura: "green",
+                              fractura: "green",
+                              vacio: "green",
+                              electrico: "green",
+                              inspeccion: "green",
+                              estructural: "green",
+                              resonancia: "green",
+                              otro: "green"
+                            }
+                          } else if (severity === "black") {
+                            newState = {
+                              ...newState,
+                              balanceo: "black",
+                              alineacion: "black",
+                              tension: "black",
+                              lubricacion: "black",
+                              rodamientos: "black",
+                              holgura: "black",
+                              excentricidad: "black",
+                              soltura: "black",
+                              fractura: "black",
+                              vacio: "black",
+                              electrico: "black",
+                              inspeccion: "black",
+                              estructural: "black",
+                              resonancia: "black",
+                              otro: "black"
+                            }
+                          }
+                          this.setState(newState
+                          )
                         }}
                       >
                         <option severity="green">OK (Verde)</option>
                         <option severity="yellow">Alerta (Amarillo)</option>
                         <option severity="red">Alarma (Rojo)</option>
-                        <option severity="purple">No Asignada (Morado)</option>
+                        <option severity="purple">No Asignado (Morado)</option>
                         <option severity="black">No Medido (Negro)</option>
                       </Input>
                     </FormGroup>
                   </Col>
-
 
                   <Col md="12" sm="12">
                     <FormGroup>
@@ -643,6 +767,50 @@ class MeasurementAdd extends React.Component {
                         onChange={e => this.setState({ diagnostic: e.target.value })} />
                     </FormGroup>
                   </Col>
+
+
+                  <Col md="6" sm="12" >
+                    <div className="ml-3">
+                      {[
+                        ["balanceo", "Balanceo"],
+                        ["alineacion", "Alineación"],
+                        ["tension", "Tensión"],
+                        ["lubricacion", "Lubricación"],
+                        ["rodamientos", "Rodamientos"],
+                        ["holgura", "Holgura"],
+                        ["excentricidad", "Excentricidad"],
+                        ["soltura", "Soltura"],
+                      ].map((vals) => (
+                        <React.Fragment key={vals[0]}>
+                          {this.createCheckers(...vals)}
+                        </React.Fragment>
+                      ))}
+
+
+                    </div>
+                  </Col>
+                  <Col md="6" sm="12">
+                    <div className="ml-3">
+                      {[
+                        ["fractura", "Fractura"],
+                        ["vacio", "Vacío"],
+                        ["electrico", "Eléctrico"],
+                        ["inspeccion", "Inspección"],
+                        ["estructural", "Estructural"],
+                        ["resonancia", "Resonancia"],
+                        ["otro", "Otro"],
+                      ].map((vals) => (
+                        <React.Fragment key={vals[0]}>
+                          {this.createCheckers(...vals)}
+                        </React.Fragment>
+                      ))}
+
+
+                    </div>
+                  </Col>
+
+
+
 
                   <Col
                     className="d-flex justify-content-end flex-wrap mt-2"

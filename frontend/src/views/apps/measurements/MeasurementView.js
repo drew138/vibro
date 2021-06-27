@@ -2,16 +2,11 @@ import React from "react";
 import {
   Row,
   Col,
-  // Button,
-  // Form,
-  // Input,
-  // Label,
-  // FormGroup,
   Card,
   CardBody,
-  // CustomInput,
   CardHeader,
-  CardImg
+  CardImg,
+  Table
 } from "reactstrap"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../redux/actions/alerts"
@@ -21,7 +16,7 @@ import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import Img from "../../../assets/img/machine/default.png"
 
 
-class MeasurementAdd extends React.Component {
+class MeasurementView extends React.Component {
 
   constructor(props) {
     super(props)
@@ -29,8 +24,6 @@ class MeasurementAdd extends React.Component {
   }
 
   state = {
-    // machine: this.props.machine.id,
-    // ...initialState
     engineerOneName: "N/A",
     engineerTwoName: "N/A",
     analystName: "N/A",
@@ -90,8 +83,6 @@ class MeasurementAdd extends React.Component {
             breadCrumbParent="Máquina"
             breadCrumbActive="Medición"
           />
-
-
           <Row>
             <Col lg="12" md="6" sm="12">
               <Card>
@@ -103,6 +94,7 @@ class MeasurementAdd extends React.Component {
                       <Row className="d-flex justify-content-center text-center mb-3">
                         <h1 className="font-large-2 content-header-title mt-2">Información De Máquina</h1>
                       </Row>
+                      <hr />
                     </Col>
                     <Col className="mt-3" lg="4" md="6" sm="12">
                       <Row>
@@ -164,7 +156,7 @@ class MeasurementAdd extends React.Component {
                                     return (
                                       <div className="badge badge-pill badge-light-primary">
                                         No Asignado
-                                      </div> // ! TODO cambiar a valor por defecto
+                                      </div>
                                     )
                                   case "black":
                                     return (
@@ -183,7 +175,7 @@ class MeasurementAdd extends React.Component {
                                     return (
                                       <div className="badge badge-pill badge-light-primary">
                                         No Asignado
-                                      </div> // ! TODO cambiar a valor por defecto
+                                      </div>
                                     )
                                 }
                               }(this.props.machine.severity)
@@ -262,13 +254,12 @@ class MeasurementAdd extends React.Component {
 
           <Card>
             <CardBody>
-
               <Row className="mt-3 text-center pt-0">
-
                 <Col lg="12" md="6" sm="12">
                   <Row className="d-flex justify-content-center text-center mb-3">
                     <h1 className="font-large-2 content-header-title">Información De Medición</h1>
                   </Row>
+                  <hr />
                 </Col>
                 <Col lg="4" md="6" sm="12">
                   <Row>
@@ -294,6 +285,7 @@ class MeasurementAdd extends React.Component {
                       </div>
                     </Col>
                   </Row>
+
 
                   <Row>
                     <Col>
@@ -324,7 +316,7 @@ class MeasurementAdd extends React.Component {
                                 return (
                                   <div className="badge badge-pill badge-light-primary">
                                     No Asignado
-                                  </div> // ! TODO cambiar a valor por defecto
+                                  </div>
                                 )
                               case "black":
                                 return (
@@ -343,7 +335,7 @@ class MeasurementAdd extends React.Component {
                                 return (
                                   <div className="badge badge-pill badge-light-primary">
                                     No Asignado
-                                  </div> // ! TODO cambiar a valor por defecto
+                                  </div>
                                 )
                             }
                           }(this.props.measurement.severity)
@@ -403,6 +395,7 @@ class MeasurementAdd extends React.Component {
                   </Row>
                 </Col>
 
+
                 <Col lg="4" md="6" sm="12">
                   <Row>
                     <Col>
@@ -428,6 +421,7 @@ class MeasurementAdd extends React.Component {
                   </Row>
                   <Row>
 
+
                     <Col>
                       <div className="uploads mt-1 mb-1">
                         <span>Analista</span>
@@ -438,6 +432,7 @@ class MeasurementAdd extends React.Component {
                     </Col>
                   </Row>
                 </Col>
+
 
                 <Col lg="4" md="6" sm="12">
                   <Row>
@@ -474,11 +469,57 @@ class MeasurementAdd extends React.Component {
                       </div>
                     </Col>
                   </Row>
-
                 </Col>
               </Row>
 
-              <Row className="m-5  text-left pt-0">
+              <div className="divider">
+                <div className="divider-text">Puntos</div>
+              </div>
+
+
+
+
+              <Row className="m-5 text-left pt-0">
+
+
+                <Table responsive hover>
+                  <thead>
+                    <tr>
+                      <th>Punto</th>
+                      <th>Valor</th>
+                      <th>Valor Anterior</th>
+                      <th>Cambio</th>
+                      <th>Severidad</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>Table cell</td>
+                      <td>Table cell</td>
+                      <td>Table cell</td>
+
+                    </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>Table cell</td>
+                      <td>Table cell</td>
+                      <td>Table cell</td>
+
+                    </tr>
+                    <tr>
+                      <th scope="row">3</th>
+                      <td>Table cell</td>
+                      <td>Table cell</td>
+                      <td>Table cell</td>
+
+                    </tr>
+                  </tbody>
+                </Table>
+
+              </Row>
+              <hr />
+              <Row className="m-5 text-left pt-0">
                 <Col >
                   <Row>
                     <Col lg="12" md="6" sm="12">
@@ -493,6 +534,7 @@ class MeasurementAdd extends React.Component {
                     </Col>
                   </Row>
 
+
                   <Row>
                     <Col lg="12" md="6" sm="12">
                       <div className="uploads mt-1 mb-1">
@@ -505,6 +547,7 @@ class MeasurementAdd extends React.Component {
                       </div>
                     </Col>
                   </Row>
+
 
                   <Row>
                     <Col lg="12" md="6" sm="12">
@@ -520,22 +563,8 @@ class MeasurementAdd extends React.Component {
                   </Row>
 
 
-
-
                 </Col>
               </Row>
-
-
-              {/* 
-              <Col
-                className="d-flex justify-content-end flex-wrap mt-2"
-                sm="12"
-              >
-              <Button.Ripple className="mr-1" color="primary">
-              Registrar Mediciones
-              </Button.Ripple>
-              </Col> */}
-
             </CardBody>
           </Card>
         </Col>
@@ -551,4 +580,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { displayAlert })(MeasurementAdd) // tODO change redux actions
+export default connect(mapStateToProps, { displayAlert })(MeasurementView) // tODO change redux actions

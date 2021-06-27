@@ -1,47 +1,51 @@
 import React from "react"
-import { history } from "../../../history"
-import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
-import "../../../assets/scss/pages/users.scss"
-import { GET_MEASUREMENTS_ENDPOINT, DELETE_MEASUREMENT_ENDPOINT } from "../../../config"
 import {
   Card,
   CardBody,
+  // CardHeader,
+  // CardTitle,
+  // FormGroup,
+  // Label,
   Input,
   Row,
   Col,
   UncontrolledDropdown,
   DropdownMenu,
   DropdownItem,
-  DropdownToggle
+  DropdownToggle,
+  // Collapse,
+  // Spinner
 } from "reactstrap"
-import { AgGridReact } from "ag-grid-react"
-import { connect } from "react-redux"
 import axios from "axios"
+import { ContextLayout } from "../../../utility/context/Layout"
+import { AgGridReact } from "ag-grid-react"
 import {
   ChevronDown,
+  // RotateCw,
+  // X
 } from "react-feather"
-import { ContextLayout } from "../../../utility/context/Layout"
-import { setMeasurement } from "../../../redux/actions/measurement"
-import { displayAlert } from "../../../redux/actions/alerts"
-import { Activity, Edit, Trash2 } from "react-feather"
-import { updateProfile } from "../../../redux/actions/auth/updateActions"
+// import classnames from "classnames"
+import { history } from "../../../history"
+import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
+import "../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
-import SweetAlert from 'react-bootstrap-sweetalert';
+import { GET_USERS_ENDPOINT } from '../../../config'
+import { connect } from "react-redux"
+import { setUser } from "../../../redux/actions/users"
+import { displayAlert } from "../../../redux/actions/alerts"
+import { Edit } from "react-feather";
 
 
-class MeasurementList extends React.Component {
+const UserTypes = {
+  'admin': "Administrador",
+  'engineer': "Ingeniero",
+  'client': "Cliente",
+  'support': "Soporte",
+  'arduino': "Arduino",
+}
 
-  constructor(props) {
-    super(props)
-    if (!props.machine.id) {
-      history.push("/")
-    }
-  }
-
-
-
+class ListUser extends React.Component {
   state = {
-    show: false,
     rowData: [],
     pageSize: 20,
     isVisible: true,
@@ -58,137 +62,125 @@ class MeasurementList extends React.Component {
     searchVal: "",
     columnDefs: [
       {
-        width: 150,
+        width: 100,
         cellRendererFramework: params => {
           return (
             <div
-              className="d-flex align-items-center justify-content-around cursor-pointer"
+              className="d-flex align-items-center cursor-pointer"
             >
               <span>
-                <Activity
-                  className="fonticon-container"
+                <Edit className="ml-1 mr-1"
                   style={{ color: "#6b6b6b" }}
                   onClick={() => {
-                    this.props.setMeasurement(params.data)
-                    history.push("/app/measurement/view")
+                    this.props.setUser(params.data)
+                    history.push("/app/user/list/edit")
                   }}
+                // onClick={
+                //   () => {
+                //     this.props.setMachine(params.data)
+                //     history.push("/app/machine/edit")
+                //   }
                 />
-                {
-                  this.props.auth.user_type !== "client" && this.props.auth.user_type !== "arduino" &&
-                  <Edit className="ml-1 mr-1"
-                    style={{ color: "#6b6b6b" }}
-                    onClick={
-                      () => {
-                        this.props.setMeasurement(params.data)
-                        history.push("/app/measurement/edit")
-                      }
-                    } />
-                }
-                {this.props.auth.user_type === "admin" &&
-                  <Trash2 style={{ color: "#F9596E" }}
-                    onClick={
-                      () => this.setState({
-                        name: params.data.name,
-                        id: params.data.id,
-                        show: true
-                      })
-                    }
-                  />}
-
               </span>
             </div>
           )
         }
       },
       {
-        headerName: "Severidad",
-        width: 150,
+        headerName: "Nombre",
+        field: "first_name",
+        filter: true,
+        width: 200
+      },
+      {
+        headerName: "Apellido",
+        field: "last_name",
+        filter: true,
+        width: 200
+      },
+      {
+        headerName: "Usuario",
+        field: "username",
+        filter: true,
+        width: 250,
         cellRendererFramework: params => {
-          switch (params.data.severity) {
-            case "red":
-              return (
-                <div className="badge badge-pill badge-light-danger w-100">
-                  Alarma
-                </div>
-              )
-            case "yellow":
-              return (
-                <div className="badge badge-pill badge-light-warning w-100">
-                  Alerta
-                </div>
-              )
-            case "green":
-              return (
-                <div className="badge badge-pill badge-light-success w-100">
-                  Ok
-                </div>
-              )
-            case "purple":
-              return (
-                <div className="badge badge-pill badge-light-primary w-100">
-                  No Asignada
-                </div> // ! TODO cambiar a valor por defecto
-              )
-            case "black":
-              return (
-                <div
-                  className="badge badge-pill w-100"
-                  style={{
-                    backgroundColor: "#43393A",
-                    color: "#F0E5E6",
-                    fontWeight: "500",
-                    textTransform: "uppercase"
-                  }}>
-                  No Medido
-                </div>
-              )
-            default:
-              return (
-                <div className="badge badge-pill badge-light-primary w-100">
-                  No Asignada
-                </div> // ! TODO cambiar a valor por defecto
-              )
-          }
+          return (
+            <div
+              className="d-flex align-items-center cursor-pointer"
+            // onClick={() => {
+            //   this.props.setUser(params.data)
+            //   history.push("/app/user/list/edit")
+            // }}
+            >
+              <img
+                className="rounded-circle mr-50"
+                src={params.data.picture}
+                alt="user avatar"
+                height="30"
+                width="30"
+              />
+              <span>{params.data.username}</span>
+            </div>
+          )
         }
       },
       {
-        headerName: "Fecha",
-        field: "date",
+        headerName: "Email",
+        field: "email",
         filter: true,
-        width: 125,
-      },
-      {
-        headerName: "Servicio",
-        field: "service",
-        filter: true,
-        width: 200
+        width: 250
       },
       {
         headerName: "Tipo",
-        field: "measurement_type",
+        field: "user_type",
         filter: true,
-        width: 200
+        width: 150,
+        cellRendererFramework: params => (
+          <span>{UserTypes[params.data.user_type]}</span>
+        )
+      },
+      {
+        headerName: "Estado",
+        field: "is_active",
+        filter: false,
+        width: 150,
+        cellRendererFramework: params => {
+          return params.data.is_active ? (
+            <div className="badge badge-pill badge-light-success">
+              {"Activo"}
+            </div>
+          ) : (
+            <div className="badge badge-pill badge-light-warning">
+              {"Inactivo"}
+            </div>
+          )
+        }
+      },
+      {
+        headerName: "Empresa",
+        field: "is_active",
+        filter: true,
+        width: 150,
+        cellRendererFramework: params => {
+          return (
+            <div className="d-flex align-items-center cursor-pointer">
+              {
+                params.data.user_type === "client" ?
+                  params.data.company?.name ?? "No Asignada" : "N/A"
+              }
+            </div>
+          )
+        }
       }
     ]
   }
 
-
   async componentDidMount() {
-    if (!this.props.machine.id) {
-      return
-    }
     try {
-      const res = await axios.get(GET_MEASUREMENTS_ENDPOINT, {
-        params: {
-          machine: this.props.machine.id
-        }
-      })
-      this.setState({
-        rowData: [...res.data]
-      })
-    } catch (e) {
-      console.log(e)
-      // console.log(e.response.data)
+      const res = await axios.get(GET_USERS_ENDPOINT)
+      // console.log(res.data)
+      this.setState({ rowData: res.data })
+    } catch {
       const alertData = {
         title: "Error de Conexión",
         success: false,
@@ -197,38 +189,6 @@ class MeasurementList extends React.Component {
       }
       this.props.displayAlert(alertData)
       this.setState({ rowData: [] })
-    }
-  }
-
-  deleteMeasurement = async () => {
-    this.setState({ show: false })
-    if (!this.state.id) {
-      return
-    }
-
-    try {
-      const res = await axios.delete(`${DELETE_MEASUREMENT_ENDPOINT}${this.state.id}/`)
-      const alertData = {
-        title: "Medición Borrada Exitosamente",
-        success: true,
-        show: true,
-        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Mediciones.`
-      }
-      this.props.displayAlert(alertData)
-      const tmp = this.state.id;
-      this.setState({
-        rowData: [...this.state.rowData.filter((measurement) => measurement.id !== tmp)],
-        id: 0,
-        name: ""
-      })
-    } catch (e) {
-      const alertData = {
-        title: "Error Al Borrar Medición ",
-        success: false,
-        show: true,
-        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Medición"
-      }
-      this.props.displayAlert(alertData)
     }
   }
 
@@ -306,26 +266,11 @@ class MeasurementList extends React.Component {
     return (
       <React.Fragment>
         <Breadcrumbs
-          breadCrumbTitle="Mediciones"
-          breadCrumbParent={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
-          breadCrumbActive="Mediciones"
+          breadCrumbTitle="Lista de Usuarios"
+          breadCrumbParent="Usuario"
+          breadCrumbActive="Lista de Usuarios"
         />
-
-
-        <div className="content-header row">
-          <div className="content-header-left col-md-9 col-12 mb-2">
-            <div className="row breadcrumbs-top">
-              <div className="col-12">
-                <h4 className="content-header-title float-left mb-0">
-                  {this.props.hierarchy.fullHierarchy}
-                </h4>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <Row className="app-user-list">
-
           <Col sm="12">
             <Card>
               <CardBody>
@@ -405,25 +350,7 @@ class MeasurementList extends React.Component {
             </Card>
           </Col>
         </Row>
-        {this.props.auth.user_type === "admin" && <SweetAlert
-          warning
-          title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
-          showCancel
-          show={this.state.show}
-          cancelBtnText="Cancelar"
-          confirmBtnText="Borrar Medición"
-          confirmBtnBsStyle="danger"
-          cancelBtnBsStyle="primary"
-          onConfirm={this.deleteMeasurement}
-          onCancel={() => this.setState({ show: false })}
-        >
-
-          <p className="sweet-alert-text">
-            Todos Los Valores Asociados Serán Borrados Junto Con Esta Medición.
-          </p>
-        </SweetAlert>}
-
-      </React.Fragment >
+      </React.Fragment>
     )
   }
 }
@@ -431,10 +358,8 @@ class MeasurementList extends React.Component {
 const mapStateToProps = state => {
   return {
     auth: state.auth,
-    machine: state.machine,
-    hierarchy: state.hierarchy
+    // user: state.user
   }
 }
 
-export default connect(mapStateToProps, { setMeasurement, displayAlert, updateProfile })(MeasurementList)
-
+export default connect(mapStateToProps, { setUser, displayAlert })(ListUser)

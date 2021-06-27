@@ -7,8 +7,9 @@ import {
   // DropdownItem,
   // DropdownToggle
 } from "reactstrap"
-import { Home
-  // , Settings 
+import {
+  Home
+  // , Settings
 } from "react-feather"
 import { NavLink } from "react-router-dom"
 class BreadCrumbs extends React.Component {

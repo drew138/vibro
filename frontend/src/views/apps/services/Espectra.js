@@ -1,12 +1,12 @@
 import React from "react"
 import { Card, CardHeader, CardTitle, CardBody } from "reactstrap"
-import ReactApexChart  from "react-apexcharts"
+import ReactApexChart from "react-apexcharts"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 
 
 class ApexLineCharts extends React.Component {
   state = {
-    
+
     optionsVel: {
       chart: {
         id: "lineChart"
@@ -20,12 +20,13 @@ class ApexLineCharts extends React.Component {
           offsetY: 10
         },
       },
-      legend : {
+      legend: {
         position: "right",
         offsetY: 40
       },
       stroke: {
-        curve: "straight"
+        curve: "straight",
+        width: 1
       },
       dataLabels: {
         enabled: false
@@ -51,12 +52,13 @@ class ApexLineCharts extends React.Component {
           offsetY: 10
         },
       },
-      legend : {
+      legend: {
         position: "right",
         offsetY: 40
       },
       stroke: {
-        curve: "straight"
+        curve: "straight",
+        width: 1
       },
       dataLabels: {
         enabled: false
@@ -82,12 +84,13 @@ class ApexLineCharts extends React.Component {
           offsetY: 10
         },
       },
-      legend : {
+      legend: {
         position: "right",
         offsetY: 40
       },
       stroke: {
-        curve: "straight"
+        curve: "straight",
+        width: 1
       },
       dataLabels: {
         enabled: false
@@ -143,41 +146,41 @@ class ApexLineCharts extends React.Component {
     seriesTwo: [
       {
         name: "line-series",
-        data: [{'x': '01/05/2021 10:51:54', 'y': 2},
-        {'x': '09/30/2020 10:07:13', 'y': 1},
-        {'x': '07/01/2020 9:43:59', 'y': 1},
-        {'x': '05/11/2020 23:26:39', 'y': 2},
-        {'x': '04/28/2020 11:14:09', 'y': 1},
-        {'x': '01/07/2020 10:10:46', 'y': 3},
-        {'x': '10/01/2019 11:44:32', 'y': 2},
-        {'x': '09/04/2019 14:50:11', 'y': 1},
-        {'x': '09/02/2019 17:39:58', 'y': 3},
-        {'x': '09/02/2019 0:18:05', 'y': 1},
-        {'x': '08/28/2019 15:19:33', 'y': 4},
-        {'x': '08/23/2019 15:16:55', 'y': 5},
-        {'x': '08/23/2019 15:14:26', 'y': 4},
-        {'x': '08/22/2019 16:52:45', 'y': 4},
-        {'x': '08/22/2019 16:52:11', 'y': 4},
-        {'x': '08/22/2019 12:49:59', 'y': 5},
-        {'x': '08/21/2019 23:54:53', 'y': 3},
-        {'x': '08/21/2019 23:47:45', 'y': 4},
-        {'x': '08/21/2019 22:56:10', 'y': 5},
-        {'x': '08/03/2019 8:44:20', 'y': 3},
-        {'x': '07/09/2019 8:22:13', 'y': 3},
-        {'x': '07/03/2019 11:46:27', 'y': 3},
-        {'x': '06/26/2019 9:46:26', 'y': 3},
-        {'x': '04/03/2019 12:02:07', 'y': 2},
-        {'x': '01/14/2019 11:25:44', 'y': 2},
-        {'x': '12/04/2018 16:39:40', 'y': 4},
-        {'x': '10/08/2018 10:29:59', 'y': 1},
-        {'x': '10/01/2018 12:17:30', 'y': 3},
-        {'x': '07/02/2018 19:38:52', 'y': 3},
-        {'x': '04/02/2018 11:14:54', 'y': 1},
-        {'x': '11/18/2017 13:34:50', 'y': 2},
-        {'x': '11/18/2017 12:44:12', 'y': 2},
-        {'x': '10/02/2017 12:33:20', 'y': 1},
-        {'x': '09/05/2017 13:50:16', 'y': 1},
-        {'x': '07/31/2017 21:43:35', 'y': 1}]
+        data: [{ 'x': '01/05/2021 10:51:54', 'y': 2 },
+        { 'x': '09/30/2020 10:07:13', 'y': 1 },
+        { 'x': '07/01/2020 9:43:59', 'y': 1 },
+        { 'x': '05/11/2020 23:26:39', 'y': 2 },
+        { 'x': '04/28/2020 11:14:09', 'y': 1 },
+        { 'x': '01/07/2020 10:10:46', 'y': 3 },
+        { 'x': '10/01/2019 11:44:32', 'y': 2 },
+        { 'x': '09/04/2019 14:50:11', 'y': 1 },
+        { 'x': '09/02/2019 17:39:58', 'y': 3 },
+        { 'x': '09/02/2019 0:18:05', 'y': 1 },
+        { 'x': '08/28/2019 15:19:33', 'y': 4 },
+        { 'x': '08/23/2019 15:16:55', 'y': 5 },
+        { 'x': '08/23/2019 15:14:26', 'y': 4 },
+        { 'x': '08/22/2019 16:52:45', 'y': 4 },
+        { 'x': '08/22/2019 16:52:11', 'y': 4 },
+        { 'x': '08/22/2019 12:49:59', 'y': 5 },
+        { 'x': '08/21/2019 23:54:53', 'y': 3 },
+        { 'x': '08/21/2019 23:47:45', 'y': 4 },
+        { 'x': '08/21/2019 22:56:10', 'y': 5 },
+        { 'x': '08/03/2019 8:44:20', 'y': 3 },
+        { 'x': '07/09/2019 8:22:13', 'y': 3 },
+        { 'x': '07/03/2019 11:46:27', 'y': 3 },
+        { 'x': '06/26/2019 9:46:26', 'y': 3 },
+        { 'x': '04/03/2019 12:02:07', 'y': 2 },
+        { 'x': '01/14/2019 11:25:44', 'y': 2 },
+        { 'x': '12/04/2018 16:39:40', 'y': 4 },
+        { 'x': '10/08/2018 10:29:59', 'y': 1 },
+        { 'x': '10/01/2018 12:17:30', 'y': 3 },
+        { 'x': '07/02/2018 19:38:52', 'y': 3 },
+        { 'x': '04/02/2018 11:14:54', 'y': 1 },
+        { 'x': '11/18/2017 13:34:50', 'y': 2 },
+        { 'x': '11/18/2017 12:44:12', 'y': 2 },
+        { 'x': '10/02/2017 12:33:20', 'y': 1 },
+        { 'x': '09/05/2017 13:50:16', 'y': 1 },
+        { 'x': '07/31/2017 21:43:35', 'y': 1 }]
       },
     ]
   }
@@ -196,29 +199,29 @@ class ApexLineCharts extends React.Component {
           </CardHeader>
           <CardBody>
             <div>
-              <ReactApexChart 
+              <ReactApexChart
                 options={this.state.optionsVel}
                 series={this.state.seriesOne}
                 type="line"
                 height={350}
-                />
+              />
             </div>
             <div>
-              <ReactApexChart 
+              <ReactApexChart
                 options={this.state.optionsAcc}
                 series={this.state.seriesTwo}
                 type="line"
                 height={350}
-                />
+              />
             </div>
             <div>
-              <ReactApexChart 
+              <ReactApexChart
                 options={this.state.optionsHeat}
                 series={this.state.seriesTwo}
-                
+
                 type="line"
                 height={350}
-                />
+              />
             </div>
           </CardBody>
         </Card>

@@ -1,48 +1,49 @@
-import React from "react"
-import { history } from "../../../history"
-import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
-import "../../../assets/scss/pages/users.scss"
-import { GET_MEASUREMENTS_ENDPOINT, DELETE_MEASUREMENT_ENDPOINT } from "../../../config"
+import React from 'react'
 import {
   Card,
   CardBody,
+  // CardHeader,
+  // CardTitle,
+  // FormGroup,
+  // Label,
   Input,
   Row,
   Col,
   UncontrolledDropdown,
   DropdownMenu,
   DropdownItem,
-  DropdownToggle
+  DropdownToggle,
+  // Collapse,
+  // Spinner
 } from "reactstrap"
-import { AgGridReact } from "ag-grid-react"
-import { connect } from "react-redux"
 import axios from "axios"
+import { ContextLayout } from "../../../../utility/context/Layout"
+import { AgGridReact } from "ag-grid-react"
 import {
   ChevronDown,
+  // RotateCw,
+  // X
 } from "react-feather"
-import { ContextLayout } from "../../../utility/context/Layout"
-import { setMeasurement } from "../../../redux/actions/measurement"
-import { displayAlert } from "../../../redux/actions/alerts"
-import { Activity, Edit, Trash2 } from "react-feather"
-import { updateProfile } from "../../../redux/actions/auth/updateActions"
-import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
+// import classnames from "classnames"
+import "../../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
+import "../../../../assets/scss/pages/users.scss"
+import { connect } from "react-redux"
+import { displayAlert } from "../../../../redux/actions/alerts"
+import { history } from "../../../../history"
+import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
+import { GET_COMPANIES_ENDPOINT, DELETE_COMPANY_ENDPOINT } from '../../../../config'
+import { setCompany } from "../../../../redux/actions/company"
+import { Edit, Trash2 } from "react-feather"
+
 import SweetAlert from 'react-bootstrap-sweetalert';
 
-
-class MeasurementList extends React.Component {
-
-  constructor(props) {
-    super(props)
-    if (!props.machine.id) {
-      history.push("/")
-    }
-  }
-
-
+class CompaniesList extends React.Component {
 
   state = {
+    id: 0,
+    name: "",
     show: false,
-    rowData: [],
+    rowData: null,
     pageSize: 20,
     isVisible: true,
     reload: false,
@@ -58,34 +59,25 @@ class MeasurementList extends React.Component {
     searchVal: "",
     columnDefs: [
       {
-        width: 150,
+        width: 100,
         cellRendererFramework: params => {
           return (
             <div
               className="d-flex align-items-center justify-content-around cursor-pointer"
             >
               <span>
-                <Activity
-                  className="fonticon-container"
+                <Edit className="ml-1 mr-1"
                   style={{ color: "#6b6b6b" }}
-                  onClick={() => {
-                    this.props.setMeasurement(params.data)
-                    history.push("/app/measurement/view")
-                  }}
-                />
-                {
-                  this.props.auth.user_type !== "client" && this.props.auth.user_type !== "arduino" &&
-                  <Edit className="ml-1 mr-1"
-                    style={{ color: "#6b6b6b" }}
-                    onClick={
-                      () => {
-                        this.props.setMeasurement(params.data)
-                        history.push("/app/measurement/edit")
-                      }
-                    } />
-                }
+                  onClick={
+                    () => {
+
+                      this.props.setCompany(params.data)
+                      history.push("/app/companies/list/edit")
+                    }
+                  } />
                 {this.props.auth.user_type === "admin" &&
-                  <Trash2 style={{ color: "#F9596E" }}
+                  <Trash2
+                    style={{ color: "#F9596E" }}
                     onClick={
                       () => this.setState({
                         name: params.data.name,
@@ -94,101 +86,58 @@ class MeasurementList extends React.Component {
                       })
                     }
                   />}
-
               </span>
             </div>
           )
         }
       },
       {
-        headerName: "Severidad",
-        width: 150,
+        headerName: "Nombre",
+        field: "name",
+        filter: true,
+        width: 300,
         cellRendererFramework: params => {
-          switch (params.data.severity) {
-            case "red":
-              return (
-                <div className="badge badge-pill badge-light-danger w-100">
-                  Alarma
-                </div>
-              )
-            case "yellow":
-              return (
-                <div className="badge badge-pill badge-light-warning w-100">
-                  Alerta
-                </div>
-              )
-            case "green":
-              return (
-                <div className="badge badge-pill badge-light-success w-100">
-                  Ok
-                </div>
-              )
-            case "purple":
-              return (
-                <div className="badge badge-pill badge-light-primary w-100">
-                  No Asignada
-                </div> // ! TODO cambiar a valor por defecto
-              )
-            case "black":
-              return (
-                <div
-                  className="badge badge-pill w-100"
-                  style={{
-                    backgroundColor: "#43393A",
-                    color: "#F0E5E6",
-                    fontWeight: "500",
-                    textTransform: "uppercase"
-                  }}>
-                  No Medido
-                </div>
-              )
-            default:
-              return (
-                <div className="badge badge-pill badge-light-primary w-100">
-                  No Asignada
-                </div> // ! TODO cambiar a valor por defecto
-              )
-          }
+          return (
+            <div
+              className="d-flex align-items-center cursor-pointer"
+            >
+              <img
+                className="rounded-circle mr-50"
+                src={params.data.picture}
+                alt="user avatar"
+                height="30"
+                width="30"
+              />
+              <span>{params.data.name}</span>
+            </div>
+          )
         }
       },
       {
-        headerName: "Fecha",
-        field: "date",
+        headerName: "Ciudad",
+        field: "city",
         filter: true,
-        width: 125,
+        width: 300
       },
       {
-        headerName: "Servicio",
-        field: "service",
+        headerName: "Nit",
+        field: "nit",
         filter: true,
-        width: 200
-      },
-      {
-        headerName: "Tipo",
-        field: "measurement_type",
-        filter: true,
-        width: 200
+        width: 300
       }
     ]
   }
 
-
   async componentDidMount() {
-    if (!this.props.machine.id) {
-      return
-    }
+
+
     try {
-      const res = await axios.get(GET_MEASUREMENTS_ENDPOINT, {
-        params: {
-          machine: this.props.machine.id
-        }
-      })
-      this.setState({
-        rowData: [...res.data]
-      })
-    } catch (e) {
-      console.log(e)
-      // console.log(e.response.data)
+      const res = await axios.get(GET_COMPANIES_ENDPOINT)
+
+      this.setState({ rowData: [...res.data] })
+
+
+    } catch {
       const alertData = {
         title: "Error de Conexión",
         success: false,
@@ -200,33 +149,33 @@ class MeasurementList extends React.Component {
     }
   }
 
-  deleteMeasurement = async () => {
+  deleteCompany = async () => {
     this.setState({ show: false })
     if (!this.state.id) {
       return
     }
 
     try {
-      const res = await axios.delete(`${DELETE_MEASUREMENT_ENDPOINT}${this.state.id}/`)
+      const res = await axios.delete(`${DELETE_COMPANY_ENDPOINT}${this.state.id}/`)
       const alertData = {
-        title: "Medición Borrada Exitosamente",
+        title: "Empresa Borrada Exitosamente",
         success: true,
         show: true,
-        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Mediciones.`
+        alertText: `Se Ha Borrado ${this.state.name} De La Lista de Empresas.`
       }
       this.props.displayAlert(alertData)
       const tmp = this.state.id;
       this.setState({
-        rowData: [...this.state.rowData.filter((measurement) => measurement.id !== tmp)],
+        rowData: [...this.state.rowData.filter((company) => company.id !== tmp)],
         id: 0,
         name: ""
       })
     } catch (e) {
       const alertData = {
-        title: "Error Al Borrar Medición ",
+        title: "Error Al Borrar Empresa",
         success: false,
         show: true,
-        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Medición"
+        alertText: "Ha Surgido Un Error Al Intentar Borrar Esta Empresa."
       }
       this.props.displayAlert(alertData)
     }
@@ -258,6 +207,7 @@ class MeasurementList extends React.Component {
       })
     }
   }
+
   updateSearchQuery = val => {
     this.gridApi.setQuickFilter(val)
     this.setState({
@@ -301,31 +251,18 @@ class MeasurementList extends React.Component {
     this.setState({ isVisible: false })
   }
 
+
   render() {
     const { rowData, columnDefs, defaultColDef, pageSize } = this.state
     return (
       <React.Fragment>
         <Breadcrumbs
-          breadCrumbTitle="Mediciones"
-          breadCrumbParent={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
-          breadCrumbActive="Mediciones"
+          breadCrumbTitle="Lista de Empresas"
+          breadCrumbParent="Empresas"
+          breadCrumbActive="Lista de Empresas"
         />
 
-
-        <div className="content-header row">
-          <div className="content-header-left col-md-9 col-12 mb-2">
-            <div className="row breadcrumbs-top">
-              <div className="col-12">
-                <h4 className="content-header-title float-left mb-0">
-                  {this.props.hierarchy.fullHierarchy}
-                </h4>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <Row className="app-user-list">
-
           <Col sm="12">
             <Card>
               <CardBody>
@@ -405,25 +342,27 @@ class MeasurementList extends React.Component {
             </Card>
           </Col>
         </Row>
+
+
         {this.props.auth.user_type === "admin" && <SweetAlert
           warning
           title="¿Estas Seguro Que Deseas Borrar Este Elemento?"
           showCancel
           show={this.state.show}
           cancelBtnText="Cancelar"
-          confirmBtnText="Borrar Medición"
+          confirmBtnText="Borrar Empresa"
           confirmBtnBsStyle="danger"
           cancelBtnBsStyle="primary"
-          onConfirm={this.deleteMeasurement}
+          onConfirm={this.deleteCompany}
           onCancel={() => this.setState({ show: false })}
         >
 
           <p className="sweet-alert-text">
-            Todos Los Valores Asociados Serán Borrados Junto Con Esta Medición.
+            Todas Las Máquinas Y Mediciones Serán Borradas Junto Con Esta Empresa.
           </p>
         </SweetAlert>}
 
-      </React.Fragment >
+      </React.Fragment>
     )
   }
 }
@@ -431,10 +370,7 @@ class MeasurementList extends React.Component {
 const mapStateToProps = state => {
   return {
     auth: state.auth,
-    machine: state.machine,
-    hierarchy: state.hierarchy
   }
 }
 
-export default connect(mapStateToProps, { setMeasurement, displayAlert, updateProfile })(MeasurementList)
-
+export default connect(mapStateToProps, { setCompany, displayAlert })(CompaniesList)

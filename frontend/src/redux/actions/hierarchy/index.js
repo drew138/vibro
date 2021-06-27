@@ -15,3 +15,20 @@ export const clearHierarchy = () => {
     }
 }
 
+export const setFullHierarchy = (fullHierarchy) => {
+    return dispatch => {
+        dispatch({
+            type: "SET_FULL_HIERARCHY_STATE",
+            payload: fullHierarchy
+        })
+    }
+}
+
+export const clearFullHierarchy = () => {
+    return dispatch => {
+        dispatch({
+            type: "CLEAR_FULL_HIERARCHY_STATE",
+        })
+    }
+}
+

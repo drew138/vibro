@@ -34,17 +34,17 @@ import {
   RotateCw,
   Edit,
   FilePlus,
-  Trash2
-  // X
+  Trash2,
+  Activity
 } from "react-feather"
 import classnames from "classnames"
 import { ContextLayout } from "../../../utility/context/Layout"
 import { setMachine } from "../../../redux/actions/machine"
 import { setCompany } from "../../../redux/actions/company"
 import { displayAlert } from "../../../redux/actions/alerts"
-import { Activity } from "react-feather"
 import { updateProfile } from "../../../redux/actions/auth/updateActions"
 import SweetAlert from 'react-bootstrap-sweetalert';
+import { setFullHierarchy } from "../../../redux/actions/hierarchy"
 
 class MachineList extends React.Component {
 
@@ -84,27 +84,35 @@ class MachineList extends React.Component {
             >
               <span>
                 <Activity
+                  style={{ color: "#6b6b6b" }}
                   onClick={() => {
                     this.props.setCompany(this.state.companiesMap[this.state.company])
                     this.props.setMachine(params.data)
+                    this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
                     history.push("/app/measurement/list") // TODO change
                   }}
                 />
-                <Edit className="ml-1 mr-1"
+                {this.props.auth.user_type !== "client" && <><Edit className="ml-1 mr-1"
+                  style={{ color: "#6b6b6b" }}
                   onClick={
                     () => {
                       this.props.setCompany(this.state.companiesMap[this.state.company])
                       this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
                       history.push("/app/machine/edit")
                     }
                   } />
-                <FilePlus className="mr-1" onClick={
-                  () => {
-                    this.props.setCompany(this.state.companiesMap[this.state.company])
-                    this.props.setMachine(params.data)
-                    history.push("/app/measurement/add")
-                  }
-                } />
+                  <FilePlus
+                    style={{ color: "#6b6b6b" }}
+                    className="mr-1"
+                    onClick={
+                      () => {
+                        this.props.setCompany(this.state.companiesMap[this.state.company])
+                        this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                        this.props.setMachine(params.data)
+                        history.push("/app/measurement/add")
+                      }
+                    } /></>}
                 {
                   this.props.auth.user_type === "admin" &&
                   <Trash2
@@ -124,38 +132,85 @@ class MachineList extends React.Component {
         }
       },
       {
-        headerName: "Severidad",
+        headerName: "Severidad", // todos mismo tamano y texto centrado
         width: 150,
         cellRendererFramework: params => {
           switch (params.data.severity) {
             case "red":
               return (
-                <div className="badge badge-pill badge-light-danger">
+                <div
+                  onClick={
+                    () => {
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                      history.push("/app/measurement/flaws")
+                    }
+                  }
+                  className="badge badge-pill badge-light-danger w-100">
                   Alarma
                 </div>
               )
             case "yellow":
               return (
-                <div className="badge badge-pill badge-light-warning">
+                <div
+                  onClick={
+                    () => {
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                      history.push("/app/measurement/flaws")
+                    }
+                  }
+
+                  className="badge badge-pill badge-light-warning w-100">
                   Alerta
                 </div>
               )
             case "green":
               return (
-                <div className="badge badge-pill badge-light-success">
+                <div
+                  onClick={
+                    () => {
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                      history.push("/app/measurement/flaws")
+                    }
+                  }
+
+                  className="badge badge-pill badge-light-success w-100">
                   Ok
                 </div>
               )
             case "purple":
               return (
-                <div className="badge badge-pill badge-light-primary">
+                <div
+
+                  onClick={
+                    () => {
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                      history.push("/app/measurement/flaws")
+                    }
+                  }
+                  className="badge badge-pill badge-light-primary w-100">
                   No Asignado
-                </div> // ! TODO cambiar a valor por defecto
+                </div>
               )
             case "black":
               return (
                 <div
-                  className="badge badge-pill"
+                  onClick={
+                    () => {
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                      history.push("/app/measurement/flaws")
+                    }
+                  }
+                  className="badge badge-pill w-100"
                   style={{
                     backgroundColor: "#43393A",
                     color: "#F0E5E6",
@@ -167,25 +222,27 @@ class MachineList extends React.Component {
               )
             default:
               return (
-                <div className="badge badge-pill badge-light-primary">
+                <div
+                  onClick={
+                    () => {
+                      this.props.setCompany(this.state.companiesMap[this.state.company])
+                      this.props.setMachine(params.data)
+                      this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                      history.push("/app/measurement/flaws")
+                    }
+                  }
+                  className="badge badge-pill badge-light-primary w-100">
                   No Asignado
-                </div> // ! TODO cambiar a valor por defecto
+                </div>
               )
           }
         }
       },
       {
-        headerName: "Identificador",
-        field: "identifier",
-        filter: true,
-        width: 175
-      },
-
-      {
         headerName: "Nombre",
         field: "name",
         filter: true,
-        width: 250,
+        width: 240,
         cellRendererFramework: params => {
           return (
             <div
@@ -204,10 +261,17 @@ class MachineList extends React.Component {
         }
       },
       {
+        headerName: "Identificador",
+        field: "identifier",
+        filter: true,
+        width: 175
+      },
+
+      {
         headerName: "Jerarquía",
         // field: "name",
         filter: true,
-        width: 250,
+        width: 500,
         cellRendererFramework: params => {
           return (
             <div
@@ -319,7 +383,14 @@ class MachineList extends React.Component {
         show: true,
         alertText: `Se Ha Borrado ${this.state.name} De La Lista de Máquinas.`
       }
-      history.push("/app/companies/list")
+      // history.push("/app/companies/list")
+      const rowData = this.state.rowDate.filter((row) => row.id !== this.state.id)
+      this.setState({
+        rowData,
+        id: 0,
+        name: ""
+      })
+
       this.props.displayAlert(alertData)
     } catch (e) {
       const alertData = {
@@ -334,8 +405,6 @@ class MachineList extends React.Component {
 
   async componentDidMount() {
     setTimeout(async () => {
-
-
       this.setState({
         company: this.props.auth.company ?? 0,
         // companyName: this.props.auth.company?.name ?? "Seleccione una opción",
@@ -345,8 +414,26 @@ class MachineList extends React.Component {
     }, 700)
 
     if (this.props.auth.user_type === "client") {
+      try {
+        const res = await axios.get(`${GET_COMPANIES_ENDPOINT}${this.props.auth.company}`);
+        const title = res.data.name
+        this.setState({
+          title,
+        })
+
+      } catch {
+        const alertData = {
+          title: "Error de Conexión",
+          success: false,
+          show: true,
+          alertText: "Error al Conectar al Servidor"
+        }
+        this.props.displayAlert(alertData)
+        this.setState({ rowData: [] })
+      }
       return
     }
+
 
     try {
       const res = await axios.get(GET_COMPANIES_ENDPOINT)
@@ -693,5 +780,5 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setMachine, setCompany, displayAlert, updateProfile })(MachineList)
+export default connect(mapStateToProps, { setMachine, setCompany, displayAlert, updateProfile, setFullHierarchy })(MachineList)
 

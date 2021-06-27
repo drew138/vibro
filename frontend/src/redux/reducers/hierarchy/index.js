@@ -3,7 +3,8 @@ const initialState = {
     parent: 0,
     company: 0,
     name: "",
-    parentName: ""
+    parentName: "",
+    fullHierarchy: ""
 }
 
 const hierarchy = (state = initialState, action) => {
@@ -12,6 +13,10 @@ const hierarchy = (state = initialState, action) => {
             return { ...action.payload }
         case "CLEAR_HIERARCHY_STATE":
             return { ...initialState }
+        case "SET_FULL_HIERARCHY_STATE":
+            return { ...state, fullHierarchy: action.payload }
+        case "CLEAR_FULL_HIERARCHY_STATE":
+            return { ...state, fullHierarchy: "" }
         default:
             return state
     }
