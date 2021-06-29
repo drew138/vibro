@@ -35,7 +35,8 @@ import {
   Edit,
   FilePlus,
   Trash2,
-  Activity
+  Activity,
+  List
 } from "react-feather"
 import classnames from "classnames"
 import { ContextLayout } from "../../../utility/context/Layout"
@@ -76,7 +77,7 @@ class MachineList extends React.Component {
     name: "", // used to delete machine
     columnDefs: [
       {
-        width: 150,
+        width: 180,
         cellRendererFramework: params => {
           return (
             <div
@@ -90,6 +91,16 @@ class MachineList extends React.Component {
                     this.props.setMachine(params.data)
                     this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
                     history.push("/app/measurement/list") // TODO change
+                  }}
+                />
+                <List
+                  style={{ color: "#6b6b6b" }}
+                  className="ml-1"
+                  onClick={() => {
+                    this.props.setCompany(this.state.companiesMap[this.state.company])
+                    this.props.setMachine(params.data)
+                    this.props.setFullHierarchy(this.getFullHierarchy(params.data.hierarchy))
+                    history.push("/app/point/list") // TODO change
                   }}
                 />
                 {this.props.auth.user_type !== "client" && <><Edit className="ml-1 mr-1"
@@ -319,7 +330,6 @@ class MachineList extends React.Component {
       return
     }
     try {
-      // console.log(companyId)
       const res = await axios.get(GET_MACHINES_ENDPOINT, {
         params: { company_id: companyId }
       })

@@ -9,7 +9,7 @@ import {
   FormGroup,
   Card,
   CardBody,
-  CardHeader,
+  // CardHeader,
   CardImg
 } from "reactstrap"
 import { connect } from "react-redux"
@@ -20,7 +20,7 @@ import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import { history } from "../../../history"
 import Img from "../../../assets/img/machine/default.png"
 import Checkbox from "../../../components/@vuexy/checkbox/CheckboxesVuexy"
-var DatePicker = require("reactstrap-date-picker");
+const DatePicker = require("reactstrap-date-picker");
 
 const severityMap = {
   purple: "No Asignado (Morado)",
@@ -275,7 +275,8 @@ class MeasurementAdd extends React.Component {
         <Col sm="12">
           <Breadcrumbs
             breadCrumbTitle="Agregar Medición"
-            breadCrumbParent="Máquina"
+            breadCrumbParent="Lista de Máquinas"
+            breadCrumbParent2={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
             breadCrumbActive="Agregar Medición"
           />
 
@@ -287,14 +288,13 @@ class MeasurementAdd extends React.Component {
           <Row>
             <Col lg="12" md="6" sm="12">
               <Card>
-                <CardHeader className="mx-auto flex-column">
-                </CardHeader>
                 <CardBody className="text-center pt-0">
                   <Row >
                     <Col lg="12" md="6" sm="12">
-                      <Row className="d-flex justify-content-center text-center mb-3">
+                      <Row className="d-flex justify-content-center text-center mb-2 mt-2">
                         <h1 className="font-large-2 content-header-title">Información De Máquina</h1>
                       </Row>
+                      <hr />
                     </Col>
 
                     <Col className="mt-3" lg="4" md="6" sm="12">
@@ -767,6 +767,13 @@ class MeasurementAdd extends React.Component {
                         onChange={e => this.setState({ diagnostic: e.target.value })} />
                     </FormGroup>
                   </Col>
+
+                  <Col md="12" sm="12">
+                    <div className="divider">
+                      <div className="divider-text">Fallas</div>
+                    </div>
+                  </Col>
+
 
 
                   <Col md="6" sm="12" >

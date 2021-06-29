@@ -27,3 +27,6 @@ export const CREATE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/`
 export const PATCH_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/`
 
 export const BULK_CREATE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/` // TODO
+
+
+export const CREATE_POINT_ENDPOINT = `${domain}/api/point/`

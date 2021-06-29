@@ -113,9 +113,10 @@ class MeasurementList extends React.Component {
     return (
       <React.Fragment>
         <Breadcrumbs
-          breadCrumbTitle="Mediciones"
-          breadCrumbParent={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
-          breadCrumbActive="Mediciones"
+          breadCrumbTitle="Fallas"
+          breadCrumbParent="Lista de Máquinas"
+          breadCrumbParent2={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
+          breadCrumbActive="Fallas"
         />
         <div className="content-header row">
           <div className="content-header-left col-md-9 col-12 mb-2">

@@ -238,7 +238,8 @@ class EditMachine extends React.Component {
             <React.Fragment>
                 <Breadcrumbs
                     breadCrumbTitle="Editar Máquinas"
-                    breadCrumbParent="Lista Máquinas"
+                    breadCrumbParent="Lista de Máquinas"
+                    breadCrumbParent2={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
                     breadCrumbActive="Editar Máquina"
                 />
 

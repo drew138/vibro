@@ -11,9 +11,10 @@ import {
   TabPane
 } from "reactstrap"
 import classnames from "classnames"
-import { Briefcase, Columns, Settings } from "react-feather"
+import { Briefcase, Columns, Settings, Circle } from "react-feather"
 import CompanyAdd from "./CompanyAdd"
 import HierarchyAdd from "./HierarchyAdd"
+import PointAdd from "./PointAdd"
 import "../../../../assets/scss/pages/users.scss"
 import Breadcrumbs from "../../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import MachineAdd from "./MachineAdd"
@@ -96,16 +97,30 @@ class Add extends React.Component {
                       <span className="align-middle ml-50">Máquina</span>
                     </NavLink>
                   </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({
+                        active: this.state.activeTab === "4"
+                      })}
+                      onClick={() => { this.toggle("4") }}
+                    >
+                      <Circle size={16} />
+                      <span className="align-middle ml-50">Punto</span>
+                    </NavLink>
+                  </NavItem>
                 </Nav>
                 <TabContent activeTab={this.state.activeTab}>
                   <TabPane tabId="1">
-                    <CompanyAdd />
+                    <CompanyAdd companies={this.state.companies} />
                   </TabPane>
                   <TabPane tabId="2">
                     <HierarchyAdd companies={this.state.companies} />
                   </TabPane>
                   <TabPane tabId="3">
                     <MachineAdd companies={this.state.companies} />
+                  </TabPane>
+                  <TabPane tabId="4">
+                    <PointAdd companies={this.state.companies} />
                   </TabPane>
                 </TabContent>
               </CardBody>

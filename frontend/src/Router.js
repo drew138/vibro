@@ -112,15 +112,15 @@ const hierarchies = lazy(() => import("./views/apps/company/list/HierarchiesList
 const userEdit = lazy(() => import("./views/apps/user/Edit"))
 const companyEdit = lazy(() => import("./views/apps/company/edit/CompanyEdit"))
 const companyAdd = lazy(() => import("./views/apps/company/add/Add"))
-const machineEdit = lazy(() => import("./views/apps/machines/edit"))
+const machineEdit = lazy(() => import("./views/apps/machine/MachineEdit"))
 const hierarchyEdit = lazy(() => import("./views/apps/company/edit/HierarchyEdit"))
-const measurementList = lazy(() => import("./views/apps/measurements/MeasurementsList"))
-const measurementsAdd = lazy(() => import("./views/apps/measurements/MeasurementsAdd"))
-const measurementEdit = lazy(() => import("./views/apps/measurements/MeasurementEdit"))
-const measurementAdd = lazy(() => import("./views/apps/measurements/MeasurementAdd"))
-const measurementView = lazy(() => import("./views/apps/measurements/MeasurementView"))
-const measurementFlawList = lazy(() => import("./views/apps/measurements/MeasurementsFlawList"))
-
+const measurementList = lazy(() => import("./views/apps/measurement/MeasurementsList"))
+const measurementsAdd = lazy(() => import("./views/apps/measurement/MeasurementsAdd"))
+const measurementEdit = lazy(() => import("./views/apps/measurement/MeasurementEdit"))
+const measurementAdd = lazy(() => import("./views/apps/measurement/MeasurementAdd"))
+const measurementView = lazy(() => import("./views/apps/measurement/MeasurementView"))
+const measurementFlawList = lazy(() => import("./views/apps/measurement/MeasurementsFlawList"))
+const pointList = lazy(() => import("./views/apps/point/PointList"))
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
   <Route
@@ -262,6 +262,11 @@ class AppRouter extends React.Component {
             exact
             path="/app/measurement/flaws"
             component={measurementFlawList}
+          />
+          <AppRoute
+            exact
+            path="/app/point/list"
+            component={pointList}
           />
 
 

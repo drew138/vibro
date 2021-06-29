@@ -4,9 +4,10 @@ import {
   Col,
   Card,
   CardBody,
-  CardHeader,
+  // CardHeader,
   CardImg,
-  Table
+  Table,
+  Button
 } from "reactstrap"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../redux/actions/alerts"
@@ -80,18 +81,18 @@ class MeasurementView extends React.Component {
         <Col sm="12">
           <Breadcrumbs
             breadCrumbTitle="Medición"
-            breadCrumbParent="Máquina"
-            breadCrumbActive="Medición"
+            breadCrumbParent="Lista de Máquinas"
+            breadCrumbParent2={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
+            breadCrumbParent3="Mediciones"
+            breadCrumbActive={this.props.measurement.date}
           />
           <Row>
             <Col lg="12" md="6" sm="12">
               <Card>
-                <CardHeader className="mx-auto flex-column">
-                </CardHeader>
                 <CardBody className="text-center pt-0">
                   <Row>
                     <Col lg="12" md="6" sm="12">
-                      <Row className="d-flex justify-content-center text-center mb-3">
+                      <Row className="d-flex justify-content-center text-center mb-2 mt-2">
                         <h1 className="font-large-2 content-header-title mt-2">Información De Máquina</h1>
                       </Row>
                       <hr />
@@ -254,9 +255,9 @@ class MeasurementView extends React.Component {
 
           <Card>
             <CardBody>
-              <Row className="mt-3 text-center pt-0">
+              <Row className="mt-2 text-center pt-0">
                 <Col lg="12" md="6" sm="12">
-                  <Row className="d-flex justify-content-center text-center mb-3">
+                  <Row className="d-flex justify-content-center text-center mb-2">
                     <h1 className="font-large-2 content-header-title">Información De Medición</h1>
                   </Row>
                   <hr />
@@ -481,7 +482,9 @@ class MeasurementView extends React.Component {
 
               <Row className="m-5 text-left pt-0">
 
-
+                <Button.Ripple>Graficas Aceleración</Button.Ripple>
+                <Button.Ripple>Graficas Velocidad</Button.Ripple>
+                <Button.Ripple>Graficas</Button.Ripple>
                 <Table responsive hover>
                   <thead>
                     <tr>

@@ -24,7 +24,7 @@ import defaultDiagramOrImage from "../../../../assets/img/machine/default.png"
 
 const initialState = {
 
-  identifier: "",
+  identifier: null,
   name: "",
   code: "",
   electric_feed: "",
@@ -36,7 +36,7 @@ const initialState = {
   companyName: "Seleccione una opción",
   rpm: "",
   severity: "purple",
-  severityName: "No Asignada (Morado)",
+  severityName: "No Asignado (Morado)",
   image: undefined,
   diagram: undefined,
   hierarchy: 0,
@@ -518,7 +518,7 @@ class MachineAdd extends React.Component {
                     <option severity="green">OK (Verde)</option>
                     <option severity="yellow">Alerta (Amarillo)</option>
                     <option severity="red">Alarma (Rojo)</option>
-                    <option severity="purple">No Asignada (Morado)</option>
+                    <option severity="purple">No Asignado (Morado)</option>
                     <option severity="black">No Medido (Negro)</option>
                   </Input>
                 </FormGroup>

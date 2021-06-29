@@ -307,7 +307,8 @@ class MeasurementList extends React.Component {
       <React.Fragment>
         <Breadcrumbs
           breadCrumbTitle="Mediciones"
-          breadCrumbParent={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
+          breadCrumbParent="Lista de Máquinas"
+          breadCrumbParent2={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
           breadCrumbActive="Mediciones"
         />
 

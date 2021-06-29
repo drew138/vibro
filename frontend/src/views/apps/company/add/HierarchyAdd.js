@@ -6,7 +6,8 @@ import {
     Form,
     Input,
     Label,
-    FormGroup
+    FormGroup,
+    FormFeedback
 } from "reactstrap"
 import { connect } from "react-redux"
 // import { createCompany } from "../../../../redux/actions/company"
@@ -124,8 +125,10 @@ class HierarchyAdd extends React.Component {
                                         id="name-hierarchy"
                                         placeholder="Nombre"
                                         value={this.state.name}
+                                        // invalid
                                         onChange={e => this.setState({ name: e.target.value })}
                                     />
+                                    {/* <FormFeedback></FormFeedback> */}
                                 </FormGroup>
                             </Col>
                             <Col md="6" sm="12">
