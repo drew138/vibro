@@ -420,7 +420,7 @@ class MachineList extends React.Component {
         // companyName: this.props.auth.company?.name ?? "Seleccione una opción",
       })
       await this.getCompanyHierarchies(this.props.auth.company ?? 0)
-      await this.getCompanyMachines(this.props.auth.company ?? 0);
+      this.getCompanyMachines(this.props.auth.company ?? 0);
     }, 700)
 
     if (this.props.auth.user_type === "client") {
@@ -664,8 +664,11 @@ class MachineList extends React.Component {
                             style={{ marginTop: 19 }}
                             onClick={
                               () => {
-                                this.props.setCompany(this.state.companiesMap[this.state.company])
-                                history.push("/app/measurements/add")
+                                console.log(this.state.company)
+                                if (this.state.company) {
+                                  this.props.setCompany(this.state.companiesMap[this.state.company])
+                                  history.push("/app/measurements/add")
+                                }
                               }}
                           >
                             Agregar Mediciones

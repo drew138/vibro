@@ -314,6 +314,15 @@ class TermoImageSerializer(serializers.ModelSerializer):
 class PointSerializer(serializers.ModelSerializer):
 
     # measurement = MeasurementSerializer()
+
+    class Meta:
+        model = custom_models.Point
+        fields = '__all__'
+
+
+class ValuesSerializer(serializers.ModelSerializer):
+
+    point = PointSerializer()
     espectra = serializers.ListField(
         child=serializers.DecimalField(
             decimal_places=2,
@@ -328,5 +337,5 @@ class PointSerializer(serializers.ModelSerializer):
         required=False)
 
     class Meta:
-        model = custom_models.Point
+        model = custom_models.Values
         fields = '__all__'

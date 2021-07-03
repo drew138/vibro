@@ -171,9 +171,10 @@ class MeasurementsAdd extends React.Component {
               <Card>
                 <CardHeader className="mx-auto flex-column">
                   <Col lg="12" md="6" sm="12">
-                    <Row className="d-flex justify-content-center text-center mb-3">
+                    <Row className="d-flex justify-content-center text-center mb-2">
                       <h1 className="font-large-2 content-header-title mt-2">Información De Empresa</h1>
                     </Row>
+                    <hr />
                   </Col>
                   <h1 className="font-large-1 content-header-title mt-1">{this.props.company.name ? this.props.company.name : "N/A"}</h1>
                 </CardHeader>

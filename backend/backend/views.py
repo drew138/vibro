@@ -485,3 +485,31 @@ class PointView(viewsets.ModelViewSet):
         if measurement:
             queryset = queryset.filter(measurement__id=measurement)
         return queryset
+
+
+class ValuesView(viewsets.ModelViewSet):
+
+    def list(self, request):  # TODO index measurement by date
+
+        machine = request.query_params.get('machine', None)
+        measurement = request.query_params.get('measurement', None)
+        date = request.query_params.get('date', None)
+
+        previous_measurement_id = custom_models.Measurement.objects.filter(
+            date__lt=date,
+            service="predictivo",
+            machine=machine).order_by("-date").values_list("id").first()[0]
+
+        current = custom_models.Values.objects.all().filter(
+            measurement__id=measurement)
+        previous = custom_models.Values.objects.all().filter(
+            measurement__machine=machine, measurement__id=previous_measurement_id)
+
+        current_serializer = custom_serializers.ValuesSerializer(
+            current, many=True)
+        previous_serializer = custom_serializers.ValuesSerializer(
+            previous, many=True)
+        return Response({
+            "current": current_serializer.data,
+            "previous": previous_serializer.data
+        })

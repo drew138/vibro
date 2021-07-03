@@ -121,6 +121,8 @@ const measurementAdd = lazy(() => import("./views/apps/measurement/MeasurementAd
 const measurementView = lazy(() => import("./views/apps/measurement/MeasurementView"))
 const measurementFlawList = lazy(() => import("./views/apps/measurement/MeasurementsFlawList"))
 const pointList = lazy(() => import("./views/apps/point/PointList"))
+const companyView = lazy(() => import("./views/apps/company/view/CompanyView"))
+
 // Set Layout and Component Using App Route
 const RouteConfig = ({ component: Component, fullLayout, ...rest }) => (
   <Route
@@ -267,6 +269,11 @@ class AppRouter extends React.Component {
             exact
             path="/app/point/list"
             component={pointList}
+          />
+          <AppRoute
+            exact
+            path="/app/company/view"
+            component={companyView}
           />
 
 
