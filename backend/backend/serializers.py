@@ -320,9 +320,29 @@ class PointSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ValuesSerializer(serializers.ModelSerializer):
+class ListValuesSerializer(serializers.ModelSerializer):
 
     point = PointSerializer()
+    espectra = serializers.ListField(
+        child=serializers.DecimalField(
+            decimal_places=2,
+            max_digits=4,
+            default=0),
+        required=False)
+    time_signal = serializers.ListField(
+        child=serializers.DecimalField(
+            decimal_places=2,
+            max_digits=4,
+            default=0),
+        required=False)
+
+    class Meta:
+        model = custom_models.Values
+        fields = '__all__'
+
+
+class ValuesSerializer(serializers.ModelSerializer):
+
     espectra = serializers.ListField(
         child=serializers.DecimalField(
             decimal_places=2,

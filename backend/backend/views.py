@@ -8,6 +8,8 @@ from rest_framework import viewsets
 from rest_framework import status
 from .tasks import Email
 from .user_groups import STAFF
+from datetime import datetime
+from rest_framework import mixins, generics
 
 
 class CityView(viewsets.ModelViewSet):
@@ -353,21 +355,21 @@ class MeasurementView(viewsets.ModelViewSet):
         return queryset
 
 
-class MeasurementDatesView(viewsets.ModelViewSet):
+# class MeasurementDatesView(viewsets.ModelViewSet):
 
-    permission_classes = [custom_permissions.IsGetRequest]
+#     permission_classes = [custom_permissions.IsGetRequest]
 
-    def get(self, request):
+#     def get(self, request):
 
-        company_id = request.query_params.get('company_id', None)
-        if not company_id:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        dates = custom_models.Measurement.objects.filter(
-            machine__company__id=company_id).values_list("date", flat=True).distinct("date")
-        dates = list(dates) if dates else []
-        return Response({
-            "dates": dates
-        }, status=status.HTTP_200_OK)
+#         company_id = request.query_params.get('company_id', None)
+#         if not company_id:
+#             return Response(status=status.HTTP_400_BAD_REQUEST)
+#         dates = custom_models.Measurement.objects.filter(
+#             machine__company__id=company_id).values_list("date", flat=True).distinct("date")
+#         dates = list(dates) if dates else []
+#         return Response({
+#             "dates": dates
+#         }, status=status.HTTP_200_OK)
 
 
 # class FlawView(viewsets.ModelViewSet):
@@ -487,7 +489,20 @@ class PointView(viewsets.ModelViewSet):
         return queryset
 
 
-class ValuesView(viewsets.ModelViewSet):
+class ValuesView(mixins.ListModelMixin, viewsets.GenericViewSet):
+
+    permission_classes = [custom_permissions.GeneralPermission]
+
+    def has_invalid_params(self, machine, measurement, date):
+        if not machine.isnumeric():
+            return True
+        if not measurement.isnumeric():
+            return True
+        try:
+            datetime.strptime(date, '%Y-%m-%d')
+        except Exception:
+            return True
+        return False
 
     def list(self, request):  # TODO index measurement by date
 
@@ -495,19 +510,26 @@ class ValuesView(viewsets.ModelViewSet):
         measurement = request.query_params.get('measurement', None)
         date = request.query_params.get('date', None)
 
+        if not all([machine, measurement, date]) or self.has_invalid_params(machine, measurement, date):
+            return Response(
+                {"error": "Parametros Incorrectos"},
+                status=status.HTTP_400_BAD_REQUEST)
+
         previous_measurement_id = custom_models.Measurement.objects.filter(
             date__lt=date,
             service="predictivo",
-            machine=machine).order_by("-date").values_list("id").first()[0]
-
+            machine__id=machine).order_by("-date").values_list("id").first()
+        print(previous_measurement_id)
+        if previous_measurement_id:
+            previous_measurement_id = previous_measurement_id[0]
         current = custom_models.Values.objects.all().filter(
             measurement__id=measurement)
         previous = custom_models.Values.objects.all().filter(
-            measurement__machine=machine, measurement__id=previous_measurement_id)
+            measurement__machine__id=machine, measurement__id=previous_measurement_id)
 
-        current_serializer = custom_serializers.ValuesSerializer(
+        current_serializer = custom_serializers.ListValuesSerializer(
             current, many=True)
-        previous_serializer = custom_serializers.ValuesSerializer(
+        previous_serializer = custom_serializers.ListValuesSerializer(
             previous, many=True)
         return Response({
             "current": current_serializer.data,

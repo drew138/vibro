@@ -281,8 +281,8 @@ class MachineList extends React.Component {
       {
         headerName: "Jerarquía",
         // field: "name",
-        filter: true,
-        width: 500,
+        filter: false,
+        width: 474,
         cellRendererFramework: params => {
           return (
             <div

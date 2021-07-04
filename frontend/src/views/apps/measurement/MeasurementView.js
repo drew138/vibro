@@ -11,7 +11,7 @@ import {
 } from "reactstrap"
 import { connect } from "react-redux"
 import { displayAlert } from "../../../redux/actions/alerts"
-import { GET_USERS_ENDPOINT } from "../../../config"
+import { GET_USERS_ENDPOINT, GET_VALUES_ENDPOINT } from "../../../config"
 import axios from "axios"
 import Breadcrumbs from "../../../components/@vuexy/breadCrumbs/BreadCrumb"
 import Img from "../../../assets/img/machine/default.png"
@@ -29,6 +29,7 @@ class MeasurementView extends React.Component {
     engineerTwoName: "N/A",
     analystName: "N/A",
     certifierName: "N/A",
+    points: []
   }
 
 
@@ -41,7 +42,55 @@ class MeasurementView extends React.Component {
     );
   }
 
-  async componentDidMount() {
+
+  async getValues() {
+
+    try {
+      const res = await axios.get(GET_VALUES_ENDPOINT, {
+        params: {
+          machine: this.props.machine.id,
+          measurement: this.props.measurement.id,
+          date: this.props.measurement.date
+        }
+      })
+      const points = {}
+      console.log(res.data)
+      res.data.current.forEach((value) => {
+        // console.log(value.point)
+        points[value.point.id] = {
+          position: value.point.position,
+          direction: value.point.direction,
+          point_type: value.point.point_type,
+          current: {
+            tendency: parseFloat(value.tendency),
+            severity: value.severity
+          },
+
+        }
+      })
+      res.data.previous.forEach((value) => {
+        if (value.point.id in points) {
+          points[value.point.id].previous = {
+            tendency: parseFloat(value.tendency),
+            severity: value.severity
+          }
+        }
+      })
+
+      this.setState({ points })
+    } catch (e) {
+      console.log(e);
+      const alertData = {
+        title: "Error de Conexión",
+        success: false,
+        show: true,
+        alertText: "Error al Conectar al Servidor"
+      }
+      this.props.displayAlert(alertData)
+    }
+  }
+
+  async getEngineers() {
     try {
       const res = await axios.get(GET_USERS_ENDPOINT, {
         params: {
@@ -71,9 +120,74 @@ class MeasurementView extends React.Component {
       }
       this.props.displayAlert(alertData)
     }
+
   }
 
+  componentDidMount() {
+    this.getEngineers();
+    this.getValues();
+  }
 
+  getValueChange(current, previous) {
+    if (!(current && previous)) {
+      return "N/A"
+    }
+    return `${((current - previous) / previous * 100).toFixed(2)} %`
+  }
+
+  createPill(severity) {
+    switch (severity) {
+      case "red":
+        return (
+          <div
+            className="badge badge-pill badge-light-danger w-100">
+            Alarma
+          </div>
+        )
+      case "yellow":
+        return (
+          <div
+            className="badge badge-pill badge-light-warning w-100">
+            Alerta
+          </div>
+        )
+      case "green":
+        return (
+          <div
+            className="badge badge-pill badge-light-success w-100">
+            Ok
+          </div>
+        )
+      case "purple":
+        return (
+          <div
+            className="badge badge-pill badge-light-primary w-100">
+            No Asignado
+          </div>
+        )
+      case "black":
+        return (
+          <div
+            className="badge badge-pill w-100"
+            style={{
+              backgroundColor: "#43393A",
+              color: "#F0E5E6",
+              fontWeight: "500",
+              textTransform: "uppercase"
+            }}>
+            No Medido
+          </div>
+        )
+      default:
+        return (
+          <div
+            className="badge badge-pill badge-light-primary w-100">
+            No Asignado
+          </div>
+        )
+    }
+
+  }
 
   render() {
     return (
@@ -482,10 +596,10 @@ class MeasurementView extends React.Component {
 
               <Row className="m-5 text-left pt-0">
 
-                <Button.Ripple>Graficas Aceleración</Button.Ripple>
+                {/* <Button.Ripple>Graficas Aceleración</Button.Ripple>
                 <Button.Ripple>Graficas Velocidad</Button.Ripple>
-                <Button.Ripple>Graficas</Button.Ripple>
-                <Table responsive hover>
+                <Button.Ripple>Graficas</Button.Ripple> */}
+                <Table hover>
                   <thead>
                     <tr>
                       <th>Punto</th>
@@ -493,30 +607,25 @@ class MeasurementView extends React.Component {
                       <th>Valor Anterior</th>
                       <th>Cambio</th>
                       <th>Severidad</th>
+                      <th>Severidad Previa</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>Table cell</td>
-                      <td>Table cell</td>
-                      <td>Table cell</td>
-
-                    </tr>
-                    <tr>
-                      <th scope="row">2</th>
-                      <td>Table cell</td>
-                      <td>Table cell</td>
-                      <td>Table cell</td>
-
-                    </tr>
-                    <tr>
-                      <th scope="row">3</th>
-                      <td>Table cell</td>
-                      <td>Table cell</td>
-                      <td>Table cell</td>
-
-                    </tr>
+                    {
+                      Object.values(this.state.points).map((point) => {
+                        console.log(point)
+                        return (
+                          <tr>
+                            <th scope="row">{`${point.position}${point.direction}${point.point_type}`}</th>
+                            <td>{point.current?.tendency ?? "N/A"}</td>
+                            <td>{point.previous?.tendency ?? "N/A"}</td>
+                            <td>{this.getValueChange(point.current?.tendency, point.previous?.tendency)}</td>
+                            <td>{point.current && this.createPill(point.current.severity)}</td>
+                            <td>{point.previous && this.createPill(point.previous.severity)}</td>
+                          </tr>
+                        )
+                      })
+                    }
                   </tbody>
                 </Table>
 

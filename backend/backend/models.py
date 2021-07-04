@@ -361,7 +361,7 @@ class Point(models.Model):
 
     class Meta:
         unique_together = ["position", "direction", "point_type", "machine"]
-    
+
     POSITION_CHOICES = [
         (num, num) for num in range(1, 13)
     ]
@@ -381,13 +381,6 @@ class Point(models.Model):
     MAN = "M"  # Manual
     CAL = "C"  # Calculado
 
-    # severity
-    RED = "red"
-    GREEN = 'green'
-    YELLOW = 'yellow'
-    BLACK = 'black'
-    PURPLE = 'purple'
-
     DIRECTION_CHOICES = [
         (VER, 'Vertical'),
         (HOR, 'Horizontal'),
@@ -406,14 +399,6 @@ class Point(models.Model):
         (CAL, "Calculado")
     ]
 
-    SEVERITY_CHOICES = [
-        (RED, 'Red'),
-        (GREEN, 'Green'),
-        (YELLOW, 'Yellow'),
-        (BLACK, 'Black'),
-        (PURPLE, 'Purple')
-    ]
-
     position = models.IntegerField(choices=POSITION_CHOICES)
     direction = models.CharField(
         max_length=1,
@@ -427,10 +412,6 @@ class Point(models.Model):
         Machine,
         related_name="points",
         on_delete=models.CASCADE)
-    severity = models.CharField(
-        max_length=9,
-        choices=SEVERITY_CHOICES,
-        default=PURPLE)
 
     def __str__(self):
         return f'{self.position}{self.direction}{self.point_type}'
@@ -617,6 +598,20 @@ class Measurement(models.Model):
 
 class Values(models.Model):
 
+    # severity
+    RED = "red"
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    BLACK = 'black'
+    PURPLE = 'purple'
+    SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+        (PURPLE, 'Purple')
+    ]
+
     point = models.ForeignKey(
         Point,
         related_name="values",
@@ -639,6 +634,10 @@ class Values(models.Model):
         decimal_places=2,
         max_digits=4),
         default=list)
+    severity = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=PURPLE)
 
 
 # class Flaw(models.Model):  # falla

@@ -30,3 +30,4 @@ export const BULK_CREATE_MEASUREMENT_ENDPOINT = `${domain}/api/measurement/` // 
 
 
 export const CREATE_POINT_ENDPOINT = `${domain}/api/point/`
+export const GET_VALUES_ENDPOINT = `${domain}/api/values/`
