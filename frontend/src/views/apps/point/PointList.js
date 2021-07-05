@@ -2,7 +2,7 @@ import React from "react"
 import { history } from "../../../history"
 import "../../../assets/scss/plugins/tables/_agGridStyleOverride.scss"
 import "../../../assets/scss/pages/users.scss"
-import { GET_MEASUREMENTS_ENDPOINT } from "../../../config"
+import { GET_POINTS_ENDPOINT } from "../../../config"
 import {
   Card,
   CardBody,
@@ -87,7 +87,7 @@ class MeasurementList extends React.Component {
       return
     }
     try {
-      const res = await axios.get(GET_MEASUREMENTS_ENDPOINT, {
+      const res = await axios.get(GET_POINTS_ENDPOINT, {
         params: {
           machine: this.props.machine.id
         }

@@ -1,15 +1,9 @@
 import React from "react";
 import {
-	CardImg,
 	Row,
 	Col,
-	Button,
-	Form,
-	Input,
-	Label,
 	Card,
 	CardBody,
-	FormGroup,
 	CardHeader,
 } from "reactstrap";
 import { connect } from "react-redux";
@@ -45,10 +39,9 @@ class CompanyView extends React.Component {
 
 			<React.Fragment>
 				<Breadcrumbs
-					breadCrumbTitle="Editar Máquinas"
-					breadCrumbParent="Lista de Máquinas"
-					breadCrumbParent2={`${this.props.machine.name} (ID: ${this.props.machine.identifier})`}
-					breadCrumbActive="Editar Máquina"
+					breadCrumbTitle="Información"
+					breadCrumbParent="Empresa"
+					breadCrumbActive="Información"
 				/>
 
 

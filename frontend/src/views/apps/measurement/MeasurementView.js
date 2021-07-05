@@ -54,7 +54,6 @@ class MeasurementView extends React.Component {
         }
       })
       const points = {}
-      console.log(res.data)
       res.data.current.forEach((value) => {
         // console.log(value.point)
         points[value.point.id] = {
@@ -602,26 +601,25 @@ class MeasurementView extends React.Component {
                 <Table hover>
                   <thead>
                     <tr>
-                      <th>Punto</th>
-                      <th>Valor</th>
-                      <th>Valor Anterior</th>
-                      <th>Cambio</th>
-                      <th>Severidad</th>
-                      <th>Severidad Previa</th>
+                      <th style={{ textAlign: 'center' }}>Punto</th>
+                      <th style={{ textAlign: 'center' }}>Valor</th>
+                      <th style={{ textAlign: 'center' }}>Valor Anterior</th>
+                      <th style={{ textAlign: 'center' }}>Cambio</th>
+                      <th style={{ textAlign: 'center' }}>Severidad</th>
+                      <th style={{ textAlign: 'center' }}>Severidad Previa</th>
                     </tr>
                   </thead>
                   <tbody>
                     {
                       Object.values(this.state.points).map((point) => {
-                        console.log(point)
                         return (
                           <tr>
-                            <th scope="row">{`${point.position}${point.direction}${point.point_type}`}</th>
-                            <td>{point.current?.tendency ?? "N/A"}</td>
-                            <td>{point.previous?.tendency ?? "N/A"}</td>
-                            <td>{this.getValueChange(point.current?.tendency, point.previous?.tendency)}</td>
-                            <td>{point.current && this.createPill(point.current.severity)}</td>
-                            <td>{point.previous && this.createPill(point.previous.severity)}</td>
+                            <th scope="row" style={{ textAlign: 'center' }}>{`${point.position}${point.direction}${point.point_type}`}</th>
+                            <td style={{ textAlign: 'center' }}>{point.current?.tendency ?? "N/A"}</td>
+                            <td style={{ textAlign: 'center' }}>{point.previous?.tendency ?? "N/A"}</td>
+                            <td style={{ textAlign: 'center' }}>{this.getValueChange(point.current?.tendency, point.previous?.tendency)}</td>
+                            <td style={{ textAlign: 'center' }}>{point.current && this.createPill(point.current.severity)}</td>
+                            <td style={{ textAlign: 'center' }}>{point.previous && this.createPill(point.previous.severity)}</td>
                           </tr>
                         )
                       })

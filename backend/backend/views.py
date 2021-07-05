@@ -519,7 +519,6 @@ class ValuesView(mixins.ListModelMixin, viewsets.GenericViewSet):
             date__lt=date,
             service="predictivo",
             machine__id=machine).order_by("-date").values_list("id").first()
-        print(previous_measurement_id)
         if previous_measurement_id:
             previous_measurement_id = previous_measurement_id[0]
         current = custom_models.Values.objects.all().filter(

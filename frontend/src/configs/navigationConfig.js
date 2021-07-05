@@ -121,6 +121,14 @@ const navigationConfig = [
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
         navLink: "/app/companies/add"
+      },
+      {
+        id: "view-company",
+        title: "Información",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions: ["admin", "client"],
+        navLink: "/app/company/view"
       }
     ]
   }
