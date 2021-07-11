@@ -12,7 +12,36 @@ import {
   // , Settings
 } from "react-feather"
 import { NavLink } from "react-router-dom"
+import { history } from "../../../history"
+
 class BreadCrumbs extends React.Component {
+
+  onClickParent = () => {
+    // if (this.props.breadCrumbParent3) {
+    //   history.goBack()
+    //   history.goBack()
+    //   history.goBack()
+    // } else if (this.props.breadCrumbParent2) {
+    //   history.goBack()
+    //   history.goBack()
+    // } else {
+    //   history.goBack()
+    // }
+  }
+
+  onClickParent2 = () => {
+    // if (this.props.breadCrumbParent3) {
+    //   history.goBack()
+    //   history.goBack()
+    // } else {
+    //   history.goBack()
+    // }
+  }
+
+  onClickParent3 = () => {
+    // history.goBack()
+  }
+
   render() {
     return (
       <div className="content-header row">
@@ -33,18 +62,21 @@ class BreadCrumbs extends React.Component {
                       <Home className="align-top" size={15} />
                     </NavLink>
                   </BreadcrumbItem>
-                  <BreadcrumbItem tag="li" className="text-primary">
+                  <BreadcrumbItem tag="li" className="text-primary" onClick={this.onClickParent} trigger="hover">
+                    {/* <NavLink> */}
+
                     {this.props.breadCrumbParent}
+                    {/* </NavLink> */}
                   </BreadcrumbItem>
                   {this.props.breadCrumbParent2 ? (
-                    <BreadcrumbItem tag="li" className="text-primary">
+                    <BreadcrumbItem tag="li" className="text-primary" onClick={this.onClickParent2}>
                       {this.props.breadCrumbParent2}
                     </BreadcrumbItem>
                   ) : (
                     ""
                   )}
                   {this.props.breadCrumbParent3 ? (
-                    <BreadcrumbItem tag="li" className="text-primary">
+                    <BreadcrumbItem tag="li" className="text-primary" onClick={this.onClickParent3}>
                       {this.props.breadCrumbParent3}
                     </BreadcrumbItem>
                   ) : (
