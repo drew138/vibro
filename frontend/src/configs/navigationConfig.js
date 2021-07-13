@@ -13,7 +13,7 @@ const navigationConfig = [
   //   permissions: ["admin", "editor"],
   //   children: []
   //   // navLink: "/services/engineering",
-    
+
   // },
   // {
   //   id: "Correctivo",
@@ -23,7 +23,7 @@ const navigationConfig = [
   //   permissions: ["admin", "editor"],
   //   children: []
   //   // navLink: "/services/corrective",
-    
+
   // },
   // {
   //   id: "Ingeniería ",
@@ -33,34 +33,34 @@ const navigationConfig = [
   //   permissions: ["admin", "editor"],
   //   children: []
   //   // navLink: "/services/engineering",
-    
+
   // },
   {
     id: "Monitoreo",
     title: "Monitoreo",
     type: "collapse",
-    icon: <Icon.Wifi size={20}/>,
-    permissions: ["admin", "editor"],
+    icon: <Icon.Wifi size={20} />,
+    permissions: ["admin", "client"],
     children: [
       {
-        id: "list-monitoring",
+        id: "list-service-monitoring",
         title: "Lista",
         type: "item",
         icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
+        permissions: ["admin", "client"],
         navLink: "/services/monitoring/list"
       },
       {
-        id: "list-monitoring",
+        id: "list-machine-monitoring",
         title: "Máquina",
         type: "item",
         icon: <Icon.Circle size={12} />,
-        permissions: ["admin", "editor"],
+        permissions: ["admin", "client"],
         navLink: "/services/monitoring/machine"
       },
     ]
     // navLink: "/services/monitoring",
-    
+
   },
   {
     type: "groupHeader",
@@ -74,7 +74,7 @@ const navigationConfig = [
     children: [
       {
         id: "list-users",
-        title: "Lista",
+        title: "Lista de Usuarios",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
@@ -91,21 +91,29 @@ const navigationConfig = [
     ]
   },
   {
-    id: "companies",
-    title: "Empresas",
+    id: "company",
+    title: "Empresa",
     type: "collapse",
     icon: <Icon.Briefcase size={20} />,
     permissions: ["admin", "support", "engineer"],
     children: [
       {
         id: "list-companies",
-        title: "Lista",
+        title: "Lista de Empresas",
         type: "item",
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
         navLink: "/app/companies/list"
       },
-      
+      {
+        id: "list-hierarchies",
+        title: "Lista de Jerarquías",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions: ["admin", "editor"],
+        navLink: "/app/companies/hierarchies"
+      },
+
       {
         id: "add-companies",
         title: "Agregar",
@@ -113,6 +121,14 @@ const navigationConfig = [
         icon: <Icon.Circle size={12} />,
         permissions: ["admin", "editor"],
         navLink: "/app/companies/add"
+      },
+      {
+        id: "view-company",
+        title: "Información",
+        type: "item",
+        icon: <Icon.Circle size={12} />,
+        permissions: ["admin", "client"],
+        navLink: "/app/company/view"
       }
     ]
   }

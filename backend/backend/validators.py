@@ -1,8 +1,8 @@
 from django.core.validators import RegexValidator
 
-PHONE_REGEX = r"^((\(\+?\d{2,3}\))|(\+?\d{2,3})[\s-])?\d{3}[\s-]\d{4}([\s-]ext[\s-]\d{1,3})?$"
+PHONE_REGEX = r"^\d{7}$"
 
-CELPHONE_REGEX = r"^(((\(\+?\d{2,3}\))|(\+?\d{2,3}))[\s-])?\d{3}[\s-]\d{3}[\s-]\d{4}$"
+CELPHONE_REGEX = r"^\d{10}$"
 # https://www.regextester.com/108138
 NIT_REGEX = r"^[0-9]+-{1}[0-9]{1}$"
 # https://www.regextester.com/111017
@@ -47,15 +47,13 @@ ADDRESS_REGEX = \
 PHONE_MESSAGE = \
     "El número de teléfono debe " \
     "ser ingresado en el formato: " \
-    "(+xxx) xxx xxxx ext xxx " \
-    "siendo el código de área y " \
-    "la extensión opcionales."
+    "xxxxxxx."
+
 
 CELPHONE_MESSAGE = \
     "El número de celular debe " \
     "ser ingresado en el formato: " \
-    "(+xxx) xxx xxxx xxxx siendo " \
-    "el código de país opcional"
+    "xxxxxxxxxx."
 
 NIT_MESSAGE = \
     "El número NIT debe ser " \

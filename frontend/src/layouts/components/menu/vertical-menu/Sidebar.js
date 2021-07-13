@@ -6,6 +6,7 @@ import SidebarHeader from "./SidebarHeader"
 import Hammer from "react-hammerjs"
 import SideMenuContent from "./sidemenu/SideMenuContent"
 import PerfectScrollbar from "react-perfect-scrollbar"
+
 class Sidebar extends Component {
   static getDerivedStateFromProps(props, state) {
     if (props.activePath !== state.activeItem) {
@@ -52,7 +53,7 @@ class Sidebar extends Component {
 
   checkDevice = () => {
     var prefixes = " -webkit- -moz- -o- -ms- ".split(" ")
-    var mq = function(query) {
+    var mq = function (query) {
       return window.matchMedia(query).matches
     }
 
@@ -221,7 +222,7 @@ class Sidebar extends Component {
 
 const mapStateToProps = state => {
   return {
-    currentUser: state.auth.userRole
+    currentUser: state.auth.user_type
   }
 }
 

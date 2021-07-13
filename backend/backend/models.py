@@ -5,7 +5,8 @@ from .validators import (
     PHONE_REGEX_VALIDATOR,
     CELPHONE_REGEX_VALIDATOR,
     NIT_REGEX_VALIDATOR,
-    ADDRESS_REGEX_VALIDATOR)
+    # ADDRESS_REGEX_VALIDATOR
+)
 
 
 class City(models.Model):
@@ -17,7 +18,7 @@ class City(models.Model):
     state = models.CharField(max_length=30)
 
     def __str__(self):
-        return f'{self.name} {self.state}'
+        return f'{self.name}, {self.state}'
 
 
 class Company(models.Model):
@@ -30,7 +31,7 @@ class Company(models.Model):
         max_length=15,
         unique=True)
     address = models.CharField(
-        validators=[ADDRESS_REGEX_VALIDATOR],
+        # validators=[ADDRESS_REGEX_VALIDATOR],
         max_length=50)
     phone = models.CharField(
         validators=[PHONE_REGEX_VALIDATOR],
@@ -40,12 +41,19 @@ class Company(models.Model):
         City,
         related_name='company',
         on_delete=models.CASCADE, null=True)
-    hierarchy = ArrayField(
-        models.CharField(max_length=50),
-        default=list)
+    picture = models.ImageField(
+        upload_to="company",
+        default='company/default.png')
 
     def __str__(self):
         return f'{self.name} {self.nit}'
+
+
+class Hierarchy(models.Model):
+
+    name = models.CharField(max_length=30)
+    parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
 
 class VibroUser(AbstractUser):
@@ -65,10 +73,6 @@ class VibroUser(AbstractUser):
     ]
 
     email = models.EmailField(unique=True)
-    phone = models.CharField(
-        validators=[PHONE_REGEX_VALIDATOR],
-        max_length=17,
-        default="")
     celphone = models.CharField(
         validators=[CELPHONE_REGEX_VALIDATOR],
         max_length=20,
@@ -88,8 +92,8 @@ class VibroUser(AbstractUser):
         default=list,
         max_length=5)
     picture = models.ImageField(
-        upload_to="profile",
-        default='profile/default.png')
+        upload_to="user/profile",
+        default='user/profile/default.png')
 
     def blur_email(self):
 
@@ -106,6 +110,19 @@ class Machine(models.Model):
     class Meta:
         unique_together = ["name", "company"]
 
+    # severity
+    RED = "red"
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    BLACK = 'black'
+    PURPLE = 'purple'
+    SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+        (PURPLE, 'Purple')
+    ]
     # codes
     SAP = 'sap'
     INTERNO = 'interno'
@@ -123,18 +140,19 @@ class Machine(models.Model):
     )
 
     # power units
-    KW = 'kW'
+    KW = 'KW'
     HP = 'HP'
     POWER_UNIT_CHOICES = (
         (KW, 'KiloWatts'),
         (HP, 'HorsePower'),
     )
 
-    # identifier = models.IntegerField(null=True)
+    # ! TODO remove default, make unique field
+    identifier = models.IntegerField(unique=True)
     company = models.ForeignKey(
         Company,
         related_name="machines",
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50)
     code = models.CharField(
         max_length=7,
@@ -142,10 +160,10 @@ class Machine(models.Model):
         null=True)
     electric_feed = models.CharField(
         max_length=8,
-        choices=CODE_CHOICES,
+        choices=ELECTRIC_FEED_CHOICES,
         null=True)
     brand = models.CharField(max_length=50)
-    power = models.IntegerField(default=0)
+    power = models.IntegerField()
     power_units = models.CharField(
         max_length=2,
         choices=POWER_UNIT_CHOICES,
@@ -153,14 +171,21 @@ class Machine(models.Model):
     norm = models.TextField(
         null=True,
     )
-    hierarchy = models.IntegerField(default=0)
-    rpm = models.IntegerField(null=True)
+    hierarchy = models.ForeignKey(
+        Hierarchy,
+        null=True,
+        on_delete=models.SET_NULL)
+    rpm = models.IntegerField()
+    severity = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=PURPLE)
     image = models.ImageField(
-        upload_to="machines/images",
-        null=True)
+        upload_to="machine/images",
+        default="machine/images/deafult.png")
     diagram = models.ImageField(
-        upload_to="machines/diagrams",
-        null=True)
+        upload_to="machine/diagrams",
+        default="machine/diagrams/deafult.png")
 
 
 class Sensor(models.Model):
@@ -182,7 +207,8 @@ class Sensor(models.Model):
     arduino = models.ForeignKey(
         VibroUser,
         related_name='sensor',
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL,
+        null=True)
     machine = models.ForeignKey(
         Machine, related_name="sensor",
         on_delete=models.SET_NULL,
@@ -333,6 +359,9 @@ class Coupling(models.Model):
 
 class Point(models.Model):
 
+    class Meta:
+        unique_together = ["position", "direction", "point_type", "machine"]
+
     POSITION_CHOICES = [
         (num, num) for num in range(1, 13)
     ]
@@ -398,12 +427,13 @@ class Measurement(models.Model):
     GREEN = 'green'
     YELLOW = 'yellow'
     BLACK = 'black'
+    PURPLE = 'purple'
 
     # service type
     PRED = 'predictivo'
     CORR = 'correctivo'
     ENG = 'ingeniería'
-    MON = 'monitoreo en línea'
+    MON = 'monitoreo'
 
     # measurement type
     ULT = 'ultrasonido'
@@ -424,6 +454,13 @@ class Measurement(models.Model):
     SUM = 'suministro'
 
     SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+        (PURPLE, 'Purple')
+    ]
+    FLAW_SEVERITY_CHOICES = [
         (RED, 'Red'),
         (GREEN, 'Green'),
         (YELLOW, 'Yellow'),
@@ -463,12 +500,12 @@ class Measurement(models.Model):
         choices=MEASUREMENT_CHOICES,
         default=VIB)
     date = models.DateField()
-    analysis = models.TextField()
-    diagnostic = models.TextField()
+    analysis = models.TextField(default="", blank=True)
+    diagnostic = models.TextField(default="", blank=True)
     severity = models.CharField(
         max_length=9,
         choices=SEVERITY_CHOICES,
-        default=BLACK)
+        default=PURPLE)
     engineer_one = models.ForeignKey(
         VibroUser,
         related_name="measurements",
@@ -494,12 +531,86 @@ class Measurement(models.Model):
         related_name="measurements",
         on_delete=models.CASCADE)
     revised = models.BooleanField(default=False)
-    resolved = models.BooleanField(default=False)
-    prev_changes = models.TextField(null=True, )
+    resolved = models.BooleanField(default=False)  # remove
+    prev_changes = models.TextField(default="", blank=True)
     prev_changes_date = models.DateField(null=True)
+    balanceo = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    alineacion = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    tension = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    lubricacion = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    rodamientos = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    holgura = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    excentricidad = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    soltura = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    fractura = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    vacio = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    electrico = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    inspeccion = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    estructural = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    resonancia = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
+    otro = models.CharField(
+        max_length=9,
+        choices=SEVERITY_CHOICES,
+        default=GREEN)
 
 
 class Values(models.Model):
+
+    # severity
+    RED = "red"
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    BLACK = 'black'
+    PURPLE = 'purple'
+    SEVERITY_CHOICES = [
+        (RED, 'Red'),
+        (GREEN, 'Green'),
+        (YELLOW, 'Yellow'),
+        (BLACK, 'Black'),
+        (PURPLE, 'Purple')
+    ]
 
     point = models.ForeignKey(
         Point,
@@ -523,74 +634,80 @@ class Values(models.Model):
         decimal_places=2,
         max_digits=4),
         default=list)
-
-
-class Flaw(models.Model):  # falla
-    # severity
-    RED = "red"
-    GREEN = 'green'
-    YELLOW = 'yellow'
-    BLACK = 'black'
-
-    # severity
-    SEVERITY_CHOICES = [
-        (RED, 'Red'),
-        (GREEN, 'Green'),
-        (YELLOW, 'Yellow'),
-        (BLACK, 'Black'),
-    ]
-
-    # flaw types
-    BN = 'bien'
-    BAL = 'balanceo'
-    ALI = 'alineación'
-    TEN = 'tensión'
-    LUB = 'lubricación'
-    ROD = 'rodamientos'
-    HOL = 'holgura'
-    EXC = 'excentricidad'
-    SOL = 'soltura'
-    FRA = 'fractura'
-    VAC = 'vacío'
-    ELE = 'eléctrico'
-    INS = 'inspección'
-    EST = 'estructural'
-    RES = 'resonancia'
-    NOM = 'no medido'
-    OTR = 'otro'
-
-    FLAW_CHOICES = [
-        (BN, 'Bien'),
-        (BAL, 'Balanceo'),
-        (ALI, 'Alineación'),
-        (TEN, 'Tensión'),
-        (LUB, 'Lubricación'),
-        (ROD, 'Rodamientos'),
-        (HOL, 'Holgura'),
-        (EXC, 'Excentricidad'),
-        (SOL, 'Soltura'),
-        (FRA, 'Fractura'),
-        (VAC, 'Vacío'),
-        (ELE, 'Eléctrico'),
-        (INS, 'Inspección'),
-        (EST, 'Estructural'),
-        (RES, 'Resonancia'),
-        (NOM, 'No medido'),
-        (OTR, 'Otro'),
-    ]
-
-    measurement = models.ForeignKey(
-        Measurement,
-        related_name="flaws",
-        on_delete=models.CASCADE)
-    flaw_type = models.CharField(
-        max_length=13,
-        choices=FLAW_CHOICES,
-        default=OTR)
     severity = models.CharField(
-        max_length=6,
+        max_length=9,
         choices=SEVERITY_CHOICES,
-        default=BLACK)
+        default=PURPLE)
+
+
+# class Flaw(models.Model):  # falla
+#     # severity
+#     RED = "red"
+#     GREEN = 'green'
+#     YELLOW = 'yellow'
+#     BLACK = 'black'
+#     PURPLE = 'purple'
+
+#     # severity
+#     SEVERITY_CHOICES = [
+#         (RED, 'Red'),
+#         (GREEN, 'Green'),
+#         (YELLOW, 'Yellow'),
+#         (BLACK, 'Black'),
+#         (PURPLE, 'Purple')
+#     ]
+
+#     # flaw types // estos son campos que van en medicion
+#     BN = 'bien'
+#     BAL = 'balanceo'
+#     ALI = 'alineación'
+#     TEN = 'tensión'
+#     LUB = 'lubricación'
+#     ROD = 'rodamientos'
+#     HOL = 'holgura'
+#     EXC = 'excentricidad'
+#     SOL = 'soltura'
+#     FRA = 'fractura'
+#     VAC = 'vacío'
+#     ELE = 'eléctrico'
+#     INS = 'inspección'
+#     EST = 'estructural'
+#     RES = 'resonancia'
+#     NOM = 'no medido'
+#     OTR = 'otro'
+
+#     FLAW_CHOICES = [
+#         (BN, 'Bien'),
+#         (BAL, 'Balanceo'),
+#         (ALI, 'Alineación'),
+#         (TEN, 'Tensión'),
+#         (LUB, 'Lubricación'),
+#         (ROD, 'Rodamientos'),
+#         (HOL, 'Holgura'),
+#         (EXC, 'Excentricidad'),
+#         (SOL, 'Soltura'),
+#         (FRA, 'Fractura'),
+#         (VAC, 'Vacío'),
+#         (ELE, 'Eléctrico'),
+#         (INS, 'Inspección'),
+#         (EST, 'Estructural'),
+#         (RES, 'Resonancia'),
+#         (NOM, 'No medido'),
+#         (OTR, 'Otro'),
+#     ]
+
+#     measurement = models.ForeignKey(
+#         Measurement,
+#         related_name="flaws",
+#         on_delete=models.CASCADE)
+#     flaw_type = models.CharField(
+#         max_length=13,
+#         choices=FLAW_CHOICES,
+#         default=OTR)
+#     severity = models.CharField(
+#         max_length=6,
+#         choices=SEVERITY_CHOICES,
+#         default=PURPLE)
 
 
 class TermoImage(models.Model):

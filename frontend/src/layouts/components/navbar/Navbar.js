@@ -1,19 +1,16 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Navbar } from "reactstrap"
 import { connect } from "react-redux"
 import classnames from "classnames"
 import {
-  logoutWithJWT
+  logoutWithJWT, getUserWithJWT
 } from "../../../redux/actions/auth/loginActions"
 import NavbarBookmarks from "./NavbarBookmarks"
 import NavbarUser from "./NavbarUser"
-import userImg from "../../../assets/img/portrait/small/avatar-s-11.jpg"
+import userImg from "../../../assets/img/user/default.png"
 
 const UserName = props => {
-  if (!props.auth.values) { // TODO remove condition after development
-    return "John doe"
-  }
-  return props.auth.values.username
+  return props.auth?.username ?? "demo"
 
 }
 
@@ -26,9 +23,17 @@ const user_type_map = {
 }
 
 const ThemeNavbar = props => {
-  const colorsArr = [ "primary", "danger", "success", "info", "warning", "dark"]
-  const navbarTypes = ["floating" , "static" , "sticky" , "hidden"]
-  // console.log(props.user)
+  const colorsArr = ["primary", "danger", "success", "info", "warning", "dark"]
+  const navbarTypes = ["floating", "static", "sticky", "hidden"]
+  const { getUserWithJWT } = props
+
+  useEffect(() => {
+    const updateUserData = () => {
+      getUserWithJWT()
+    }
+    updateUserData()
+  }, [getUserWithJWT])
+
   return (
     <React.Fragment>
       <div className="content-overlay" />
@@ -85,18 +90,19 @@ const ThemeNavbar = props => {
                 changeCurrentLang={props.changeCurrentLang}
                 userName={<UserName {...props} />}
                 userImg={
-                  !props.auth.values ? userImg : props.auth.values.picture
+                  props.auth?.picture ?? userImg
                 }
                 loggedInWith={
                   props.auth !== undefined &&
-                  props.auth.values !== undefined
-                    ? props.auth.values.loggedInWith
+                    props.auth !== undefined
+                    ? props.auth.loggedInWith
                     : null
                 }
                 logoutWithJWT={props.logoutWithJWT}
                 userType={
-                  !props.auth.values ? "demo" // TODO remove in production
-                  : user_type_map[props.auth.values.user_type]
+                  props.auth ?
+                    user_type_map[props.auth.user_type] :
+                    "demo" // TODO remove in production
                 }
               />
             </div>
@@ -113,4 +119,6 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {logoutWithJWT})(ThemeNavbar)
+export default connect(mapStateToProps, {
+  logoutWithJWT, getUserWithJWT
+})(ThemeNavbar)

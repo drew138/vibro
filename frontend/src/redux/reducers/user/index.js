@@ -1,16 +1,16 @@
 const initialState = {
-    id: null,
-    username: null,
+    id: 0,
+    username: "",
     first_name: "",
     last_name: "",
     email: "",
-    is_active: true,
+    is_active: false,
     is_staff: false,
     is_superuser: false,
     celphone: "",
     phone: "",
-    company: null,
-    picture: null,
+    company: "",
+    picture: "",
     user_type: "client",
 }
 

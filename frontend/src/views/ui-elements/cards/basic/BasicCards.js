@@ -15,6 +15,7 @@ import img3 from "../../../../assets/img/pages/content-img-3.jpg"
 class BasicCards extends React.Component {
   render() {
     return (
+
       <Row>
         <Col lg="4" md="6" sm="12">
           <Card>

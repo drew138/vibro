@@ -1,29 +1,31 @@
-const auth = (state = { userRole: "client" }, action) => {
+import localStorageService from "../../../axios/localStorageService"
+
+const initialState = localStorageService.getUserValues();
+
+
+const auth = (state = initialState, action) => {
   switch (action.type) {
     case "LOGIN_WITH_JWT": {
-      return { 
-        ...state, 
-        values: action.values,
+      return {
+        // ...state,
+        // values: action.values,
+        ...action.auth
       }
     }
-    case "SET_JWTS": {
-      return { ...state, tokens: action.payload }
-    }
     case "LOGOUT_WITH_JWT": {
-      return { 
-        ...state,
-        values: action.payload,
-        tokens: action.payload
+      return {
+        // ...state,
+        // values: action.payload,
+        // tokens: action.payload
+        ...initialState
       }
     }
     case "UPDATE_USER_PROFILE": {
       return {
         ...state,
-        values: {...state.values, ...action.values}
+        // values: { ...state.values, ...action.values }
+        ...action.auth
       }
-    }
-    case "CHANGE_ROLE": {
-      return { ...state, userRole: action.userRole }
     }
     default: {
       return state

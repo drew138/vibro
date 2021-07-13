@@ -1,5 +1,5 @@
 # from django.contrib.postgres.fields.array import ArrayField
-from rest_framework import serializers
+from rest_framework import serializers, fields
 from . import models as custom_models
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
 from django.contrib.auth import password_validation
@@ -23,17 +23,35 @@ class DefaultCompanySerializer(serializers.ModelSerializer):
 
 class GetCompanySerializer(serializers.ModelSerializer):
 
-    city = serializers.CharField(source="city.name")
+    city = serializers.StringRelatedField()
+    # city = serializers.CharField(source="city.name")
 
     class Meta:
         model = custom_models.Company
         fields = '__all__'
 
 
+class HierarchySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = custom_models.Hierarchy
+        fields = '__all__'
+
+
+class ListHierarchySerializer(serializers.ModelSerializer):
+
+    parent = HierarchySerializer()
+    company = DefaultCompanySerializer()
+
+    class Meta:
+        model = custom_models.Hierarchy
+        fields = '__all__'
+
+
 # User Serializer
 class VibroUserSerializer(serializers.ModelSerializer):
 
-    company = DefaultCompanySerializer(required=False)
+    # company = DefaultCompanySerializer(required=False)
 
     class Meta:
         model = custom_models.VibroUser
@@ -43,7 +61,7 @@ class VibroUserSerializer(serializers.ModelSerializer):
             'first_name',
             "last_name",
             'celphone',
-            'phone',
+            # 'phone',
             'email',
             'company',
             'user_type',
@@ -66,7 +84,7 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
             'email',
             'company',
             'password',
-            'phone',
+            # 'phone',
             'celphone',
         ]
         extra_kwargs = {'password': {'write_only': True,
@@ -100,7 +118,7 @@ class RegisterAdminUserSerializer(serializers.ModelSerializer):
             'email',
             'company',
             'password',
-            'phone',
+            # 'phone',
             'celphone',
             'user_type'
         ]
@@ -158,7 +176,7 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
             "id",
             'first_name',
             'last_name',
-            'phone',
+            # 'phone',
             'celphone',
             'email',
             'company',
@@ -170,6 +188,8 @@ class UpdadateUserSerialiazer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
+
+    # company = DefaultCompanySerializer()
 
     default_error_messages = {
         'no_active_account':
@@ -194,9 +214,10 @@ class LoginSerializer(TokenObtainPairSerializer):
         data["first_name"] = self.user.first_name
         data["last_name"] = self.user.last_name
         data["celphone"] = self.user.celphone
-        data["phone"] = self.user.phone
+        # data["phone"] = self.user.phone
         data["email"] = self.user.email
-        data["company"] = self.user.company
+        if self.user.company:
+            data["company"] = self.user.company.id
         data["user_type"] = self.user.user_type
         data["is_active"] = self.user.is_active
         request = self.context.get('request')
@@ -265,19 +286,20 @@ class MeasurementSerializer(serializers.ModelSerializer):
     # engineer_two = VibroUserSerializer()
     # analyst = VibroUserSerializer()
     # certifier = VibroUserSerializer()
+    date = fields.DateField(input_formats=['%Y-%m-%dT%H:%M:%S.%fZ'])
 
     class Meta:
         model = custom_models.Measurement
         fields = '__all__'
 
 
-class FlawSerializer(serializers.ModelSerializer):
+# class FlawSerializer(serializers.ModelSerializer):
 
-    # measurement = MeasurementSerializer()
+#     # measurement = MeasurementSerializer()
 
-    class Meta:
-        model = custom_models.Flaw
-        fields = '__all__'
+#     class Meta:
+#         model = custom_models.Flaw
+#         fields = '__all__'
 
 
 class TermoImageSerializer(serializers.ModelSerializer):
@@ -292,6 +314,15 @@ class TermoImageSerializer(serializers.ModelSerializer):
 class PointSerializer(serializers.ModelSerializer):
 
     # measurement = MeasurementSerializer()
+
+    class Meta:
+        model = custom_models.Point
+        fields = '__all__'
+
+
+class ListValuesSerializer(serializers.ModelSerializer):
+
+    point = PointSerializer()
     espectra = serializers.ListField(
         child=serializers.DecimalField(
             decimal_places=2,
@@ -306,5 +337,25 @@ class PointSerializer(serializers.ModelSerializer):
         required=False)
 
     class Meta:
-        model = custom_models.Point
+        model = custom_models.Values
+        fields = '__all__'
+
+
+class ValuesSerializer(serializers.ModelSerializer):
+
+    espectra = serializers.ListField(
+        child=serializers.DecimalField(
+            decimal_places=2,
+            max_digits=4,
+            default=0),
+        required=False)
+    time_signal = serializers.ListField(
+        child=serializers.DecimalField(
+            decimal_places=2,
+            max_digits=4,
+            default=0),
+        required=False)
+
+    class Meta:
+        model = custom_models.Values
         fields = '__all__'

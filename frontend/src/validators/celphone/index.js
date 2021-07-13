@@ -1,4 +1,4 @@
-const celphone_regex = /^(((\(\+?\d{2,3}\))|(\+\d{2,3}))[\s-])?\d{3}[\s-]\d{3}[\s-]\d{4}$/
+const celphone_regex = /^\d{10}$/
 
 
 const isValidCelphone = (celphone) => {
