@@ -291,7 +291,7 @@ class MachineAdd extends React.Component {
                 <FormGroup>
                   <Label for="id">Identificador</Label>
                   <Input
-                    type="number"
+                    type="text"
                     id="id"
                     placeholder="Identificador"
                     value={this.state.identifier}

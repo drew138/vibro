@@ -104,37 +104,37 @@ class RegisterVibroUserSerializer(serializers.ModelSerializer):
 
 
 # Register admin Serializer
-class RegisterAdminUserSerializer(serializers.ModelSerializer):
+# class RegisterAdminUserSerializer(serializers.ModelSerializer):
 
-    # company = DefaultCompanySerializer(required=False)
-    user_type = serializers.CharField(required=False)
+#     # company = DefaultCompanySerializer(required=False)
+#     user_type = serializers.CharField(required=False)
 
-    class Meta:
-        model = custom_models.VibroUser
-        fields = [
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'company',
-            'password',
-            # 'phone',
-            'celphone',
-            'user_type'
-        ]
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
+#     class Meta:
+#         model = custom_models.VibroUser
+#         fields = [
+#             'username',
+#             'first_name',
+#             'last_name',
+#             'email',
+#             'company',
+#             'password',
+#             # 'phone',
+#             'celphone',
+#             'user_type'
+#         ]
+#         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
-    def create(self, validated_data):
-        user = custom_models.VibroUser.objects.create_user(
-            **validated_data)
-        return user
+#     def create(self, validated_data):
+#         user = custom_models.VibroUser.objects.create_user(
+#             **validated_data)
+#         return user
 
-    def validate_password(self, value):
-        try:
-            password_validation.validate_password(value)
-        except ValidationError as exc:
-            raise serializers.ValidationError(str(exc))
-        return value
+#     def validate_password(self, value):
+#         try:
+#             password_validation.validate_password(value)
+#         except ValidationError as exc:
+#             raise serializers.ValidationError(str(exc))
+#         return value
 
 
 # Rest Password Serializer

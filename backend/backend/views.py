@@ -515,22 +515,22 @@ class ValuesView(mixins.ListModelMixin, viewsets.GenericViewSet):
                 {"error": "Parametros Incorrectos"},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        previous_measurement_id = custom_models.Measurement.objects.filter(
-            date__lt=date,
+        measurements = custom_models.Measurement.objects.filter(
+            date__lte=date,
             service="predictivo",
-            machine__id=machine).order_by("-date").values_list("id").first()
-        if previous_measurement_id:
-            previous_measurement_id = previous_measurement_id[0]
-        current = custom_models.Values.objects.all().filter(
-            measurement__id=measurement)
-        previous = custom_models.Values.objects.all().filter(
-            measurement__machine__id=machine, measurement__id=previous_measurement_id)
+            machine__id=machine).order_by("-date")[:2]
+        # if previous_measurement_id:
+        #     previous_measurement_id = previous_measurement_id[0]
+        current = measurements[0]
+        previous = measurements[1] if len(measurements) == 2 else None
 
         current_serializer = custom_serializers.ListValuesSerializer(
             current, many=True)
-        previous_serializer = custom_serializers.ListValuesSerializer(
-            previous, many=True)
-        return Response({
-            "current": current_serializer.data,
-            "previous": previous_serializer.data
-        })
+        response = {
+            "current": current_serializer.data
+        }
+        if previous:
+            previous_serializer = custom_serializers.ListValuesSerializer(
+                previous, many=True)
+            response["previous"] = previous_serializer.data
+        return Response(response)

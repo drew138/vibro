@@ -9,8 +9,8 @@ from . import views
 auth_views = [
     path('auth/user', authentication_views.UserAPI.as_view(), name='user'),
     path('auth/register', authentication_views.RegisterAPI.as_view(), name='register'),
-    path('auth/register/admin',
-         authentication_views.RegisterAdminAPI.as_view(), name='register-admin'),
+    #     path('auth/register/admin',
+    #          authentication_views.RegisterAdminAPI.as_view(), name='register-admin'),
     path('auth/reset', authentication_views.ResetAPI.as_view(), name='reset'),
     path('auth/change', authentication_views.ChangePassAPI.as_view(), name='change'),
     path('auth/change/forgot',

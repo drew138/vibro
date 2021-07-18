@@ -53,29 +53,29 @@ class RegisterAPI(generics.GenericAPIView):
         })
 
 
-# Register Admin
-class RegisterAdminAPI(generics.GenericAPIView):
+# # Register Admin
+# class RegisterAdminAPI(generics.GenericAPIView):
 
-    permission_classes = [custom_permissions.IsAdmin]
-    serializer_class = custom_serializers.RegisterAdminUserSerializer
+#     permission_classes = [custom_permissions.IsAdmin]
+#     serializer_class = custom_serializers.RegisterAdminUserSerializer
 
-    def post(self, request, *args, **kwargs):
-        """
-        create a new user and respond accoringly to user.
-        """
+#     def post(self, request, *args, **kwargs):
+#         """
+#         create a new user and respond accoringly to user.
+#         """
 
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        Email().register(request).delay()  # ! TODO test task
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "user": custom_serializers.VibroUserSerializer(
-                user,
-                context=self.get_serializer_context()).data,
-            "refresh": str(refresh),
-            "access": str(refresh.access_token)
-        })
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.save()
+#         Email().register(request).delay()  # ! TODO test task
+#         refresh = RefreshToken.for_user(user)
+#         return Response({
+#             "user": custom_serializers.VibroUserSerializer(
+#                 user,
+#                 context=self.get_serializer_context()).data,
+#             "refresh": str(refresh),
+#             "access": str(refresh.access_token)
+#         })
 
 
 # Reset API

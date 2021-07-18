@@ -104,6 +104,9 @@ class VibroUser(AbstractUser):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+    def get_certifications_string(self):
+        return "<br/>".join(self.certifications)
+
 
 class Machine(models.Model):
 
@@ -147,8 +150,7 @@ class Machine(models.Model):
         (HP, 'HorsePower'),
     )
 
-    # ! TODO remove default, make unique field
-    identifier = models.IntegerField(unique=True)
+    identifier = models.CharField(unique=True, max_length=120)
     company = models.ForeignKey(
         Company,
         related_name="machines",
@@ -168,7 +170,7 @@ class Machine(models.Model):
         max_length=2,
         choices=POWER_UNIT_CHOICES,
         default=KW)
-    norm = models.TextField(
+    norm = models.TextField(  # TODO change to charfield and add choices
         null=True,
     )
     hierarchy = models.ForeignKey(
@@ -614,18 +616,18 @@ class Values(models.Model):
 
     point = models.ForeignKey(
         Point,
-        related_name="values",
+        related_name="vals",
         on_delete=models.CASCADE
     )
     measurement = models.ForeignKey(
         Measurement,
-        related_name="values",
+        related_name="vals",
         on_delete=models.CASCADE)
-    tendency = models.DecimalField(
+    overall = models.DecimalField(
         decimal_places=2,
         max_digits=4,
-        default=0)
-    espectra = ArrayField(
+        default=0)  # TODO  remove deafult
+    spectra = ArrayField(
         models.DecimalField(
             decimal_places=2,
             max_digits=4),
@@ -638,76 +640,6 @@ class Values(models.Model):
         max_length=9,
         choices=SEVERITY_CHOICES,
         default=PURPLE)
-
-
-# class Flaw(models.Model):  # falla
-#     # severity
-#     RED = "red"
-#     GREEN = 'green'
-#     YELLOW = 'yellow'
-#     BLACK = 'black'
-#     PURPLE = 'purple'
-
-#     # severity
-#     SEVERITY_CHOICES = [
-#         (RED, 'Red'),
-#         (GREEN, 'Green'),
-#         (YELLOW, 'Yellow'),
-#         (BLACK, 'Black'),
-#         (PURPLE, 'Purple')
-#     ]
-
-#     # flaw types // estos son campos que van en medicion
-#     BN = 'bien'
-#     BAL = 'balanceo'
-#     ALI = 'alineación'
-#     TEN = 'tensión'
-#     LUB = 'lubricación'
-#     ROD = 'rodamientos'
-#     HOL = 'holgura'
-#     EXC = 'excentricidad'
-#     SOL = 'soltura'
-#     FRA = 'fractura'
-#     VAC = 'vacío'
-#     ELE = 'eléctrico'
-#     INS = 'inspección'
-#     EST = 'estructural'
-#     RES = 'resonancia'
-#     NOM = 'no medido'
-#     OTR = 'otro'
-
-#     FLAW_CHOICES = [
-#         (BN, 'Bien'),
-#         (BAL, 'Balanceo'),
-#         (ALI, 'Alineación'),
-#         (TEN, 'Tensión'),
-#         (LUB, 'Lubricación'),
-#         (ROD, 'Rodamientos'),
-#         (HOL, 'Holgura'),
-#         (EXC, 'Excentricidad'),
-#         (SOL, 'Soltura'),
-#         (FRA, 'Fractura'),
-#         (VAC, 'Vacío'),
-#         (ELE, 'Eléctrico'),
-#         (INS, 'Inspección'),
-#         (EST, 'Estructural'),
-#         (RES, 'Resonancia'),
-#         (NOM, 'No medido'),
-#         (OTR, 'Otro'),
-#     ]
-
-#     measurement = models.ForeignKey(
-#         Measurement,
-#         related_name="flaws",
-#         on_delete=models.CASCADE)
-#     flaw_type = models.CharField(
-#         max_length=13,
-#         choices=FLAW_CHOICES,
-#         default=OTR)
-#     severity = models.CharField(
-#         max_length=6,
-#         choices=SEVERITY_CHOICES,
-#         default=PURPLE)
 
 
 class TermoImage(models.Model):

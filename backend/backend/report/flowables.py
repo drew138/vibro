@@ -1,123 +1,55 @@
-from reportlab.platypus import PageBreak, PageTemplate, BaseDocTemplate, Paragraph, NextPageTemplate, TableStyle, Image, Spacer
-from reportlab.pdfbase.pdfmetrics import registerFont
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.colors import Color, black
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus.tables import Table
-from reportlab.platypus.frames import Frame
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
-import datetime
-import sys
+# import datetime
+# import sys
 import os
 # from django.config.settings import STATIC_URL
-
-# file location
-B_DIR = os.path.dirname(os.path.dirname(  # ! TODO needs to point to digitalocean
-    os.path.dirname(os.path.abspath(__file__))))
-LOGO = os.path.join(B_DIR, 'static', 'images', 'logo.jpg')
-SKF = os.path.join(B_DIR, 'static', 'images', 'skf.jpg')
-DIAGRAM = os.path.join(B_DIR, 'static', 'images', 'numeration.png')
-ARROW = os.path.join(B_DIR, 'static', 'images', 'arrow.png')
-# register fonts
-registerFont(TTFont('Arial', os.path.join(
-    B_DIR, 'static', 'fonts', 'arial.ttf')))
-registerFont(
-    TTFont('Arial-Bold', os.path.join(B_DIR, 'static', 'fonts', 'arialbd.ttf')))
-
-
-# datetime constants
-MONTHS = (
-    'enero',
-    'febrero',
-    'marzo',
-    'abril',
-    'mayo',
-    'junio',
-    'julio',
-    'agosto',
-    'septiembre',
-    'octubre',
-    'noviembre',
-    'diciembre'
+from reportlab.platypus import (
+    BaseDocTemplate,
+    PageTemplate,
+    Paragraph,
+    Image,
+    TableStyle,
+    Table,
+    Spacer
 )
-NOW = datetime.datetime.now()
-CURRENT_YEAR = NOW.year
-CURRENT_MONTH = NOW.month
-CURRENT_DAY = NOW.day
-# constants for footer
-ADDRESS = 'Calle 9A  No. 54 - 129 Guayabal'
-PHONE = 'PBX: (4) 362 00 62'
-CELPHONE = 'Cel. 312 296 84 50'
-WHATSAPP = 'WhatsApp 301  249 92 84'
-WEBSITE = 'www.vibromontajes.com'
-EMAIL = 'servicios@vibromontajes.com'
-FOOTER_CITY = 'Medellín, Colombia'
-# constants for colors
-HEADER_FOOTER_GREEN = Color(red=0, green=(102/255), blue=0)
-COMPANY_HEADER_BLUE = Color(red=(82/255), green=(139/255), blue=(166/255))
-TABLE_BLUE = Color(red=(141/255), green=(179/255), blue=(226/255))
-FOOTER_BLUE = Color(red=(84/255), green=(141/255), blue=(212/255))
-RED = Color(red=1, green=0, blue=0)
-YELLOW = Color(red=1, green=1, blue=0)
-GREEN = Color(red=0, green=1, blue=0)
-WHITE = Color(red=1, green=1, blue=1)
-FADED_GREEN = Color(
-    red=(153/255),
-    green=1,
-    blue=(153/255))
-# paragraph styles for TOC entries
-ADMIN_REP = ParagraphStyle(
-    name='INFORME ADMINISTRATIVO', fontName='Arial', fontSize=10)
-TOC = ParagraphStyle(
-    name='Table of contents', fontName='Arial-Bold', fontSize=15, alignment=1)
-BLACK_BOLD_CENTER = ParagraphStyle(
-    name='black_bold_center', fontName='Arial-Bold', fontSize=10, alignment=1)
-SUMMARY = ParagraphStyle(
-    name='summary', fontName='Arial-Bold', fontSize=10, alignment=1)
-SUMMARY_TWO = ParagraphStyle(
-    name='summary_two', fontName='Arial-Bold', fontSize=10, alignment=1)
-MACHINE_PARAGRAPH = ParagraphStyle(
-    name='machine_entry', fontName='Arial', fontSize=10, alignment=1)
-# constants for paragraph styles
-STANDARD = ParagraphStyle(
-    name='standard', fontName='Arial', fontSize=10)
-STANDARD_CENTER = ParagraphStyle(
-    name='standard_center', fontName='Arial', fontSize=10, alignment=1)
-STANDARD_HEADER = ParagraphStyle(
-    name='standard_header', fontName='Arial', fontSize=10, alignment=2)
-STANDARD_JUSTIFIED = ParagraphStyle(
-    name='standard_justified', fontName='Arial', fontSize=10, alignment=4)
-STANDARD_INDENTED = ParagraphStyle(
-    name='standard_indented', fontName='Arial', fontSize=10, leftIndent=130
-)
-BLACK_BOLD = ParagraphStyle(
-    name='black_bold', fontName='Arial-Bold', fontSize=10)
 
-BLUE_HEADER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
-                             textColor=COMPANY_HEADER_BLUE, alignment=2)
-BLUE_FOOTER = ParagraphStyle(name='blue_hf', fontName='Arial-Bold', fontSize=10,
-                             textColor=FOOTER_BLUE, alignment=1)
-BLACK_SMALL = ParagraphStyle(
-    name='black_small', fontName='Arial', fontSize=7, alignment=1)
-GREEN_SMALL = ParagraphStyle(
-    name='green_small', fontName='Arial', fontSize=7, textColor=HEADER_FOOTER_GREEN, alignment=1)
-# paragraph styles for TOC
-LEVEL_ONE = ParagraphStyle(
-    name='level_one', fontName='Arial', fontSize=12, endDots=' . ')
-LEVEL_TWO = ParagraphStyle(
-    name='level_two', fontName='Arial', fontSize=10, leftIndent=30, endDots=' . ')
-# footer paragraph lines
-LINE_ONE = Paragraph('_' * 80, style=BLUE_FOOTER)
-LINE_TWO = Paragraph(
-    f'{ADDRESS} {PHONE} {CELPHONE} {WHATSAPP}', style=BLACK_SMALL)
-LINE_THREE = Paragraph(
-    text=f'{WEBSITE} E-mail: <a href="mailto:{EMAIL}"><font color="blue">{EMAIL}</font></a> {FOOTER_CITY}', style=GREEN_SMALL)
-# Frames used for templates
-STANDARD_FRAME = Frame(1.6*cm, 2*cm, 18*cm, 26*cm,
-                       id='standard')
-MACHINE_FRAME = Frame(1.6*cm, 2*cm, 18*cm, 23*cm,
-                      id='big_header')
+from .constants import (
+    MACHINE_FRAME,
+    STANDARD_FRAME,
+    BLACK_SMALL,
+    STANDARD_HEADER,
+    LOGO,
+    SKF,
+    GREEN_SMALL,
+    BLUE_HEADER,
+    LINE_ONE,
+    LINE_TWO,
+    LINE_THREE,
+    MONTHS,
+    STANDARD,
+    BLACK_BOLD,
+    TABLE_OF_CONTENTS,
+    DIAGRAM,
+    BLACK,
+    BLACK_BOLD_CENTER,
+    TABLE_BLUE,
+    ARROW,
+    STANDARD_INDENTED,
+    RED,
+    YELLOW,
+    FADED_GREEN,
+    WHITE,
+    GREEN,
+    SUMMARY,
+    SUMMARY_TWO,
+    MACHINE_PARAGRAPH,
+    BASE_DIRECTORY,
+    STANDARD_CENTER,
+    CURRENT_DAY,
+    CURRENT_MONTH,
+    CURRENT_YEAR
+)
 
 
 class Flowables(BaseDocTemplate):
@@ -133,7 +65,7 @@ class Flowables(BaseDocTemplate):
         self.queryset = queryset
         self.user = user
         self.company = self.user.company.name
-        self.date = self.queryset.first().date.date.strftime('%d/%m/%Y')
+        self.date = self.queryset.first().date.strftime('%d/%m/%Y')
         self.engineer_one = self.queryset.first().engineer_one
         self.engineer_two = self.queryset.first().engineer_two
         self.width = 18 * cm
@@ -176,8 +108,11 @@ class Flowables(BaseDocTemplate):
             f'Pagina {doc.page}',
             style=BLACK_SMALL)
         w, h = page.wrap(self.width, 1 * cm)
-        page.drawOn(canvas, self.leftMargin + 0.5 * cm +
-                    ((self.width - w) / 2), (29 * cm) - h)
+        page.drawOn(
+            canvas,
+            self.leftMargin + 0.5 * cm + ((self.width - w) / 2),
+            (29 * cm) - h
+        )
         report_date = Paragraph(self.date.upper(), style=STANDARD_HEADER)
         table = self._create_header_table(report_date)
         _, ht = table.wrap(self.width, 3 * cm)
@@ -195,10 +130,14 @@ class Flowables(BaseDocTemplate):
         canvas.bookmarkPage(str(doc.page))
         page = Paragraph(
             f'Pagina {doc.page}',
-            style=BLACK_SMALL)
+            style=BLACK_SMALL
+        )
         w, h = page.wrap(self.width, 1 * cm)
-        page.drawOn(canvas, self.leftMargin + 0.5 * cm +
-                    ((self.width - w) / 2), (29 * cm) - h)
+        page.drawOn(
+            canvas,
+            self.leftMargin + 0.5 * cm + ((self.width - w) / 2),
+            (29 * cm) - h
+        )
         canvas.restoreState()
 
     def _header_three(self, canvas, doc):
@@ -303,12 +242,14 @@ class Flowables(BaseDocTemplate):
 
         name = f'{self.user.first_name} {self.user.last_name}'
         date = Paragraph(
-            f'Medellín, {CURRENT_DAY} de {MONTHS[CURRENT_MONTH - 1]} de {CURRENT_YEAR},',
+            f'Medellín, {CURRENT_DAY()} de {MONTHS[CURRENT_MONTH() - 1]} de {CURRENT_YEAR()},',
             style=STANDARD)
         engineer_client = Paragraph(
-            f"""Ingeniero:<br/><font name="Arial-Bold">{name.upper()}
+            f"""
+            Ingeniero:<br/><font name="Arial-Bold">{name.upper()}
             </font><br/>Dpto. de Mantenimiento <br/>Email:
-            <font color='blue'><a href={f'mailto:{self.user.email}'}>{self.user.email}</a></font>""",
+            <font color='blue'><a href={f'mailto:{self.user.email}'}
+            >{self.user.email}</a></font>""",
             style=STANDARD)
         flowables = [
             date,
@@ -382,12 +323,14 @@ class Flowables(BaseDocTemplate):
 
         self.create_signature_name
         line = '_'*36
-        first_engineer_full_name = f"""{self.engineer_one.first_name}
-        {self.engineer_one.last_name}""".upper()  # space inbetween string
+        first_engineer_full_name = f"""
+        {self.engineer_one if self.engineer_one else ""}
+        """.upper()
 
         if self.engineer_two:
-            second_engineer_name = f"""{self.engineer_two.first_name}
-            {self.engineer_two.last_name}""".upper()
+            second_engineer_name = f"""
+            {self.engineer_two if self.engineer_two else ""}
+            """.upper()
             data = [
                 [
                     self.create_signature_line(line),
@@ -399,9 +342,11 @@ class Flowables(BaseDocTemplate):
                 ],
                 [  # TODO verify linebreaks \t in certifications of each engineer
                     self.create_signature_line(
-                        self.engineer_one.profile.certifications),
+                        self.engineer_one.get_certifications_string() if self.engineer_one else ""
+                    ),
                     self.create_signature_line(
-                        self.engineer_two.profile.certifications)
+                        self.engineer_two.get_certifications_string() if self.engineer_two else ""
+                    )
                 ]
             ]
         else:
@@ -409,8 +354,8 @@ class Flowables(BaseDocTemplate):
                 [self.create_signature_line(line), ''],
                 [self.create_signature_name(first_engineer_full_name), ''],
                 [self.create_signature_line(
-                    self.engineer_one.profile.certifications),
-                    '']
+                    self.engineer_one.get_certifications_string() if self.engineer_one else ""
+                ), '']
             ]
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -438,7 +383,7 @@ class Flowables(BaseDocTemplate):
         table of contents.
         """
 
-        return Paragraph('Tabla de Contenidos', style=TOC)
+        return Paragraph('Tabla de Contenidos', style=TABLE_OF_CONTENTS)
 
     # flowables used in second letter
     @staticmethod
@@ -508,7 +453,7 @@ class Flowables(BaseDocTemplate):
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('GRID', (0, 0), (-1, -1), 0.25, BLACK),
             ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE),
         ]
         table = Table(
@@ -719,8 +664,8 @@ class Flowables(BaseDocTemplate):
             ('FONTNAME', (2, 3), (-1, -1), 'Arial-Bold'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('GRID', (0, 0), (-1, -1), 0.25, black),
-            ('BOX', (0, 0), (-1, -1), 2.5, black),
+            ('GRID', (0, 0), (-1, -1), 0.25, BLACK),
+            ('BOX', (0, 0), (-1, -1), 2.5, BLACK),
             ('BOX', (0, 0), (-1, -1), 1.25, WHITE),
         ]
         table = Table(
@@ -757,20 +702,31 @@ class Flowables(BaseDocTemplate):
         returns first especifications table.
         """
 
-        para_one = Paragraph(
-            'Máquinas pequeñas de 15 KW. (20 HP).', style=STANDARD)
-        para_two = Paragraph(
-            'Máquinas de Tamaño mediano de 15 a 75 KW., o máquinas rígidamente montadas hasta 300 KW.', style=STANDARD)
-        para_three = Paragraph(
-            'Máquinas grandes sobre 300 KW. Montadas en soportes rígidos.', style=STANDARD)
-        para_four = Paragraph(
-            'Máquinas grandes sobre 300 KW. Montadas en soportes flexibles.', style=STANDARD)
+        paragraph_one = Paragraph(
+            'Máquinas pequeñas de 15 KW. (20 HP).',
+            style=STANDARD
+        )
+        paragraph_two = Paragraph(
+            'Máquinas de Tamaño mediano de 15 a 75 KW., o \
+            máquinas rígidamente montadas hasta 300 KW.',
+            style=STANDARD
+        )
+        paragraph_three = Paragraph(
+            'Máquinas grandes sobre 300 KW. Montadas \
+            en soportes rígidos.',
+            style=STANDARD
+        )
+        paragraph_four = Paragraph(
+            'Máquinas grandes sobre 300 KW. Montadas\
+            en soportes flexibles.',
+            style=STANDARD
+        )
 
         data = [
-            ['Clase I', ':', para_one],
-            ['Clase II', ':', para_two],
-            ['Clase III', ':', para_three],
-            ['Clase IV', ':', para_four],
+            ['Clase I', ':', paragraph_one],
+            ['Clase II', ':', paragraph_two],
+            ['Clase III', ':', paragraph_three],
+            ['Clase IV', ':', paragraph_four],
         ]
         return self._create_especifications_table(data)
 
@@ -787,7 +743,7 @@ class Flowables(BaseDocTemplate):
         ]
         return self._create_especifications_table(data)
 
-    # summary flowables
+    # summary flowables TODO not finished
     @staticmethod
     def create_summary_title():
         """
@@ -834,7 +790,7 @@ class Flowables(BaseDocTemplate):
             ('ALIGN', (0, 3), (0, -1), 'RIGHT'),
             ('ALIGN', (1, 3), (2, -1), 'RIGHT'),
             # grid
-            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('GRID', (0, 0), (-1, -1), 0.25, BLACK),
             # font
             ('FONTNAME', (0, 0), (1, 16), 'Arial-Bold'),
             ('NOSPLIT', (0, 0), (-1, -1))
@@ -854,7 +810,8 @@ class Flowables(BaseDocTemplate):
 
         return Paragraph(
             'INFORME RESUMEN Y COMPARATIVO DE CORRECTIVOS AL MANTENIMIENTO',
-            style=SUMMARY_TWO)
+            style=SUMMARY_TWO
+        )
 
     # Pred flowables
 
@@ -875,14 +832,17 @@ class Flowables(BaseDocTemplate):
         # TODO abstract title variable from query_instance and make them uppercase
         title = query_instance.machine.name.upper()
         image = os.path.join(
-            B_DIR, 'static', 'images', f'{query_instance.severity}.png')
+            # BASE_DIRECTORY, 'static', 'images', f'{query_instance.severity}.png')
+            BASE_DIRECTORY, 'static', 'images', f'{"green"}.png')  # TODO change to the way it was (line above)
         severity_image = Image(image, width=1.8 * cm, height=2 * cm)
         machine = query_instance.machine
         code = machine.code.upper()
-        transmission = machine.transmission.upper()
+        # transmission = machine.transmission.upper()
+        transmission = ""
         brand = machine.brand.upper()
-        power = machine.power.upper()
-        rpm = f'{machine.rpm}'.upper()
+        power = machine.power
+        rpm = machine.rpm
+        # norm = machine.norm.upper() # TODO remove comments
 
         data = [
             [title, '', '', '', ''],
@@ -891,6 +851,7 @@ class Flowables(BaseDocTemplate):
             ['CODIGO MÁQUINA:', code, 'POTENCIA MOTOR:', power, severity_image],
             ['TIPO TRANSMISIÓN:', transmission, 'RPM MOTOR:', rpm, ''],
             ['MARCA MOTOR:', brand, 'NORMA:', 'ISO 10816', ''],
+            # ['MARCA MOTOR:', brand, 'NORMA:', norm, ''], # TODO remove comments
         ]
         styles = [
             ('BACKGROUND', (0, 0), (4, 2), TABLE_BLUE),
@@ -906,7 +867,7 @@ class Flowables(BaseDocTemplate):
             ('ALIGN', (0, 3), (-2, -1), 'LEFT'),
             ('ALIGN', (4, 3), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('GRID', (0, 0), (-1, -1), 0.25, black)
+            ('GRID', (0, 0), (-1, -1), 0.25, BLACK)
         ]
         table = Table(data, colWidths=[4 * cm, 4 * cm, 4 * cm, 3 * cm, 3 * cm])
         table.setStyle(TableStyle(styles))
@@ -935,7 +896,7 @@ class Flowables(BaseDocTemplate):
         styles = [
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('GRID', (0, 0), (-1, -1), 0.25, BLACK),
             ('BACKGROUND', (0, 0), (1, 0), TABLE_BLUE),
             ('FONTNAME', (0, 0), (0, 1), 'Arial-Bold'),
         ]
@@ -959,7 +920,9 @@ class Flowables(BaseDocTemplate):
         """
 
         return Paragraph(
-            'LECTURAS REGISTRADAS (@ptitude - SKF)', style=STANDARD_CENTER)
+            'LECTURAS REGISTRADAS (@ptitude - SKF)',
+            style=STANDARD_CENTER
+        )
 
     @staticmethod
     def create_analysis_table(analysis, recomendation):
@@ -1018,7 +981,7 @@ class Flowables(BaseDocTemplate):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('BACKGROUND', (0, 0), (0, 0), TABLE_BLUE),
-            ('GRID', (0, 0), (-1, -1), 0.25, black),
+            ('GRID', (0, 0), (-1, -1), 0.25, BLACK),
             ('FONTNAME', (0, 0), (0, 0), 'Arial-Bold'),
             ('NOSPLIT', (0, 0), (-1, -1))
         ]
@@ -1027,37 +990,40 @@ class Flowables(BaseDocTemplate):
         return table
 
     @staticmethod
-    def create_tendendy_title():
+    def create_overalls_title():
         """
         create a paragraph flowable to
         be used as a title for the
-        tendency graphs.
+        overalls graphs.
         """
 
         return Paragraph(
             'GRAFICAS TENDENCIAS (En el Tiempo)',
-            style=STANDARD_CENTER)
+            style=STANDARD_CENTER
+        )
 
     @staticmethod
-    def create_espectra_title():
+    def create_spectra_title():
         """
         create a paragraph flowable to
         be used as a title for the
-        tendency graphs.
+        spectra graphs.
         """
 
         return Paragraph(
             'GRAFICAS ESPECTROS',
-            style=STANDARD_CENTER)
+            style=STANDARD_CENTER
+        )
 
     @staticmethod
     def create_time_signal_title():
         """
         create a paragraph flowable to
         be used as a title for the
-        tendency graphs.
+        time signal graphs.
         """
 
         return Paragraph(
             'GRAFICAS SEÑAL EN EL TIEMPO',
-            style=STANDARD_CENTER)
+            style=STANDARD_CENTER
+        )

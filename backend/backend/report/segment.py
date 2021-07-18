@@ -1,4 +1,4 @@
-from .flowables import STANDARD, BLACK_BOLD_CENTER, LEVEL_ONE, LEVEL_TWO, ADMIN_REP
+from .constants import STANDARD, BLACK_BOLD_CENTER, LEVEL_ONE, LEVEL_TWO, ADMIN_REPORT
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak, Image, KeepTogether
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.units import cm
@@ -63,7 +63,7 @@ class Segment(Graphs):
         para_one = self.create_second_letter_paragraph_one()
         bullets_one = self.create_second_letter_bullet_one()
         bullets_two = self.create_second_letter_bullet_two()
-        para_two = Paragraph('Ejemplo:', style=ADMIN_REP)
+        para_two = Paragraph('Ejemplo:', style=ADMIN_REPORT)
         diagram_one = self.create_letter_two_diagram_one()
         bullets_three = self.create_second_letter_bullet_three()
         diagram_two = self.create_second_letter_diagram_two()
@@ -120,10 +120,13 @@ class Segment(Graphs):
         """
 
         title_one = self.create_iso_letter_title(
-            '<u>Tabla N. 1.</u> Rangos de severidad vibratoria para máquinas ISO 10816-1. ')
+            '<u>Tabla N. 1.</u> Rangos de severidad \
+            vibratoria para máquinas ISO 10816-1. '
+        )
         diagram_three = self.create_iso_letter_table()
         title_two = self.create_iso_letter_title(
-            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>')
+            '<u>TIPO DE MÁQUINAS (entre 10 y 200 rev/s)</u>'
+        )
         especifications_one = self.create_iso_letter_especifications_one()
         title_three = self.create_iso_letter_title(
             '<u>CALIDAD DE LA VIBRACIÓN</u>')
@@ -167,13 +170,13 @@ class Segment(Graphs):
         table_title = self.create_table_title()
         table_title.keepWithNext = True
         table = self.create_table_graph(query_instance)
-        tendency_title = self.create_tendendy_title()
-        tendency_title.keepWithNext = True
+        overalls_title = self.create_overalls_title()
+        overalls_title.keepWithNext = True
         # TODO check if queryset contains V
-        graph_one = self.create_tendency_graph(query_instance, 'V')
+        graph_one = self.create_overalls_graph(query_instance, 'V')
         table_one = self.graph_table('MOTOR (Velocidad)', graph_one)
-        graph_two = self.create_tendency_graph(query_instance, 'A')
-        table_two = self.graph_table('MOTOR (Aceleracion)', graph_two)
+        graph_two = self.create_overalls_graph(query_instance, 'A')
+        table_two = self.graph_table('MOTOR (Aceleración)', graph_two)
 
         ########## TODO NEEDS DEBUGGING ##############
         flowables = [
@@ -182,7 +185,7 @@ class Segment(Graphs):
                  table]),
             self.spacer_two,
             KeepTogether(
-                [tendency_title,
+                [overalls_title,
                  table_one]),
             self.spacer_one,
             KeepTogether(
@@ -204,12 +207,12 @@ class Segment(Graphs):
         title = self.create_measurement_title_entry(
             query_instance.machine.name.upper())
         diagram = self.pictures_table(
-            query_instance.machine.images.diagram,
-            query_instance.machine.images.image)
+            query_instance.machine.diagram,
+            query_instance.machine.image)
         graphs = self.add_graphs(query_instance)
         analysis = self.create_analysis_table(
             query_instance.analysis,
-            query_instance.recomendation)
+            query_instance.diagnostic)
 
         self.story += [
             especifications,

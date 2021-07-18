@@ -1,7 +1,7 @@
 from reportlab.platypus import Paragraph, NextPageTemplate, Spacer, PageBreak
-from .flowables import STANDARD_CENTER
+from .constants import STANDARD_CENTER
 from .segment import Segment
-from backend.models import VibroUser, Measurement
+from backend.models import VibroUser, Measurement, Values
 
 
 class Report(Segment):
@@ -63,8 +63,7 @@ class Report(Segment):
             style = flowable.style.name
             page = str(self.page)
             if style == 'Table of contents':
-                self.notify('TOCEntry', (0, text.upper(),
-                                         self.page, page))
+                self.notify('TOCEntry', (0, text.upper(), self.page, page))
             elif style == 'INFORME ADMINISTRATIVO':
                 self.notify(
                     'TOCEntry', (0, style, self.page, page))
@@ -111,8 +110,9 @@ class Report(Segment):
 #         return self
 
 
-# user = VibroUser.objects.filter(username='juliana').first()
+user = VibroUser.objects.filter(username='Sebastian').first()
 
-# queryset = Measurement.objects.filter(severity='green')
-
-# Report('test.pdf', queryset, user).build_doc()
+queryset = Measurement.objects.filter(id=1)
+# print("here", queryset.first().vals.all())
+# print(Values.objects.filter(measurement=queryset.first()))
+Report('test.pdf', queryset, user).build_doc()

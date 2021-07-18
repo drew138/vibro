@@ -8,6 +8,7 @@ from reportlab.lib.units import cm
 import matplotlib.pyplot as plt
 from io import BytesIO
 import datetime
+from collections import defaultdict
 
 
 class Graphs(Flowables):
@@ -38,13 +39,15 @@ class Graphs(Flowables):
     def retrieve_measurements(self, query_instance):
         """
         retrieve queryset of all 'pred'
-        measurements for a given machiine
-        ordered by date.
+        measurements for a given machine
+        ordered by date, up to a given date.
         """
 
         return custom_models.Measurement.objects.filter(
             machine=query_instance.machine,
-            measurement_type='pred').order_by('date__date')
+            service="predictivo",
+            measurement_type='vibración',
+            date__lte=query_instance.date).order_by('-date')
 
     def format_table_data(self, measurements, title):
         """
@@ -58,63 +61,55 @@ class Graphs(Flowables):
         """
 
         # TODO check if its only V and A
-        points = ((measurement.points.filter(point_type__in=['A', 'V']),
-                   measurement.date.date.strftime('%d/%m/%Y')) for measurement in measurements[:2])
-        data = {'dates': []}
-        keys = set()
-        for point_generator, date in points:
-            data['dates'].append(date)
-            for point in point_generator:
-                key = f'{point.number}{point.position}{point.point_type}'
-                if key in keys:
-                    data[key][date] = point.tendency.value
-                else:
-                    data[key] = {date: point.tendency.value}
-                    keys.add(key)
+        table_measurements = measurements[:2].values_list("id", "date")
+        has_two_measurements = len(table_measurements) == 2
+        current_date = table_measurements[0][1] if has_two_measurements else "N/A"
+        previous_date = table_measurements[1][1] if has_two_measurements else "N/A"
 
-        try:
-            previous_date = data['dates'][1]
-        except IndexError:
-            previous_date = 'N/A'
-        current_date = data['dates'][0]
-        rows = [[title, '', '', '', ''],
-                [
-            self.create_graph_table_title('Nombre de<br/>PUNTO'),
-            self.create_graph_table_title('Unidades'),
-            self.create_graph_table_title(
-                f'Valor Anterior<br/>{previous_date}'),
-            self.create_graph_table_title(f'Últ. Valor<br/>{current_date}'),
-            self.create_graph_table_title('% de Cambio')
-        ]]
-        # format data dictionary to 2d list rows
-        for key in data.keys():
-            if key != 'dates':
-                if key.endswith('V'):
-                    units = 'mm/s'
-                else:
-                    units = 'g'
-                try:
-                    previous_value = data[key][previous_date]
-                except KeyError:
-                    previous_value = '--'
-                try:
-                    current_value = data[key][current_date]
-                except KeyError:
-                    current_value = '--'
-                if (previous_value == '--') or (current_value == '--'):
-                    change = 'N/A'
-                else:
-                    percentage = (current_value - previous_value) * \
-                        100 / previous_value
-                    change = round(percentage, 2)
-                row = [
-                    key,
-                    units,
-                    previous_value,
-                    current_value,
-                    change
-                ]
-                rows.append(row)
+        rows = [
+            [title, '', '', '', ''],
+            [
+                self.create_graph_table_title('Nombre de<br/>PUNTO'),
+                self.create_graph_table_title('Unidades'),
+                self.create_graph_table_title(
+                    f'Valor Anterior<br/>{previous_date}'),
+                self.create_graph_table_title(
+                    f'Últ. Valor<br/>{current_date}'),
+                self.create_graph_table_title('% de Cambio')
+            ]
+        ]
+        if not table_measurements:
+            return rows
+        points_map = defaultdict(list)
+        point_query_list = (
+            "point__position",
+            "point__direction",
+            "point__point_type",
+            "overall"
+        )
+        for pos, dir, type, overall in custom_models.Values.objects.filter(
+                measurement__id=table_measurements[0][0],
+                point__point_type__in=["A", "V"]).values_list(*point_query_list):
+            points_map[f"{pos}{dir}{type}"].append(overall)
+
+        if len(table_measurements) == 2:
+            for pos, dir, type, overall in custom_models.Values.objects.filter(
+                    measurement__id=table_measurements[1][0],
+                    point__point_type__in=["A", "V"]).values_list(*point_query_list):
+                point_name = f"{pos}{dir}{type}"
+                if points_map[point_name]:
+                    points_map[point_name].append(overall)
+
+        for key in sorted(points_map.keys()):
+            has_two_values = len(points_map[key]) == 2
+            units = "mms" if key.endswith("V") else "g"
+            current = points_map[key][0]
+            previous = points_map[key][1] if has_two_values else "--"
+            change = round(
+                ((current - previous) / previous) * 100,
+                2) if has_two_values else "N/A"
+            rows.append([key, units, previous, current, change])
+
         return rows
 
     def create_row_colors(self, rows):
@@ -129,14 +124,15 @@ class Graphs(Flowables):
                 continue
             elif index % 2:
                 colors.append(
-                    ('BACKGROUND',
-                     (0, index),
-                     (4, index),
-                     Color(
-                         red=220/255,
-                         green=230/255,
-                         blue=241)
-                     )
+                    (
+                        'BACKGROUND',
+                        (0, index),
+                        (4, index),
+                        Color(
+                            red=220/255,
+                            green=230/255,
+                            blue=241)
+                    )
                 )
         return colors
 
@@ -150,7 +146,7 @@ class Graphs(Flowables):
 
         measurements = self.retrieve_measurements(query_instance)
         # TODO confirm title
-        title = f'{query_instance.machine.machine_type} {query_instance.machine.name}'.upper()
+        title = query_instance.machine.name.upper()
         rows = self.format_table_data(measurements, title)
 
         styles = [
@@ -169,11 +165,11 @@ class Graphs(Flowables):
         table.setStyle(TableStyle(styles))
         return table
 
-    def format_tendency_data(self, measurements, position):
+    def format_overalls_data(self, measurements, point_type):
         """
         abstract data from measurements models
         generators and format it to be consumed
-        by create_tendency_graph method.
+        by create_overalls_graph method.
 
         Returns a dictionary populated with data
         in the format:
@@ -181,35 +177,44 @@ class Graphs(Flowables):
         {key: {values: [v1..vn], dates: [d1..dn]}}
         """
 
-        points = ((measurement.points.filter(point_type=position),
-                   measurement.date.date) for measurement in measurements[:10])
+        values_queried_fields = (
+            "point__position",
+            "point__direction",
+            "point__point_type",
+            "overall"
+        )
+        values = (
+            (
+                measurement.vals.all().filter(point__point_type=point_type)
+                .values_list(*values_queried_fields), measurement.date
+            )
+            for measurement in measurements[:10])
         data = {}
         keys = set()
-        for point_generator, date in points:
-            for point in point_generator:
-                key = f'{point.number}{point.position}{point.point_type}'
+
+        for values_generator, date in values:
+            for position, direction, point_type, overall in values_generator:
+                key = f'{position}{direction}{point_type}'
                 if key in keys:
-                    data[key]['values'].append(point.tendency.value)
+                    data[key]['values'].append(overall)
                     data[key]['dates'].append(date)
                 else:
                     data[key] = {
-                        'values': [point.tendency.value],
+                        'values': [overall],
                         'dates': [date]
                     }
                     keys.add(key)
         return data
 
-    def create_tendency_graph(self, query_instance, position):
+    def create_overalls_graph(self, query_instance, position):
         """
-        create chart graph of tendency
+        create chart graph of overalls
         values for vel or acc.
 
         Returns an image in bytes format.
         """
-
         measurements = self.retrieve_measurements(query_instance)
-        data = self.format_tendency_data(measurements, position)
-
+        data = self.format_overalls_data(measurements, position)
         _, ax = plt.subplots(figsize=(10, 3.5))
         for index, key in enumerate(data.keys()):
             ax.plot_date(
@@ -227,10 +232,8 @@ class Graphs(Flowables):
 
         date_format = mpl_dates.DateFormatter('%d/%m/%Y')
         # TODO title needs review
-        ax.set_title(
-            f"""Tendencia\n{query_instance.machine.machine_type}
-            {query_instance.machine.name}, Canal X""")
-        ax.xaxis.set_major_formatter(date_format)  # set format to x  axis
+        ax.set_title(f"""Tendencia\n{query_instance.machine.name}, Canal X""")
+        ax.xaxis.set_major_formatter(date_format)  # set format to x axis
         ax.xaxis_date()
         ax.set_xlabel('Fecha', labelpad=5)
         ax.set_ylabel(units)
@@ -267,12 +270,7 @@ class Graphs(Flowables):
         label = None
         time = None
         values = None
-
-        if position == 'V':
-            units = 'mm/s - Pico'
-        else:
-            units = 'g - RMS'
-
+        units = "mm/s - Pico" if position == 'V' else 'g - RMS'
         _, ax = plt.subplots(figsize=(10, 3.5))
         ax.plot_date(
             time,
